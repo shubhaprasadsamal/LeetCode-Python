@@ -1,0 +1,263 @@
+953. Verifying an Alien Dictionary
+
+In an alien language, surprisingly they also use english lowercase letters, but possibly in a different order. The order of the alphabet is some permutation of lowercase letters.
+
+Given a sequence of words written in the alien language, and the order of the alphabet, return true if and only if the given words are sorted lexicographicaly in this alien language.
+
+
+Example 1:
+
+Input: words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"
+Output: true
+Explanation: As 'h' comes before 'l' in this language, then the sequence is sorted.
+Example 2:
+
+Input: words = ["word","world","row"], order = "worldabcefghijkmnpqstuvxyz"
+Output: false
+Explanation: As 'd' comes after 'l' in this language, then words[0] > words[1], hence the sequence is unsorted.
+Example 3:
+
+Input: words = ["apple","app"], order = "abcdefghijklmnopqrstuvwxyz"
+Output: false
+Explanation: The first three characters "app" match, and the second string is shorter (in size.) According to lexicographical rules "apple" > "app", because 'l' > 'Ø', where 'Ø' is defined as the blank character which is less than any other character (More info).
+
+Solution:
+class Solution:
+    def isAlienSorted(self, words: List[str], order: str) -> bool:
+        
+        diction = {}    # Create an empty Dictionary for creating HASH Table
+        for x,y in enumerate(order):
+            diction[y] = x
+        
+        for i in range(len(words)-1):
+            word1 = words[i]
+            word2 = words[i+1]
+            
+            for x in range(min(len(word1),len(word2))):
+                if word1[x] != word2[x]:
+                    if diction[word1[x]] > diction[word2[x]]:
+                        return False
+                    break
+                else:
+                    if len(word1) > len(word2):
+                        return False
+        return True
+        
+680. Valid Palindrome II
+Given a non-empty string s, you may delete at most one character. Judge whether you can make it a palindrome.
+
+Example 1:
+Input: "aba"
+Output: True
+Example 2:
+Input: "abca"
+Output: True
+Explanation: You could delete the character 'c'.
+
+Solution:
+
+Time Complexity O(n2)
+Here, we loop through the string and find the sub strings to see if they satisfy pallindrum
+
+class Solution:
+    def validPalindrome(self, s: str) -> bool:
+        for i in range(len(s)):  # both len(s) and len(s-1) is working?
+            T = s[:i]+s[i+1:]
+            if T == T[::-1]:
+                return True
+        
+        return s == s[::-1]
+        
+Less Time Complexity:
+Here, we check two adjacent letter and then keep increamenting the left side and decreamenting the right side to see if it's form an palidrum
+
+class Solution:
+    def validPalindrome(self, s: str) -> bool:
+        l = 0
+        r = len(s)-1
+        
+        while l < r:
+            if s[l] == s[r]:
+                l += 1
+                r -= 1
+                
+                if s[l:r] == s[l:r][::-1] or s[l+1:r+1] == s[l+1:r+1][::-1]:
+                    return True
+                return True
+                
+                
+14. Longest Common Prefix
+
+Write a function to find the longest common prefix string amongst an array of strings.
+
+If there is no common prefix, return an empty string "".
+
+ 
+
+Example 1:
+
+Input: strs = ["flower","flow","flight"]
+Output: "fl"
+Example 2:
+
+Input: strs = ["dog","racecar","car"]
+Output: ""
+Explanation: There is no common prefix among the input strings.
+
+
+Solution:
+class Solution:
+    def longestCommonPrefix(self, strs: List[str]) -> str:
+        if len(strs) == 0:
+            return ""
+        
+        minlength = len(strs[0]) # Get the lingth of the first String and then compare to #find the min length
+        for x in range(len(strs)):
+            minlength = min(len(strs[x]),minlength) # Keep updating the minimum length
+            
+        j = 0
+        output = ""
+        while j < minlength:
+            fisrtchar = strs[0][j]
+            for i in range(1,len(strs)):
+                if fisrtchar != strs[i][j]:
+                    return output
+                    
+            output += fisrtchar
+            j+=1
+        return output
+            
+                        
+415. Add Strings
+Given two non-negative integers num1 and num2 represented as string, return the sum of num1 and num2.
+
+Note:
+
+The length of both num1 and num2 is < 5100.
+Both num1 and num2 contains only digits 0-9.
+Both num1 and num2 does not contain any leading zero.
+You must not use any built-in BigInteger library or convert the inputs to integer directly.
+
+
+Solution:
+ord() will return a integer value representing the unicode code of a specified character
+
+class Solution:
+    def addStrings(self, num1: str, num2: str) -> str:
+        len1 = len(num1)-1
+        len2 = len(num2)-1
+        carry = 0
+        res = ""
+        while len1>=0 or len2 >= 0 or carry>0:
+            if len1 >= 0:
+                carry+=(ord(num1[len1])-ord('0'))
+                len1-=1
+            if len2 >= 0:
+                carry+=(ord(num2[len2])-ord('0'))
+                len2-=1
+            res = res+str(carry%10)
+            print(res)
+            carry = carry/10
+            
+        return res[::-1]
+        
+
+67. Add Binary
+Given two binary strings a and b, return their sum as a binary string.
+
+Example 1:
+
+Input: a = "11", b = "1"
+Output: "100"
+Example 2:
+
+Input: a = "1010", b = "1011"
+Output: "10101"
+
+Constraints:
+
+1 <= a.length, b.length <= 104
+a and b consist only of '0' or '1' characters.
+Each string does not contain leading zeros except for the zero itself.
+
+
+
+Solution1:
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        len1 = len(a)-1
+        len2 = len(b)-1
+        carry = 0
+        res = ""
+        while len1>=0 or len2>=0 or carry>0:
+            if len1>=0:
+                carry+=(ord(a[len1])-ord('0'))
+                print(carry)
+                len1-=1
+            if len2>=0:
+                carry+=(ord(b[len2])-ord('0'))
+                len2-=1
+            res += str(carry%2)
+            carry = carry//2
+        return res[::-1]
+        
+        
+Solution2:
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        len1 = len(a)-1
+        len2 = len(b)-1
+        carry = 0
+        res = []
+        while len1>=0 or len2>=0 or carry>0:
+            if len1>=0:
+                carry+=(ord(a[len1])-ord('0'))
+                # print(carry)
+                len1-=1
+            if len2>=0:
+                carry+=(ord(b[len2])-ord('0'))
+                len2-=1
+            res.insert(0,carry%2) # Always add the char/int to the 0th position to form a sum result
+            carry = carry//2
+        return "".join(str(x) for x in res) # convert a List to String
+  
+  
+125. Valid Palindrome
+Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+Note: For the purpose of this problem, we define empty string as valid palindrome.
+
+Example 1:
+Input: "A man, a plan, a canal: Panama"
+Output: true
+Example 2:
+Input: "race a car"
+Output: false
+
+
+Solution1:
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        start = 0
+        end = len(s)-1
+        res = ""
+        
+        while start <= end:
+            if s[start].isalnum():
+                res += s[start]
+            start+=1
+        
+        resLower = res.lower()
+        
+        return resLower == resLower[::-1]
+        
+
+Solution2:
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        filteredString = filter(lambda x: x.isalnum(),s)
+        lowerString = map(lambda x: x.lower(),filteredString)
+        
+        lowerStringList = list(lowerString)
+        
+        return lowerStringList == lowerStringList[::-1]
+        
