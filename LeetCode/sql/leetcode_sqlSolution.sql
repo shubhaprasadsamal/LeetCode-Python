@@ -1279,10 +1279,18 @@ and
     d1.order_date = d2.customer_pref_delivery_date;
 
 	["d1.delivery_id", "d1.customer_id", "d1.order_date", "d1.customer_pref_delivery_date", "d2.delivery_id", "d2.customer_id", "d2.order_date", "d2.customer_pref_delivery_date"]
+		[null, 		null, 		null, 		null, 				1, 			1, 		"2019-08-01", 		"2019-08-02"],
+		[2, 		5, 		"2019-08-02", 	"2019-08-02", 			2, 			5, 		"2019-08-02", 		"2019-08-02"],
+		[3, 		1, 		"2019-08-11", 	"2019-08-11", 			3, 			1, 		"2019-08-11", 		"2019-08-11"],
+		[null, 		null, 		null, 		null, 				4, 			3, 		"2019-08-24", 		"2019-08-26"],
+		[null, 		null, 		null, 		null, 				5, 			4, 		"2019-08-21", 		"2019-08-22"],
+		[null, 		null, 		null, 		null, 				6, 			2, 		"2019-08-11", 		"2019-08-13"]
+
+	["d1.delivery_id", "d1.customer_id", "d1.order_date", "d1.customer_pref_delivery_date", "d2.delivery_id", "d2.customer_id", "d2.order_date", "d2.customer_pref_delivery_date"]
 		[null, 		    null, 		        null, 		    null, 				                1, 			            1, 		"2019-08-01", 		"2019-08-02"],
 		[2, 		    5, 		            "2019-08-02", 	"2019-08-02", 			            2, 			            5, 		"2019-08-02", 		"2019-08-02"],
 		[3, 		    1, 		            "2019-08-11", 	"2019-08-11", 			            3, 			            1, 		"2019-08-11", 		"2019-08-11"],
 		[null, 		    null, 		        null, 		    null, 				                4, 			            3, 		"2019-08-24", 		"2019-08-26"],
 		[null, 		    null, 		        null, 		    null, 				                5, 			            4, 		"2019-08-21", 		"2019-08-22"],
 		[null, 		    null, 		        null, 		    null, 				                6, 			            2, 		"2019-08-11", 		"2019-08-13"]
-		
+
