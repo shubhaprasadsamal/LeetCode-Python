@@ -791,3 +791,340 @@ WHERE
     a.student_name <> b.student_name AND
     b.student_name <> c.student_name AND
     c.student_name <> a.student_name;
+
+--1484. Group Sold Products By The Date               [Revision]
+                                                      [GROUP_CONCAT]
+--Table Activities:
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| sell_date   | date    |
+--| product     | varchar |
+--+-------------+---------+
+--There is no primary key for this table, it may contains duplicates.
+--Each row of this table contains the product name and the date it was sold in a market.
+--
+--
+--Write an SQL query to find for each date, the number of distinct products sold and their names.
+--
+--The sold-products names for each date should be sorted lexicographically.
+--
+--Return the result table ordered by sell_date.
+--
+--The query result format is in the following example.
+--
+--Activities table:
+--+------------+-------------+
+--| sell_date  | product     |
+--+------------+-------------+
+--| 2020-05-30 | Headphone   |
+--| 2020-06-01 | Pencil      |
+--| 2020-06-02 | Mask        |
+--| 2020-05-30 | Basketball  |
+--| 2020-06-01 | Bible       |
+--| 2020-06-02 | Mask        |
+--| 2020-05-30 | T-Shirt     |
+--+------------+-------------+
+--
+--Result table:
+--+------------+----------+------------------------------+
+--| sell_date  | num_sold | products                     |
+--+------------+----------+------------------------------+
+--| 2020-05-30 | 3        | Basketball,Headphone,T-shirt |
+--| 2020-06-01 | 2        | Bible,Pencil                 |
+--| 2020-06-02 | 1        | Mask                         |
+--+------------+----------+------------------------------+
+--For 2020-05-30, Sold items were (Headphone, Basketball, T-shirt), we sort them lexicographically and separate them by comma.
+--For 2020-06-01, Sold items were (Pencil, Bible), we sort them lexicographically and separate them by comma.
+--For 2020-06-02, Sold item is (Mask), we just return it.
+--
+--Solution:
+
+SELECT
+    sell_date,
+    COUNT(DISTINCT product) AS num_sold,
+    GROUP_CONCAT(DISTINCT product
+        ORDER BY product
+        SEPARATOR ',') AS products
+FROM
+    activities
+GROUP BY sell_date;
+
+--1407. Top Travellers
+--able: Users
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| name          | varchar |
+--+---------------+---------+
+--id is the primary key for this table.
+--name is the name of the user.
+--
+--
+--Table: Rides
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| user_id       | int     |
+--| distance      | int     |
+--+---------------+---------+
+--id is the primary key for this table.
+--user_id is the id of the user who travelled the distance "distance".
+--
+--
+--Write an SQL query to report the distance travelled by each user.
+--
+--Return the result table ordered by travelled_distance in descending order, if two or more users travelled the same distance, order them by their name in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Users table:
+--+------+-----------+
+--| id   | name      |
+--+------+-----------+
+--| 1    | Alice     |
+--| 2    | Bob       |
+--| 3    | Alex      |
+--| 4    | Donald    |
+--| 7    | Lee       |
+--| 13   | Jonathan  |
+--| 19   | Elvis     |
+--+------+-----------+
+--
+--Rides table:
+--+------+----------+----------+
+--| id   | user_id  | distance |
+--+------+----------+----------+
+--| 1    | 1        | 120      |
+--| 2    | 2        | 317      |
+--| 3    | 3        | 222      |
+--| 4    | 7        | 100      |
+--| 5    | 13       | 312      |
+--| 6    | 19       | 50       |
+--| 7    | 7        | 120      |
+--| 8    | 19       | 400      |
+--| 9    | 7        | 230      |
+--+------+----------+----------+
+--
+--Result table:
+--+----------+--------------------+
+--| name     | travelled_distance |
+--+----------+--------------------+
+--| Elvis    | 450                |
+--| Lee      | 450                |
+--| Bob      | 317                |
+--| Jonathan | 312                |
+--| Alex     | 222                |
+--| Alice    | 120                |
+--| Donald   | 0                  |
+--+----------+--------------------+
+--Elvis and Lee travelled 450 miles, Elvis is the top traveller as his name is alphabetically smaller than Lee.
+--Bob, Jonathan, Alex and Alice have only one ride and we just order them by the total distances of the ride.
+--Donald didn't have any rides, the distance travelled by him is 0.
+--
+--SQL Solution:
+
+SELECT
+    U.name,
+    IF(R.distance IS NOT NULL, SUM(R.distance),0) AS travelled_distance
+FROM
+    Users AS U LEFT JOIN Rides AS R
+ON
+    U.id=R.user_id
+GROUP BY
+    U.id
+ORDER BY
+    travelled_distance DESC, U.name ASC;
+
+--MS SQL Server Solution:                                 [How to remove duplicate rows with no use of DISTINCT]
+--                                                          [https://www.sqlservercentral.com/articles/eliminating-duplicate-rows-using-the-partition-by-clause]
+
+SELECT
+    distinct U.name,
+    (case when R.distance is not null then sum(R.distance) over (partition by U.id) else 0 end) as travelled_distance
+FROM
+    Users AS U LEFT JOIN Rides AS R
+ON
+    U.id=R.user_id
+ORDER BY
+    travelled_distance DESC, U.name ASC;
+
+--OR
+
+select
+    u.name,
+    isnull(sum(r.distance),0) as travelled_distance
+from
+    Users u left join Rides r
+on
+    u.id=r.user_id
+group by
+    u.name
+order by
+    travelled_distance desc, u.name;
+
+
+--1069. Product Sales Analysis II                                 [Amazon]
+--Table: Sales
+--
+--+-------------+-------+
+--| Column Name | Type  |
+--+-------------+-------+
+--| sale_id     | int   |
+--| product_id  | int   |
+--| year        | int   |
+--| quantity    | int   |
+--| price       | int   |
+--+-------------+-------+
+--sale_id is the primary key of this table.
+--product_id is a foreign key to Product table.
+--Note that the price is per unit.
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--
+--
+--Write an SQL query that reports the total quantity sold for every product id.
+--
+--The query result format is in the following example:
+--
+--Sales table:
+--+---------+------------+------+----------+-------+
+--| sale_id | product_id | year | quantity | price |
+--+---------+------------+------+----------+-------+
+--| 1       | 100        | 2008 | 10       | 5000  |
+--| 2       | 100        | 2009 | 12       | 5000  |
+--| 7       | 200        | 2011 | 15       | 9000  |
+--+---------+------------+------+----------+-------+
+--
+--Product table:
+--+------------+--------------+
+--| product_id | product_name |
+--+------------+--------------+
+--| 100        | Nokia        |
+--| 200        | Apple        |
+--| 300        | Samsung      |
+--+------------+--------------+
+--
+--Result table:
+--+--------------+----------------+
+--| product_id   | total_quantity |
+--+--------------+----------------+
+--| 100          | 22             |
+--| 200          | 15             |
+--+--------------+----------------+
+--
+--MySQL Solution:
+--
+select
+    p.product_id,sum(s.quantity) as total_quantity
+from
+    Sales s  left join Product p
+on
+    p.product_id = s.product_id
+group by
+    p.product_id
+order by 1;
+
+--MS SQL Server Solution:
+--
+SELECT
+    Product.product_id,
+    SUM(Sales.quantity) AS total_quantity
+FROM
+    Sales LEFT JOIN Product
+on
+    Sales.product_id = Product.product_id
+GROUP BY
+    Product.product_id;
+--OR
+
+select
+    p.product_id,
+    sum(s.quantity) as total_quantity
+from
+    Product p  left join Sales s
+on
+    p.product_id = s.product_id
+group by p.product_id
+having sum(s.quantity) is not null
+order by 1;
+
+
+--1565. Unique Orders and Customers Per Month
+                                                        [Left]
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| order_date    | date    |
+--| customer_id   | int     |
+--| invoice       | int     |
+--+---------------+---------+
+--order_id is the primary key for this table.
+--This table contains information about the orders made by customer_id.
+--
+--
+--Write an SQL query to find the number of unique orders and the number of unique customers with invoices > $20 for each different month.
+--
+--Return the result table sorted in any order.
+--
+--The query result format is in the following example:
+--
+--Orders
+--+----------+------------+-------------+------------+
+--| order_id | order_date | customer_id | invoice    |
+--+----------+------------+-------------+------------+
+--| 1        | 2020-09-15 | 1           | 30         |
+--| 2        | 2020-09-17 | 2           | 90         |
+--| 3        | 2020-10-06 | 3           | 20         |
+--| 4        | 2020-10-20 | 3           | 21         |
+--| 5        | 2020-11-10 | 1           | 10         |
+--| 6        | 2020-11-21 | 2           | 15         |
+--| 7        | 2020-12-01 | 4           | 55         |
+--| 8        | 2020-12-03 | 4           | 77         |
+--| 9        | 2021-01-07 | 3           | 31         |
+--| 10       | 2021-01-15 | 2           | 20         |
+--+----------+------------+-------------+------------+
+--
+--Result table:
+--+---------+-------------+----------------+
+--| month   | order_count | customer_count |
+--+---------+-------------+----------------+
+--| 2020-09 | 2           | 2              |
+--| 2020-10 | 1           | 1              |
+--| 2020-12 | 2           | 1              |
+--| 2021-01 | 1           | 1              |
+--+---------+-------------+----------------+
+--In September 2020 we have two orders from 2 different customers with invoices > $20.
+--In October 2020 we have two orders from 1 customer, and only one of the two orders has invoice > $20.
+--In November 2020 we have two orders from 2 different customers but invoices < $20, so we don't include that month.
+--In December 2020 we have two orders from 1 customer both with invoices > $20.
+--In January 2021 we have two orders from 2 different customers, but only one of them with invoice > $20.
+--
+--My SQL:
+
+select
+    left(order_date ,7) as month,
+    count(order_id) as order_count,
+    count(distinct customer_id) as customer_count
+from 
+    Orders
+where
+    invoice > 20
+group by 1;
