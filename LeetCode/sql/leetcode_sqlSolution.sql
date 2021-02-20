@@ -1123,8 +1123,165 @@ select
     left(order_date ,7) as month,
     count(order_id) as order_count,
     count(distinct customer_id) as customer_count
-from 
+from
     Orders
 where
     invoice > 20
 group by 1;
+
+
+--1251. Average Selling Price                                     [Revision]
+--Table: Prices
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| start_date    | date    |
+--| end_date      | date    |
+--| price         | int     |
+--+---------------+---------+
+--(product_id, start_date, end_date) is the primary key for this table.
+--Each row of this table indicates the price of the product_id in the period from start_date to end_date.
+--For each product_id there will be no two overlapping periods. That means there will be no two intersecting periods for the same product_id.
+--
+--
+--Table: UnitsSold
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| purchase_date | date    |
+--| units         | int     |
+--+---------------+---------+
+--There is no primary key for this table, it may contain duplicates.
+--Each row of this table indicates the date, units and product_id of each product sold.
+--
+--
+--Write an SQL query to find the average selling price for each product.
+--
+--average_price should be rounded to 2 decimal places.
+--
+--The query result format is in the following example:
+--
+--Prices table:
+--+------------+------------+------------+--------+
+--| product_id | start_date | end_date   | price  |
+--+------------+------------+------------+--------+
+--| 1          | 2019-02-17 | 2019-02-28 | 5      |
+--| 1          | 2019-03-01 | 2019-03-22 | 20     |
+--| 2          | 2019-02-01 | 2019-02-20 | 15     |
+--| 2          | 2019-02-21 | 2019-03-31 | 30     |
+--+------------+------------+------------+--------+
+--
+--UnitsSold table:
+--+------------+---------------+-------+
+--| product_id | purchase_date | units |
+--+------------+---------------+-------+
+--| 1          | 2019-02-25    | 100   |
+--| 1          | 2019-03-01    | 15    |
+--| 2          | 2019-02-10    | 200   |
+--| 2          | 2019-03-22    | 30    |
+--+------------+---------------+-------+
+--
+--Result table:
+--+------------+---------------+
+--| product_id | average_price |
+--+------------+---------------+
+--| 1          | 6.96          |
+--| 2          | 16.96         |
+--+------------+---------------+
+--Average selling price = Total Price of Product / Number of products sold.
+--Average selling price for product 1 = ((100 * 5) + (15 * 20)) / 115 = 6.96
+--Average selling price for product 2 = ((200 * 15) + (30 * 30)) / 230 = 16.96
+--
+--MySQL:
+
+select
+    p.product_id,
+    round((sum(u.units*p.price)/sum(u.units)),2) as average_price
+from
+    Prices p,UnitsSold u
+where
+    p.product_id = u.product_id
+    and u.purchase_date between p.start_date and p.end_date
+group by 1
+order by 1;
+
+
+1173. Immediate Food Delivery I                                 [Revision]
+Table: Delivery
+
++-----------------------------+---------+
+| Column Name                 | Type    |
++-----------------------------+---------+
+| delivery_id                 | int     |
+| customer_id                 | int     |
+| order_date                  | date    |
+| customer_pref_delivery_date | date    |
++-----------------------------+---------+
+delivery_id is the primary key of this table.
+The table holds information about food delivery to customers that make orders at some date and specify a preferred delivery date (on the same order date or after it).
+
+
+If the preferred delivery date of the customer is the same as the order date then the order is called immediate otherwise it's called scheduled.
+
+Write an SQL query to find the percentage of immediate orders in the table, rounded to 2 decimal places.
+
+The query result format is in the following example:
+
+Delivery table:
++-------------+-------------+------------+-----------------------------+
+| delivery_id | customer_id | order_date | customer_pref_delivery_date |
++-------------+-------------+------------+-----------------------------+
+| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+| 2           | 5           | 2019-08-02 | 2019-08-02                  |
+| 3           | 1           | 2019-08-11 | 2019-08-11                  |
+| 4           | 3           | 2019-08-24 | 2019-08-26                  |
+| 5           | 4           | 2019-08-21 | 2019-08-22                  |
+| 6           | 2           | 2019-08-11 | 2019-08-13                  |
++-------------+-------------+------------+-----------------------------+
+
+Result table:
++----------------------+
+| immediate_percentage |
++----------------------+
+| 33.33                |
++----------------------+
+The orders with delivery id 2 and 3 are immediate while the others are scheduled.
+
+MySQL:
+select
+    round((count(d1.delivery_id)/count(d2.delivery_id))*100,2) immediate_percentage
+from
+    Delivery d1 right outer join Delivery d2
+on
+    d1.delivery_id = d2.delivery_id
+and
+    d1.order_date = d2.customer_pref_delivery_date;
+
+Explain:
+select
+    d1.delivery_id,
+    d1.customer_id,
+    d1.order_date,
+    d1.customer_pref_delivery_date,
+    d2.delivery_id,
+    d2.customer_id,
+    d2.order_date,
+    d2.customer_pref_delivery_date
+from
+    Delivery d1 right outer join Delivery d2
+on
+    d1.delivery_id = d2.delivery_id
+and
+    d1.order_date = d2.customer_pref_delivery_date;
+
+	["d1.delivery_id", "d1.customer_id", "d1.order_date", "d1.customer_pref_delivery_date", "d2.delivery_id", "d2.customer_id", "d2.order_date", "d2.customer_pref_delivery_date"]
+		[null, 		    null, 		        null, 		    null, 				                1, 			            1, 		"2019-08-01", 		"2019-08-02"],
+		[2, 		    5, 		            "2019-08-02", 	"2019-08-02", 			            2, 			            5, 		"2019-08-02", 		"2019-08-02"],
+		[3, 		    1, 		            "2019-08-11", 	"2019-08-11", 			            3, 			            1, 		"2019-08-11", 		"2019-08-11"],
+		[null, 		    null, 		        null, 		    null, 				                4, 			            3, 		"2019-08-24", 		"2019-08-26"],
+		[null, 		    null, 		        null, 		    null, 				                5, 			            4, 		"2019-08-21", 		"2019-08-22"],
+		[null, 		    null, 		        null, 		    null, 				                6, 			            2, 		"2019-08-11", 		"2019-08-13"]
