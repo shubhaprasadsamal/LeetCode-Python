@@ -1123,8 +1123,517 @@ select
     left(order_date ,7) as month,
     count(order_id) as order_count,
     count(distinct customer_id) as customer_count
-from 
+from
     Orders
 where
     invoice > 20
 group by 1;
+
+
+--1251. Average Selling Price                                     [Revision]
+--Table: Prices
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| start_date    | date    |
+--| end_date      | date    |
+--| price         | int     |
+--+---------------+---------+
+--(product_id, start_date, end_date) is the primary key for this table.
+--Each row of this table indicates the price of the product_id in the period from start_date to end_date.
+--For each product_id there will be no two overlapping periods. That means there will be no two intersecting periods for the same product_id.
+--
+--
+--Table: UnitsSold
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| purchase_date | date    |
+--| units         | int     |
+--+---------------+---------+
+--There is no primary key for this table, it may contain duplicates.
+--Each row of this table indicates the date, units and product_id of each product sold.
+--
+--
+--Write an SQL query to find the average selling price for each product.
+--
+--average_price should be rounded to 2 decimal places.
+--
+--The query result format is in the following example:
+--
+--Prices table:
+--+------------+------------+------------+--------+
+--| product_id | start_date | end_date   | price  |
+--+------------+------------+------------+--------+
+--| 1          | 2019-02-17 | 2019-02-28 | 5      |
+--| 1          | 2019-03-01 | 2019-03-22 | 20     |
+--| 2          | 2019-02-01 | 2019-02-20 | 15     |
+--| 2          | 2019-02-21 | 2019-03-31 | 30     |
+--+------------+------------+------------+--------+
+--
+--UnitsSold table:
+--+------------+---------------+-------+
+--| product_id | purchase_date | units |
+--+------------+---------------+-------+
+--| 1          | 2019-02-25    | 100   |
+--| 1          | 2019-03-01    | 15    |
+--| 2          | 2019-02-10    | 200   |
+--| 2          | 2019-03-22    | 30    |
+--+------------+---------------+-------+
+--
+--Result table:
+--+------------+---------------+
+--| product_id | average_price |
+--+------------+---------------+
+--| 1          | 6.96          |
+--| 2          | 16.96         |
+--+------------+---------------+
+--Average selling price = Total Price of Product / Number of products sold.
+--Average selling price for product 1 = ((100 * 5) + (15 * 20)) / 115 = 6.96
+--Average selling price for product 2 = ((200 * 15) + (30 * 30)) / 230 = 16.96
+--
+--MySQL:
+
+select
+    p.product_id,
+    round((sum(u.units*p.price)/sum(u.units)),2) as average_price
+from
+    Prices p,UnitsSold u
+where
+    p.product_id = u.product_id
+    and u.purchase_date between p.start_date and p.end_date
+group by 1
+order by 1;
+
+
+--1173. Immediate Food Delivery I                                 [Revision]
+--Table: Delivery
+--
+--+-----------------------------+---------+
+--| Column Name                 | Type    |
+--+-----------------------------+---------+
+--| delivery_id                 | int     |
+--| customer_id                 | int     |
+--| order_date                  | date    |
+--| customer_pref_delivery_date | date    |
+--+-----------------------------+---------+
+--delivery_id is the primary key of this table.
+--The table holds information about food delivery to customers that make orders at some date and specify a preferred delivery date (on the same order date or after it).
+--
+--
+--If the preferred delivery date of the customer is the same as the order date then the order is called immediate otherwise it's called scheduled.
+--
+--Write an SQL query to find the percentage of immediate orders in the table, rounded to 2 decimal places.
+--
+--The query result format is in the following example:
+--
+--Delivery table:
+--+-------------+-------------+------------+-----------------------------+
+--| delivery_id | customer_id | order_date | customer_pref_delivery_date |
+--+-------------+-------------+------------+-----------------------------+
+--| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+--| 2           | 5           | 2019-08-02 | 2019-08-02                  |
+--| 3           | 1           | 2019-08-11 | 2019-08-11                  |
+--| 4           | 3           | 2019-08-24 | 2019-08-26                  |
+--| 5           | 4           | 2019-08-21 | 2019-08-22                  |
+--| 6           | 2           | 2019-08-11 | 2019-08-13                  |
+--+-------------+-------------+------------+-----------------------------+
+--
+--Result table:
+--+----------------------+
+--| immediate_percentage |
+--+----------------------+
+--| 33.33                |
+--+----------------------+
+--The orders with delivery id 2 and 3 are immediate while the others are scheduled.
+--
+--MySQL:
+
+select
+    round((count(d1.delivery_id)/count(d2.delivery_id))*100,2) immediate_percentage
+from
+    Delivery d1 right outer join Delivery d2
+on
+    d1.delivery_id = d2.delivery_id
+and
+    d1.order_date = d2.customer_pref_delivery_date;
+
+--Explain on Right Join:
+select
+    d1.delivery_id,
+    d1.customer_id,
+    d1.order_date,
+    d1.customer_pref_delivery_date,
+    d2.delivery_id,
+    d2.customer_id,
+    d2.order_date,
+    d2.customer_pref_delivery_date
+from
+    Delivery d1 right outer join Delivery d2
+on
+    d1.delivery_id = d2.delivery_id
+and
+    d1.order_date = d2.customer_pref_delivery_date;
+
+	["d1.delivery_id", "d1.customer_id", "d1.order_date", "d1.customer_pref_delivery_date", "d2.delivery_id", "d2.customer_id", "d2.order_date", "d2.customer_pref_delivery_date"]
+		[null, 		null, 		null, 		null, 				1, 			1, 		"2019-08-01", 		"2019-08-02"],
+		[2, 		5, 		"2019-08-02", 	"2019-08-02", 			2, 			5, 		"2019-08-02", 		"2019-08-02"],
+		[3, 		1, 		"2019-08-11", 	"2019-08-11", 			3, 			1, 		"2019-08-11", 		"2019-08-11"],
+		[null, 		null, 		null, 		null, 				4, 			3, 		"2019-08-24", 		"2019-08-26"],
+		[null, 		null, 		null, 		null, 				5, 			4, 		"2019-08-21", 		"2019-08-22"],
+		[null, 		null, 		null, 		null, 				6, 			2, 		"2019-08-11", 		"2019-08-13"]
+
+--1068. Product Sales Analysis I              [Amazon]
+--Table: Sales
+--
+--+-------------+-------+
+--| Column Name | Type  |
+--+-------------+-------+
+--| sale_id     | int   |
+--| product_id  | int   |
+--| year        | int   |
+--| quantity    | int   |
+--| price       | int   |
+--+-------------+-------+
+--(sale_id, year) is the primary key of this table.
+--product_id is a foreign key to Product table.
+--Note that the price is per unit.
+--
+--
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--
+--
+--Write an SQL query that reports the product_name, year, and price for each sale_id in the Sales table.
+--
+--Return the resulting table in any order.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Sales table:
+--+---------+------------+------+----------+-------+
+--| sale_id | product_id | year | quantity | price |
+--+---------+------------+------+----------+-------+
+--| 1       | 100        | 2008 | 10       | 5000  |
+--| 2       | 100        | 2009 | 12       | 5000  |
+--| 7       | 200        | 2011 | 15       | 9000  |
+--+---------+------------+------+----------+-------+
+--
+--Product table:
+--+------------+--------------+
+--| product_id | product_name |
+--+------------+--------------+
+--| 100        | Nokia        |
+--| 200        | Apple        |
+--| 300        | Samsung      |
+--+------------+--------------+
+--
+--Result table:
+--+--------------+-------+-------+
+--| product_name | year  | price |
+--+--------------+-------+-------+
+--| Nokia        | 2008  | 5000  |
+--| Nokia        | 2009  | 5000  |
+--| Apple        | 2011  | 9000  |
+--+--------------+-------+-------+
+--From sale_id = 1, we can conclude that Nokia was sold for 5000 in the year 2008.
+--From sale_id = 2, we can conclude that Nokia was sold for 5000 in the year 2009.
+--From sale_id = 7, we can conclude that Apple was sold for 9000 in the year 2011.
+--
+--MySQL:
+select
+    p.product_name,
+    s.year,
+    s.price
+from
+    Sales s join Product p
+on
+    s.product_id = p.product_id;
+
+--1179. Reformat Department Table                     [Amazon]
+                                                      [Pivot way: Explore]
+--Table: Department
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| revenue       | int     |
+--| month         | varchar |
+--+---------------+---------+
+--(id, month) is the primary key of this table.
+--The table has information about the revenue of each department per month.
+--The month has values in ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].
+--
+--
+--Write an SQL query to reformat the table such that there is a department id column and a revenue column for each month.
+--
+--The query result format is in the following example:
+--
+--Department table:
+--+------+---------+-------+
+--| id   | revenue | month |
+--+------+---------+-------+
+--| 1    | 8000    | Jan   |
+--| 2    | 9000    | Jan   |
+--| 3    | 10000   | Feb   |
+--| 1    | 7000    | Feb   |
+--| 1    | 6000    | Mar   |
+--+------+---------+-------+
+--
+--Result table:
+--+------+-------------+-------------+-------------+-----+-------------+
+--| id   | Jan_Revenue | Feb_Revenue | Mar_Revenue | ... | Dec_Revenue |
+--+------+-------------+-------------+-------------+-----+-------------+
+--| 1    | 8000        | 7000        | 6000        | ... | null        |
+--| 2    | 9000        | null        | null        | ... | null        |
+--| 3    | null        | 10000       | null        | ... | null        |
+--+------+-------------+-------------+-------------+-----+-------------+
+--
+--Note that the result table has 13 columns (1 for the department id + 12 for the months).
+
+--MySQL:
+
+select
+id,
+SUM(CASE WHEN month = 'Jan' then revenue end) Jan_Revenue,
+SUM(CASE WHEN month = 'Feb' then revenue end) Feb_Revenue,
+SUM(CASE WHEN month = 'Mar' then revenue end) Mar_Revenue,
+SUM(CASE WHEN month = 'Apr' then revenue end) Apr_Revenue,
+SUM(CASE WHEN month = 'May' then revenue end) May_Revenue,
+SUM(CASE WHEN month = 'Jun' then revenue end) Jun_Revenue,
+SUM(CASE WHEN month = 'Jul' then revenue end) Jul_Revenue,
+SUM(CASE WHEN month = 'Aug' then revenue end) Aug_Revenue,
+SUM(CASE WHEN month = 'Sep' then revenue end) Sep_Revenue,
+SUM(CASE WHEN month = 'Oct' then revenue end) Oct_Revenue,
+SUM(CASE WHEN month = 'Nov' then revenue end) Nov_Revenue,
+SUM(CASE WHEN month = 'Dec' then revenue end) Dec_Revenue
+from Department
+group by id;
+
+--511. Game Play Analysis I
+--Table: Activity
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| player_id    | int     |
+--| device_id    | int     |
+--| event_date   | date    |
+--| games_played | int     |
+--+--------------+---------+
+--(player_id, event_date) is the primary key of this table.
+--This table shows the activity of players of some game.
+--Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
+--
+--
+--Write an SQL query that reports the first login date for each player.
+--
+--The query result format is in the following example:
+--
+--Activity table:
+--+-----------+-----------+------------+--------------+
+--| player_id | device_id | event_date | games_played |
+--+-----------+-----------+------------+--------------+
+--| 1         | 2         | 2016-03-01 | 5            |
+--| 1         | 2         | 2016-05-02 | 6            |
+--| 2         | 3         | 2017-06-25 | 1            |
+--| 3         | 1         | 2016-03-02 | 0            |
+--| 3         | 4         | 2018-07-03 | 5            |
+--+-----------+-----------+------------+--------------+
+--
+--Result table:
+--+-----------+-------------+
+--| player_id | first_login |
+--+-----------+-------------+
+--| 1         | 2016-03-01  |
+--| 2         | 2017-06-25  |
+--| 3         | 2016-03-02  |
+--+-----------+-------------+
+--
+--MySQL:
+select
+    player_id,
+    min(event_date) as first_login
+from
+    Activity
+group by
+    player_id
+order by
+    player_id;
+
+--613. Shortest Distance in a Line
+--SQL Schema
+--Table point holds the x coordinate of some points on x-axis in a plane, which are all integers.
+--Write a query to find the shortest distance between two points in these points.
+--
+--| x   |
+--|-----|
+--| -1  |
+--| 0   |
+--| 2   |
+--
+--The shortest distance is '1' obviously, which is from point '-1' to '0'. So the output is as below:
+--
+--| shortest|
+--|---------|
+--| 1       |
+--
+--Note: Every point is unique, which means there is no duplicates in table point.
+--Follow-up: What if all these points have an id and are arranged from the left most to the right most of x axis?
+--
+--MySQL:
+
+select
+    min(abs(x1.x-x2.x)) as shortest
+from
+    point x1, point x2
+where
+    x1.x != x2.x;
+
+--595. Big Countries
+--There is a table World
+--
+--+-----------------+------------+------------+--------------+---------------+
+--| name            | continent  | area       | population   | gdp           |
+--+-----------------+------------+------------+--------------+---------------+
+--| Afghanistan     | Asia       | 652230     | 25500100     | 20343000      |
+--| Albania         | Europe     | 28748      | 2831741      | 12960000      |
+--| Algeria         | Africa     | 2381741    | 37100000     | 188681000     |
+--| Andorra         | Europe     | 468        | 78115        | 3712000       |
+--| Angola          | Africa     | 1246700    | 20609294     | 100990000     |
+--+-----------------+------------+------------+--------------+---------------+
+--A country is big if it has an area of bigger than 3 million square km or a population of more than 25 million.
+--
+--Write a SQL solution to output big countries' name, population and area.
+--
+--For example, according to the above table, we should output:
+--
+--+--------------+-------------+--------------+
+--| name         | population  | area         |
+--+--------------+-------------+--------------+
+--| Afghanistan  | 25500100    | 652230       |
+--| Algeria      | 37100000    | 2381741      |
+--+--------------+-------------+--------------+
+--
+--MySQL:
+
+select
+    name,
+    population,
+    area
+from
+    World
+where
+    area > 3000000
+or
+    population > 25000000;
+
+--1661. Average Time of Process per Machine                   [Revision]
+--
+--Table: Activity
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| machine_id     | int     |
+--| process_id     | int     |
+--| activity_type  | enum    |
+--| timestamp      | float   |
+--+----------------+---------+
+--The table shows the user activities for a factory website.
+--(machine_id, process_id, activity_type) is the primary key of this table.
+--machine_id is the ID of a machine.
+--process_id is the ID of a process running on the machine with ID machine_id.
+--activity_type is an ENUM of type ('start', 'end').
+--timestamp is a float representing the current time in seconds.
+--'start' means the machine starts the process at the given timestamp and 'end' means the machine ends the process at the given timestamp.
+--The 'start' timestamp will always be before the 'end' timestamp for every (machine_id, process_id) pair.
+--
+--
+--There is a factory website that has several machines each running the same number of processes. Write an SQL query to find the average time each machine takes to complete a process.
+--
+--The time to complete a process is the 'end' timestamp minus the 'start' timestamp. The average time is calculated by the total time to complete every process on the machine divided by the number of processes that were run.
+--
+--The resulting table should have the machine_id along with the average time as processing_time, which should be rounded to 3 decimal places.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Activity table:
+--+------------+------------+---------------+-----------+
+--| machine_id | process_id | activity_type | timestamp |
+--+------------+------------+---------------+-----------+
+--| 0          | 0          | start         | 0.712     |
+--| 0          | 0          | end           | 1.520     |
+--| 0          | 1          | start         | 3.140     |
+--| 0          | 1          | end           | 4.120     |
+--| 1          | 0          | start         | 0.550     |
+--| 1          | 0          | end           | 1.550     |
+--| 1          | 1          | start         | 0.430     |
+--| 1          | 1          | end           | 1.420     |
+--| 2          | 0          | start         | 4.100     |
+--| 2          | 0          | end           | 4.512     |
+--| 2          | 1          | start         | 2.500     |
+--| 2          | 1          | end           | 5.000     |
+--+------------+------------+---------------+-----------+
+--
+--Result table:
+--+------------+-----------------+
+--| machine_id | processing_time |
+--+------------+-----------------+
+--| 0          | 0.894           |
+--| 1          | 0.995           |
+--| 2          | 1.456           |
+--+------------+-----------------+
+--
+--There are 3 machines running 2 processes each.
+--Machine 0's average time is ((1.520 - 0.712) + (4.120 - 3.140)) / 2 = 0.894
+--Machine 1's average time is ((1.550 - 0.550) + (1.420 - 0.430)) / 2 = 0.995
+--Machine 2's average time is ((4.512 - 4.100) + (5.000 - 2.500)) / 2 = 1.456
+--
+--MySQL:
+select
+    machine_id,
+    round((sum(case when activity_type = 'end' then timestamp end) - sum(case when activity_type = 'start' then timestamp end))/count(distinct process_id),3) as processing_time
+from
+    Activity
+group by
+    machine_id
+order by
+    1;
+
+-- Explanation:
+
+select
+    machine_id, process_id,
+    sum(case when activity_type = 'end' then timestamp end) as end_time,
+    sum(case when activity_type = 'start' then timestamp end) as start_time
+from
+    Activity
+group by
+    machine_id ,process_id
+order by
+    1;
+
+		["machine_id", "process_id", "end_time", 		"start_time"],
+		[0, 		0, 		1.5199999809265137, 	0.7120000123977661],
+		[0, 		1, 		4.119999885559082, 	3.140000104904175],
+		[1, 		0, 		1.5499999523162842, 	0.550000011920929],
+		[1, 		1, 		1.4199999570846558, 	0.4300000071525574],
+		[2, 		0, 		4.51200008392334, 	4.099999904632568],
+		[2, 		1, 		5.0, 			2.5]
