@@ -1542,7 +1542,7 @@ where
 or
     population > 25000000;
 
---1661. Average Time of Process per Machine                   [Revision]
+--1661. Average Time of Process per Machine                   [Revision][FaceBook]
 --
 --Table: Activity
 --
@@ -1637,3 +1637,280 @@ order by
 		[1, 		1, 		1.4199999570846558, 	0.4300000071525574],
 		[2, 		0, 		4.51200008392334, 	4.099999904632568],
 		[2, 		1, 		5.0, 			2.5]
+
+
+--1435. Create a Session Bar Chart                            [Need to work on as my solution is not working]
+--Table: Sessions
+--
+--+---------------------+---------+
+--| Column Name         | Type    |
+--+---------------------+---------+
+--| session_id          | int     |
+--| duration            | int     |
+--+---------------------+---------+
+--session_id is the primary key for this table.
+--duration is the time in seconds that a user has visited the application.
+--
+--
+--You want to know how long a user visits your application. You decided to create bins of "[0-5>", "[5-10>", "[10-15>" and "15 minutes or more" and count the number of sessions on it.
+--
+--Write an SQL query to report the (bin, total) in any order.
+--
+--The query result format is in the following example.
+--
+--Sessions table:
+--+-------------+---------------+
+--| session_id  | duration      |
+--+-------------+---------------+
+--| 1           | 30            |
+--| 2           | 199           |
+--| 3           | 299           |
+--| 4           | 580           |
+--| 5           | 1000          |
+--+-------------+---------------+
+--
+--Result table:
+--+--------------+--------------+
+--| bin          | total        |
+--+--------------+--------------+
+--| [0-5>        | 3            |
+--| [5-10>       | 1            |
+--| [10-15>      | 0            |
+--| 15 or more   | 1            |
+--+--------------+--------------+
+--
+--For session_id 1, 2 and 3 have a duration greater or equal than 0 minutes and less than 5 minutes.
+--For session_id 4 has a duration greater or equal than 5 minutes and less than 10 minutes.
+--There are no session with a duration greater or equial than 10 minutes and less than 15 minutes.
+--For session_id 5 has a duration greater or equal than 15 minutes.
+--
+--MySQL:
+
+select
+    case #when 0 <duration < 300 then '[0-5>'
+         # when 300 <= duration< 600 then '[5-10>'
+         when duration >= 300 and duration < 600 then '[5-10>'
+         # when 600 <= duration < 900 then '[10-15>'
+         when duration >= 600 and duration < 900 then '[10-15>'
+         else '15 or more'
+    end as bin,
+    count(session_id) as total
+from
+    Sessions
+group by
+    1;
+
+--627. Swap Salary
+--Table: Salary
+--
+--+-------------+----------+
+--| Column Name | Type     |
+--+-------------+----------+
+--| id          | int      |
+--| name        | varchar  |
+--| sex         | ENUM     |
+--| salary      | int      |
+--+-------------+----------+
+--id is the primary key for this table.
+--The sex column is ENUM value of type ('m', 'f').
+--The table contains information about an employee.
+--
+--
+--Write an SQL query to swap all 'f' and 'm' values (i.e., change all 'f' values to 'm' and vice versa) with a single update statement and no intermediate temp table(s).
+--
+--Note that you must write a single update statement, DO NOT write any select statement for this problem.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Salary table:
+--+----+------+-----+--------+
+--| id | name | sex | salary |
+--+----+------+-----+--------+
+--| 1  | A    | m   | 2500   |
+--| 2  | B    | f   | 1500   |
+--| 3  | C    | m   | 5500   |
+--| 4  | D    | f   | 500    |
+--+----+------+-----+--------+
+--
+--Result table:
+--+----+------+-----+--------+
+--| id | name | sex | salary |
+--+----+------+-----+--------+
+--| 1  | A    | f   | 2500   |
+--| 2  | B    | m   | 1500   |
+--| 3  | C    | f   | 5500   |
+--| 4  | D    | m   | 500    |
+--+----+------+-----+--------+
+--(1, A) and (2, C) were changed from 'm' to 'f'.
+--(2, B) and (4, D) were changed from 'f' to 'm'.
+--
+--MySQL:
+
+update salary
+    set sex = case when sex='m' then 'f' else 'm' end;
+
+--1327. List the Products Ordered in a Period                   [Amazon]
+--Table: Products
+--
+--+------------------+---------+
+--| Column Name      | Type    |
+--+------------------+---------+
+--| product_id       | int     |
+--| product_name     | varchar |
+--| product_category | varchar |
+--+------------------+---------+
+--product_id is the primary key for this table.
+--This table contains data about the company's products.
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| order_date    | date    |
+--| unit          | int     |
+--+---------------+---------+
+--There is no primary key for this table. It may have duplicate rows.
+--product_id is a foreign key to Products table.
+--unit is the number of products ordered in order_date.
+--
+--
+--Write an SQL query to get the names of products with greater than or equal to 100 units ordered in February 2020 and their amount.
+--
+--Return result table in any order.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Products table:
+--+-------------+-----------------------+------------------+
+--| product_id  | product_name          | product_category |
+--+-------------+-----------------------+------------------+
+--| 1           | Leetcode Solutions    | Book             |
+--| 2           | Jewels of Stringology | Book             |
+--| 3           | HP                    | Laptop           |
+--| 4           | Lenovo                | Laptop           |
+--| 5           | Leetcode Kit          | T-shirt          |
+--+-------------+-----------------------+------------------+
+--
+--Orders table:
+--+--------------+--------------+----------+
+--| product_id   | order_date   | unit     |
+--+--------------+--------------+----------+
+--| 1            | 2020-02-05   | 60       |
+--| 1            | 2020-02-10   | 70       |
+--| 2            | 2020-01-18   | 30       |
+--| 2            | 2020-02-11   | 80       |
+--| 3            | 2020-02-17   | 2        |
+--| 3            | 2020-02-24   | 3        |
+--| 4            | 2020-03-01   | 20       |
+--| 4            | 2020-03-04   | 30       |
+--| 4            | 2020-03-04   | 60       |
+--| 5            | 2020-02-25   | 50       |
+--| 5            | 2020-02-27   | 50       |
+--| 5            | 2020-03-01   | 50       |
+--+--------------+--------------+----------+
+--
+--Result table:
+--+--------------------+---------+
+--| product_name       | unit    |
+--+--------------------+---------+
+--| Leetcode Solutions | 130     |
+--| Leetcode Kit       | 100     |
+--+--------------------+---------+
+--
+--Products with product_id = 1 is ordered in February a total of (60 + 70) = 130.
+--Products with product_id = 2 is ordered in February a total of 80.
+--Products with product_id = 3 is ordered in February a total of (2 + 3) = 5.
+--Products with product_id = 4 was not ordered in February 2020.
+--Products with product_id = 5 is ordered in February a total of (50 + 50) = 100.
+--
+--MySQL:
+
+select
+    p.product_name, o.total_unit as unit
+from Products p,
+    (select
+        product_id,sum(unit) as total_unit
+     from
+        Orders
+     where month(order_date) = '02'
+     and year(order_date) = '2020'
+     group by product_id
+     having sum(unit) >= 100            [Condition can be here or outside, but this will be predicate pushdown]
+    ) o
+where p.product_id = o.product_id
+# and o.total_unit >= 100
+order by 1;
+
+
+--1148. Article Views I
+--Table: Views
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| article_id    | int     |
+--| author_id     | int     |
+--| viewer_id     | int     |
+--| view_date     | date    |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--Each row of this table indicates that some viewer viewed an article (written by some author) on some date.
+--Note that equal author_id and viewer_id indicate the same person.
+--
+--
+--Write an SQL query to find all the authors that viewed at least one of their own articles, sorted in ascending order by their id.
+--
+--The query result format is in the following example:
+--
+--Views table:
+--+------------+-----------+-----------+------------+
+--| article_id | author_id | viewer_id | view_date  |
+--+------------+-----------+-----------+------------+
+--| 1          | 3         | 5         | 2019-08-01 |
+--| 1          | 3         | 6         | 2019-08-02 |
+--| 2          | 7         | 7         | 2019-08-01 |
+--| 2          | 7         | 6         | 2019-08-02 |
+--| 4          | 7         | 1         | 2019-07-22 |
+--| 3          | 4         | 4         | 2019-07-21 |
+--| 3          | 4         | 4         | 2019-07-21 |
+--+------------+-----------+-----------+------------+
+--
+--Result table:
+--+------+
+--| id   |
+--+------+
+--| 4    |
+--| 7    |
+--+------+
+--
+--MySQL:
+
+select
+    author_id as id
+from
+    Views
+where
+    author_id = viewer_id
+group by
+    author_id
+having count(*) >=1
+order by
+    author_id;
+
+-- OR
+
+select
+    distinct author_id as id
+from
+    Views
+where
+    author_id = viewer_id
+order by
+    author_id;
+
+
