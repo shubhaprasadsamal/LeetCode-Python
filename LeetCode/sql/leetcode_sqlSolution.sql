@@ -1914,3 +1914,865 @@ order by
     author_id;
 
 
+--586. Customer Placing the Largest Number of Orders                  [Revision]
+--Table: Orders
+--
+--+-----------------+----------+
+--| Column Name     | Type     |
+--+-----------------+----------+
+--| order_number    | int      |
+--| customer_number | int      |
+--+-----------------+----------+
+--order_number is the primary key for this table.
+--This table contains information about the order ID and the customer ID.
+--
+--
+--Write an SQL query to find the customer_number for the customer who has placed the largest number of orders.
+--
+--It is guaranteed that exactly one customer will have placed more orders than any other customer.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Orders table:
+--+--------------+-----------------+
+--| order_number | customer_number |
+--+--------------+-----------------+
+--| 1            | 1               |
+--| 2            | 2               |
+--| 3            | 3               |
+--| 4            | 3               |
+--+--------------+-----------------+
+--
+--Result table:
+--+-----------------+
+--| customer_number |
+--+-----------------+
+--| 3               |
+--+-----------------+
+--The customer with number 3 has two orders, which is greater than either customer 1 or 2 because each of them only has one order.
+--So the result is customer_number 3.
+--
+--
+--Follow up: What if more than one customer have the largest number of orders, can you find all the customer_number in this case?
+--
+--MySQL:
+
+select
+    customer_number
+from
+    orders
+group by
+    customer_number
+order by
+    count(customer_number) desc
+limit 1;
+
+-- OR
+
+select customer_number "customer_number" from (
+select
+    customer_number,
+    rank() over(order by count(order_number) desc) rnk
+from
+    orders
+group by
+    customer_number
+) x
+where
+    rnk = 1;
+
+--1280. Students and Examinations
+--Table: Students
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| student_id    | int     |
+--| student_name  | varchar |
+--+---------------+---------+
+--student_id is the primary key for this table.
+--Each row of this table contains the ID and the name of one student in the school.
+--
+--
+--Table: Subjects
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| subject_name | varchar |
+--+--------------+---------+
+--subject_name is the primary key for this table.
+--Each row of this table contains the name of one subject in the school.
+--
+--
+--Table: Examinations
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| student_id   | int     |
+--| subject_name | varchar |
+--+--------------+---------+
+--There is no primary key for this table. It may contain duplicates.
+--Each student from the Students table takes every course from Subjects table.
+--Each row of this table indicates that a student with ID student_id attended the exam of subject_name.
+--
+--
+--Write an SQL query to find the number of times each student attended each exam.
+--
+--Order the result table by student_id and subject_name.
+--
+--The query result format is in the following example:
+--
+--Students table:
+--+------------+--------------+
+--| student_id | student_name |
+--+------------+--------------+
+--| 1          | Alice        |
+--| 2          | Bob          |
+--| 13         | John         |
+--| 6          | Alex         |
+--+------------+--------------+
+--Subjects table:
+--+--------------+
+--| subject_name |
+--+--------------+
+--| Math         |
+--| Physics      |
+--| Programming  |
+--+--------------+
+--Examinations table:
+--+------------+--------------+
+--| student_id | subject_name |
+--+------------+--------------+
+--| 1          | Math         |
+--| 1          | Physics      |
+--| 1          | Programming  |
+--| 2          | Programming  |
+--| 1          | Physics      |
+--| 1          | Math         |
+--| 13         | Math         |
+--| 13         | Programming  |
+--| 13         | Physics      |
+--| 2          | Math         |
+--| 1          | Math         |
+--+------------+--------------+
+--Result table:
+--+------------+--------------+--------------+----------------+
+--| student_id | student_name | subject_name | attended_exams |
+--+------------+--------------+--------------+----------------+
+--| 1          | Alice        | Math         | 3              |
+--| 1          | Alice        | Physics      | 2              |
+--| 1          | Alice        | Programming  | 1              |
+--| 2          | Bob          | Math         | 1              |
+--| 2          | Bob          | Physics      | 0              |
+--| 2          | Bob          | Programming  | 1              |
+--| 6          | Alex         | Math         | 0              |
+--| 6          | Alex         | Physics      | 0              |
+--| 6          | Alex         | Programming  | 0              |
+--| 13         | John         | Math         | 1              |
+--| 13         | John         | Physics      | 1              |
+--| 13         | John         | Programming  | 1              |
+--+------------+--------------+--------------+----------------+
+--The result table should contain all students and all subjects.
+--Alice attended Math exam 3 times, Physics exam 2 times and Programming exam 1 time.
+--Bob attended Math exam 1 time, Programming exam 1 time and didn't attend the Physics exam.
+--Alex didn't attend any exam.
+--John attended Math exam 1 time, Physics exam 1 time and Programming exam 1 time.
+--
+--MySQL:
+
+select
+    s.student_id,
+    s.student_name ,
+    s.subject_name,
+    count(e.student_id) as attended_exams
+from
+    (select * from
+        Students s,
+        Subjects sub) s left join
+        Examinations  e
+on
+    s.student_id = e.student_id and s.subject_name = e.subject_name
+group by
+    s.student_id,s.subject_name
+order by
+    s.student_id ,s.subject_name;
+
+--584. Find Customer Referee                      [Amazon]
+--Given a table customer holding customers information and the referee.
+--
+--+------+------+-----------+
+--| id   | name | referee_id|
+--+------+------+-----------+
+--|    1 | Will |      NULL |
+--|    2 | Jane |      NULL |
+--|    3 | Alex |         2 |
+--|    4 | Bill |      NULL |
+--|    5 | Zack |         1 |
+--|    6 | Mark |         2 |
+--+------+------+-----------+
+--Write a query to return the list of customers NOT referred by the person with id '2'.
+--
+--For the sample data above, the result is:
+--
+--+------+
+--| name |
+--+------+
+--| Will |
+--| Jane |
+--| Bill |
+--| Zack |
+--+------+
+--
+--MySQL:
+
+select
+    name
+from customer
+where referee_id <> 2
+or referee_id is NULL;
+
+
+--1511. Customer Order Frequency                          [Amazon][Revision]
+--Table: Customers
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| customer_id   | int     |
+--| name          | varchar |
+--| country       | varchar |
+--+---------------+---------+
+--customer_id is the primary key for this table.
+--This table contains information of the customers in the company.
+--
+--
+--Table: Product
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| description   | varchar |
+--| price         | int     |
+--+---------------+---------+
+--product_id is the primary key for this table.
+--This table contains information of the products in the company.
+--price is the product cost.
+--
+--
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| customer_id   | int     |
+--| product_id    | int     |
+--| order_date    | date    |
+--| quantity      | int     |
+--+---------------+---------+
+--order_id is the primary key for this table.
+--This table contains information on customer orders.
+--customer_id is the id of the customer who bought "quantity" products with id "product_id".
+--Order_date is the date in format ('YYYY-MM-DD') when the order was shipped.
+--
+--
+--Write an SQL query to report the customer_id and customer_name of customers who have spent at least $100 in each month of June and July 2020.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Customers
+--+--------------+-----------+-------------+
+--| customer_id  | name      | country     |
+--+--------------+-----------+-------------+
+--| 1            | Winston   | USA         |
+--| 2            | Jonathan  | Peru        |
+--| 3            | Moustafa  | Egypt       |
+--+--------------+-----------+-------------+
+--
+--Product
+--+--------------+-------------+-------------+
+--| product_id   | description | price       |
+--+--------------+-------------+-------------+
+--| 10           | LC Phone    | 300         |
+--| 20           | LC T-Shirt  | 10          |
+--| 30           | LC Book     | 45          |
+--| 40           | LC Keychain | 2           |
+--+--------------+-------------+-------------+
+--
+--Orders
+--+--------------+-------------+-------------+-------------+-----------+
+--| order_id     | customer_id | product_id  | order_date  | quantity  |
+--+--------------+-------------+-------------+-------------+-----------+
+--| 1            | 1           | 10          | 2020-06-10  | 1         |
+--| 2            | 1           | 20          | 2020-07-01  | 1         |
+--| 3            | 1           | 30          | 2020-07-08  | 2         |
+--| 4            | 2           | 10          | 2020-06-15  | 2         |
+--| 5            | 2           | 40          | 2020-07-01  | 10        |
+--| 6            | 3           | 20          | 2020-06-24  | 2         |
+--| 7            | 3           | 30          | 2020-06-25  | 2         |
+--| 9            | 3           | 30          | 2020-05-08  | 3         |
+--+--------------+-------------+-------------+-------------+-----------+
+--
+--Result table:
+--+--------------+------------+
+--| customer_id  | name       |
+--+--------------+------------+
+--| 1            | Winston    |
+--+--------------+------------+
+--Winston spent $300 (300 * 1) in June and $100 ( 10 * 1 + 45 * 2) in July 2020.
+--Jonathan spent $600 (300 * 2) in June and $20 ( 2 * 10) in July 2020.
+--Moustafa spent $110 (10 * 2 + 45 * 2) in June and $0 in July 2020.
+--
+--MySQL:
+
+select
+    distinct customer_id, name
+from
+(
+select
+    customer_id, name, left(order_date, 7) month,
+    count(*) over(partition by customer_id,left(order_date,7) ) cnt
+from
+        orders
+        join product
+            using (product_id)
+        join customers
+            using (customer_id)
+where
+        left(order_date, 7) in ('2020-06', '2020-07')
+group by 1,2,3
+having sum(price*quantity) >=100) t
+
+group by 1
+having sum(cnt) = 2;
+
+-- OR
+
+SELECT
+    customer_id,
+    name
+FROM
+    Orders
+    JOIN Customers USING (customer_id)
+    JOIN Product USING (product_id)
+WHERE order_date BETWEEN "2020-06-01" AND "2020-07-31"
+GROUP BY customer_id
+HAVING
+    SUM(CASE WHEN MONTH(order_date) = 6 THEN price*quantity ELSE 0 END) >= 100 AND
+    SUM(CASE WHEN MONTH(order_date) = 7 THEN price*quantity ELSE 0 END) >= 100
+
+--1082. Sales Analysis I                                          [Amazon][Revision]
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--| unit_price   | int     |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--Table: Sales
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| seller_id   | int     |
+--| product_id  | int     |
+--| buyer_id    | int     |
+--| sale_date   | date    |
+--| quantity    | int     |
+--| price       | int     |
+--+------ ------+---------+
+--This table has no primary key, it can have repeated rows.
+--product_id is a foreign key to Product table.
+--
+--
+--Write an SQL query that reports the best seller by total sales price, If there is a tie, report them all.
+--
+--The query result format is in the following example:
+--
+--Product table:
+--+------------+--------------+------------+
+--| product_id | product_name | unit_price |
+--+------------+--------------+------------+
+--| 1          | S8           | 1000       |
+--| 2          | G4           | 800        |
+--| 3          | iPhone       | 1400       |
+--+------------+--------------+------------+
+--
+--Sales table:
+--+-----------+------------+----------+------------+----------+-------+
+--| seller_id | product_id | buyer_id | sale_date  | quantity | price |
+--+-----------+------------+----------+------------+----------+-------+
+--| 1         | 1          | 1        | 2019-01-21 | 2        | 2000  |
+--| 1         | 2          | 2        | 2019-02-17 | 1        | 800   |
+--| 2         | 2          | 3        | 2019-06-02 | 1        | 800   |
+--| 3         | 3          | 4        | 2019-05-13 | 2        | 2800  |
+--+-----------+------------+----------+------------+----------+-------+
+--
+--Result table:
+--+-------------+
+--| seller_id   |
+--+-------------+
+--| 1           |
+--| 3           |
+--+-------------+
+--Both sellers with id 1 and 3 sold products with the most total price of 2800.
+--
+--MySQL:
+
+select a.seller_id as seller_id
+from
+    (
+        select seller_id,dense_rank() over (order by sum(price) desc) as rnk
+        from Sales
+        group by seller_id
+    ) a
+where a.rnk = 1
+order by seller_id;
+
+
+--1677. Product's Worth Over Invoices
+--Table: Product
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| product_id  | int     |
+--| name        | varchar |
+--+-------------+---------+
+--product_id is the primary key for this table.
+--This table contains the ID and the name of the product. The name consists of only lowercase English letters. No two products have the same name.
+--
+--
+--Table: Invoice
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| invoice_id  | int  |
+--| product_id  | int  |
+--| rest        | int  |
+--| paid        | int  |
+--| canceled    | int  |
+--| refunded    | int  |
+--+-------------+------+
+--invoice_id is the primary key for this table and the id of this invoice.
+--product_id is the id of the product for this invoice.
+--rest is the amount left to pay for this invoice.
+--paid is the amount paid for this invoice.
+--canceled is the amount canceled for this invoice.
+--refunded is the amount refunded for this invoice.
+--
+--
+--Write an SQL query that will, for all products, return each product name with total amount due, paid, canceled, and refunded across all invoices.
+--
+--Return the result table ordered by product_name.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Product table:
+--+------------+-------+
+--| product_id | name  |
+--+------------+-------+
+--| 0          | ham   |
+--| 1          | bacon |
+--+------------+-------+
+--Invoice table:
+--+------------+------------+------+------+----------+----------+
+--| invoice_id | product_id | rest | paid | canceled | refunded |
+--+------------+------------+------+------+----------+----------+
+--| 23         | 0          | 2    | 0    | 5        | 0        |
+--| 12         | 0          | 0    | 4    | 0        | 3        |
+--| 1          | 1          | 1    | 1    | 0        | 1        |
+--| 2          | 1          | 1    | 0    | 1        | 1        |
+--| 3          | 1          | 0    | 1    | 1        | 1        |
+--| 4          | 1          | 1    | 1    | 1        | 0        |
+--+------------+------------+------+------+----------+----------+
+--Result table:
+--+-------+------+------+----------+----------+
+--| name  | rest | paid | canceled | refunded |
+--+-------+------+------+----------+----------+
+--| bacon | 3    | 3    | 3        | 3        |
+--| ham   | 2    | 4    | 5        | 3        |
+--+-------+------+------+----------+----------+
+--- The amount of money left to pay for bacon is 1 + 1 + 0 + 1 = 3
+--- The amount of money paid for bacon is 1 + 0 + 1 + 1 = 3
+--- The amount of money canceled for bacon is 0 + 1 + 1 + 1 = 3
+--- The amount of money refunded for bacon is 1 + 1 + 1 + 0 = 3
+--- The amount of money left to pay for ham is 2 + 0 = 2
+--- The amount of money paid for ham is 0 + 4 = 4
+--- The amount of money canceled for ham is 5 + 0 = 5
+--- The amount of money refunded for ham is 0 + 3 = 3
+--
+--MySQL:
+
+select
+    name,
+    sum(rest) as rest,
+    sum(paid) as paid,
+    sum(canceled) as canceled,
+    sum(refunded) as refunded
+from
+    Product
+    join Invoice
+using (product_id)
+group by 1
+order by 1;
+
+--1050. Actors and Directors Who Cooperated At Least Three Times      [Amazon][Revision]
+--Table: ActorDirector
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| actor_id    | int     |
+--| director_id | int     |
+--| timestamp   | int     |
+--+-------------+---------+
+--timestamp is the primary key column for this table.
+--
+--
+--Write a SQL query for a report that provides the pairs (actor_id, director_id) where the actor have cooperated with the director at least 3 times.
+--
+--Example:
+--
+--ActorDirector table:
+--+-------------+-------------+-------------+
+--| actor_id    | director_id | timestamp   |
+--+-------------+-------------+-------------+
+--| 1           | 1           | 0           |
+--| 1           | 1           | 1           |
+--| 1           | 1           | 2           |
+--| 1           | 2           | 3           |
+--| 1           | 2           | 4           |
+--| 2           | 1           | 5           |
+--| 2           | 1           | 6           |
+--+-------------+-------------+-------------+
+--
+--Result table:
+--+-------------+-------------+
+--| actor_id    | director_id |
+--+-------------+-------------+
+--| 1           | 1           |
+--+-------------+-------------+
+--The only pair is (1, 1) where they cooperated exactly 3 times.
+--
+--MySQL:
+
+select
+    actor_id,
+    director_id
+from
+    ActorDirector
+group by
+    actor_id,
+    director_id
+having count(actor_id) >= 3;
+
+--1729. Find Followers Count
+--Table: Followers
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| user_id     | int  |
+--| follower_id | int  |
+--+-------------+------+
+--(user_id, follower_id) is the primary key for this table.
+--This table contains the IDs of a user and a follower in a social media app where the follower follows the user.
+--Write an SQL query that will, for each user, return the number of followers.
+--
+--Return the result table ordered by user_id.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Followers table:
+--+---------+-------------+
+--| user_id | follower_id |
+--+---------+-------------+
+--| 0       | 1           |
+--| 1       | 0           |
+--| 2       | 0           |
+--| 2       | 1           |
+--+---------+-------------+
+--Result table:
+--+---------+----------------+
+--| user_id | followers_count|
+--+---------+----------------+
+--| 0       | 1              |
+--| 1       | 1              |
+--| 2       | 2              |
+--+---------+----------------+
+--The followers of 0 are {1}
+--The followers of 1 are {0}
+--The followers of 2 are {0,1}
+--
+--MySQL:
+
+select
+    user_id,count(*) as followers_count
+from Followers
+group by user_id
+order by 1;
+
+--1633. Percentage of Users Attended a Contest
+--Table: Users
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| user_id     | int     |
+--| user_name   | varchar |
+--+-------------+---------+
+--user_id is the primary key for this table.
+--Each row of this table contains the name and the id of a user.
+--
+--
+--Table: Register
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| contest_id  | int     |
+--| user_id     | int     |
+--+-------------+---------+
+--(contest_id, user_id) is the primary key for this table.
+--Each row of this table contains the id of a user and the contest they registered into.
+--
+--
+--Write an SQL query to find the percentage of the users registered in each contest rounded to two decimals.
+--
+--Return the result table ordered by percentage in descending order. In case of a tie, order it by contest_id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Users table:
+--+---------+-----------+
+--| user_id | user_name |
+--+---------+-----------+
+--| 6       | Alice     |
+--| 2       | Bob       |
+--| 7       | Alex      |
+--+---------+-----------+
+--
+--Register table:
+--+------------+---------+
+--| contest_id | user_id |
+--+------------+---------+
+--| 215        | 6       |
+--| 209        | 2       |
+--| 208        | 2       |
+--| 210        | 6       |
+--| 208        | 6       |
+--| 209        | 7       |
+--| 209        | 6       |
+--| 215        | 7       |
+--| 208        | 7       |
+--| 210        | 2       |
+--| 207        | 2       |
+--| 210        | 7       |
+--+------------+---------+
+--
+--Result table:
+--+------------+------------+
+--| contest_id | percentage |
+--+------------+------------+
+--| 208        | 100.0      |
+--| 209        | 100.0      |
+--| 210        | 100.0      |
+--| 215        | 66.67      |
+--| 207        | 33.33      |
+--+------------+------------+
+--All the users registered in contests 208, 209, and 210. The percentage is 100% and we sort them in the answer table by contest_id in ascending order.
+--Alice and Alex registered in contest 215 and the percentage is ((2/3) * 100) = 66.67%
+--Bob registered in contest 207 and the percentage is ((1/3) * 100) = 33.33%
+--
+--MySQL:
+
+select
+    contest_id,
+    round(count(user_id)*100/(select count(*) from users),2) percentage
+from
+    register
+group by
+    contest_id
+order by
+    percentage desc,
+    contest_id;
+
+--577. Employee Bonus
+--Select all employee's name and bonus whose bonus is < 1000.
+--
+--Table:Employee
+--
+--+-------+--------+-----------+--------+
+--| empId |  name  | supervisor| salary |
+--+-------+--------+-----------+--------+
+--|   1   | John   |  3        | 1000   |
+--|   2   | Dan    |  3        | 2000   |
+--|   3   | Brad   |  null     | 4000   |
+--|   4   | Thomas |  3        | 4000   |
+--+-------+--------+-----------+--------+
+--empId is the primary key column for this table.
+--Table: Bonus
+--
+--+-------+-------+
+--| empId | bonus |
+--+-------+-------+
+--| 2     | 500   |
+--| 4     | 2000  |
+--+-------+-------+
+--empId is the primary key column for this table.
+--Example ouput:
+--
+--+-------+-------+
+--| name  | bonus |
+--+-------+-------+
+--| John  | null  |
+--| Dan   | 500   |
+--| Brad  | null  |
+--+-------+-------+
+--
+--MySQL:
+
+select
+    e.name,
+    b.bonus
+from
+    Employee e left Join Bonus b
+on
+    e.empId = b.empId
+where
+    b.bonus < 1000 or bonus is null;
+
+--1211. Queries Quality and Percentage        [Facebook][Revision]
+--Table: Queries
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| query_name  | varchar |
+--| result      | varchar |
+--| position    | int     |
+--| rating      | int     |
+--+-------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--This table contains information collected from some queries on a database.
+--The position column has a value from 1 to 500.
+--The rating column has a value from 1 to 5. Query with rating less than 3 is a poor query.
+--
+--
+--We define query quality as:
+--
+--The average of the ratio between query rating and its position.
+--
+--We also define poor query percentage as:
+--
+--The percentage of all queries with rating less than 3.
+--
+--Write an SQL query to find each query_name, the quality and poor_query_percentage.
+--
+--Both quality and poor_query_percentage should be rounded to 2 decimal places.
+--
+--The query result format is in the following example:
+--
+--Queries table:
+--+------------+-------------------+----------+--------+
+--| query_name | result            | position | rating |
+--+------------+-------------------+----------+--------+
+--| Dog        | Golden Retriever  | 1        | 5      |
+--| Dog        | German Shepherd   | 2        | 5      |
+--| Dog        | Mule              | 200      | 1      |
+--| Cat        | Shirazi           | 5        | 2      |
+--| Cat        | Siamese           | 3        | 3      |
+--| Cat        | Sphynx            | 7        | 4      |
+--+------------+-------------------+----------+--------+
+--
+--Result table:
+--+------------+---------+-----------------------+
+--| query_name | quality | poor_query_percentage |
+--+------------+---------+-----------------------+
+--| Dog        | 2.50    | 33.33                 |
+--| Cat        | 0.66    | 33.33                 |
+--+------------+---------+-----------------------+
+--
+--Dog queries quality is ((5 / 1) + (5 / 2) + (1 / 200)) / 3 = 2.50
+--Dog queries poor_ query_percentage is (1 / 3) * 100 = 33.33
+--
+--Cat queries quality equals ((2 / 5) + (3 / 3) + (4 / 7)) / 3 = 0.66
+--Cat queries poor_ query_percentage is (1 / 3) * 100 = 33.33
+--
+--MySQL:
+
+
+select
+    query_name,
+    round(avg(rating/position),2) as quality ,
+    round((sum(case when rating < 3 then 1 else 0 end)/count(query_name))*100,2) as poor_query_percentage
+from
+    Queries
+group by 1;
+
+--My Try                      [Passed but failed with one DataSet]
+
+select
+    a.query_name,
+    round(a.avgratio/a.query_cnt,2) as quality ,
+    round((b.rating_cnt/a.query_cnt)*100,2) as poor_query_percentage
+from
+        (select
+            query_name,
+            round(sum(rating/position),2) as avgratio,
+            count(query_name) as query_cnt
+         from
+            Queries
+         group by query_name) a,
+        (select
+            query_name,
+            count(rating) as rating_cnt
+         from
+            Queries
+         where rating < 3
+         group by query_name) b
+where
+    a.query_name = b.query_name;
+
+--[Failed Dataset]
+{"headers":{"Queries":["query_name","result","position","rating"]},"rows":{"Queries":[["lfdxfi","qduxwfnfozvsr",2,5],["meayln","prepggxrpnrvy",1,1],["phqghu","wcysyycqpevik",1,2],["rcvscx","mznimkkasvwsr",1,4],["lfdxfi","kycxfxtlsgyps",2,2]]}}
+
+["query_name",	"result",		"position","rating"]}
+		["lfdxfi",	"qduxwfnfozvsr",	2,		5],
+		["meayln",	"prepggxrpnrvy",	1,		1],
+		["phqghu",	"wcysyycqpevik",	1,		2],
+		["rcvscx",	"mznimkkasvwsr",	1,		4],
+		["lfdxfi",	"kycxfxtlsgyps",	2,		2]]
+
+Output:
+["query_name", "quality", "poor_query_percentage"],
+["lfdxfi", 	1.75, 		50.00],
+["meayln", 	1.00, 		100.00],
+["phqghu", 	2.00, 		100.00]
+
+Expected Result:
+["query_name", "quality", "poor_query_percentage"],
+["lfdxfi", 	1.75, 		50.00],
+["meayln", 	1.00, 		100.00],
+["phqghu", 	2.00, 		100.00],
+["rcvscx", 	4.00, 		0.00]]}
