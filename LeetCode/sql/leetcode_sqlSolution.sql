@@ -2776,3 +2776,654 @@ Expected Result:
 ["meayln", 	1.00, 		100.00],
 ["phqghu", 	2.00, 		100.00],
 ["rcvscx", 	4.00, 		0.00]]}
+
+--620. Not Boring Movies                  [Revision]
+--X city opened a new cinema, many people would like to go to this cinema. The cinema also gives out a poster indicating the movies’ ratings and descriptions.
+--Please write a SQL query to output movies with an odd numbered ID and a description that is not 'boring'. Order the result by rating.
+--
+--
+--
+--For example, table cinema:
+--
+--+---------+-----------+--------------+-----------+
+--|   id    | movie     |  description |  rating   |
+--+---------+-----------+--------------+-----------+
+--|   1     | War       |   great 3D   |   8.9     |
+--|   2     | Science   |   fiction    |   8.5     |
+--|   3     | irish     |   boring     |   6.2     |
+--|   4     | Ice song  |   Fantacy    |   8.6     |
+--|   5     | House card|   Interesting|   9.1     |
+--+---------+-----------+--------------+-----------+
+--For the example above, the output should be:
+--+---------+-----------+--------------+-----------+
+--|   id    | movie     |  description |  rating   |
+--+---------+-----------+--------------+-----------+
+--|   5     | House card|   Interesting|   9.1     |
+--|   1     | War       |   great 3D   |   8.9     |
+--+---------+-----------+--------------+-----------+
+--
+--MySQL:
+
+select
+    *
+from cinema
+where mod(id,2) != 0
+and description != 'boring'
+order by rating desc;
+
+--MS SQL Server:
+
+select
+    id,
+    movie,
+    description,
+    rating
+from
+    cinema
+where id%2 != 0
+and description != 'boring'
+order by rating desc
+
+
+--610. Triangle Judgement
+--A pupil Tim gets homework to identify whether three line segments could possibly form a triangle.
+--
+--
+--However, this assignment is very heavy because there are hundreds of records to calculate.
+--
+--
+--Could you help Tim by writing a query to judge whether these three sides can form a triangle, assuming table triangle holds the length of the three sides x, y and z.
+--
+--
+--| x  | y  | z  |
+--|----|----|----|
+--| 13 | 15 | 30 |
+--| 10 | 20 | 15 |
+--For the sample data above, your query should return the follow result:
+--| x  | y  | z  | triangle |
+--|----|----|----|----------|
+--| 13 | 15 | 30 | No       |
+--| 10 | 20 | 15 | Yes      |
+--
+--MySQL:
+
+select
+    x,y,z,
+    CASE WHEN x+y > z and x+z>y and z+y > x then 'Yes' else 'No' END as triangle
+from triangle;
+
+--1527. Patients With a Condition                 [Glance]
+--Table: Patients
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| patient_id   | int     |
+--| patient_name | varchar |
+--| conditions   | varchar |
+--+--------------+---------+
+--patient_id is the primary key for this table.
+--'conditions' contains 0 or more code separated by spaces.
+--This table contains information of the patients in the hospital.
+--
+--
+--Write an SQL query to report the patient_id, patient_name all conditions of patients who have Type I Diabetes. Type I Diabetes always starts with DIAB1 prefix
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Patients
+--+------------+--------------+--------------+
+--| patient_id | patient_name | conditions   |
+--+------------+--------------+--------------+
+--| 1          | Daniel       | YFEV COUGH   |
+--| 2          | Alice        |              |
+--| 3          | Bob          | DIAB100 MYOP |
+--| 4          | George       | ACNE DIAB100 |
+--| 5          | Alain        | DIAB201      |
+--+------------+--------------+--------------+
+--
+--Result table:
+--+------------+--------------+--------------+
+--| patient_id | patient_name | conditions   |
+--+------------+--------------+--------------+
+--| 3          | Bob          | DIAB100 MYOP |
+--| 4          | George       | ACNE DIAB100 |
+--+------------+--------------+--------------+
+--Bob and George both have a condition that starts with DIAB1.
+--
+--MySQL:
+
+select
+    patient_id ,
+    patient_name ,
+    conditions
+from
+    Patients
+where
+    conditions like '% DIAB1%' or conditions like 'DIAB1%';
+
+--1241. Number of Comments per Post                           [Facebook] [Revision]
+--Table: Submissions
+--
+--+---------------+----------+
+--| Column Name   | Type     |
+--+---------------+----------+
+--| sub_id        | int      |
+--| parent_id     | int      |
+--+---------------+----------+
+--There is no primary key for this table, it may have duplicate rows.
+--Each row can be a post or comment on the post.
+--parent_id is null for posts.
+--parent_id for comments is sub_id for another post in the table.
+--
+--
+--Write an SQL query to find number of comments per each post.
+--
+--Result table should contain post_id and its corresponding number_of_comments, and must be sorted by post_id in ascending order.
+--
+--Submissions may contain duplicate comments. You should count the number of unique comments per post.
+--
+--Submissions may contain duplicate posts. You should treat them as one post.
+--
+--The query result format is in the following example:
+--
+--Submissions table:
+--+---------+------------+
+--| sub_id  | parent_id  |
+--+---------+------------+
+--| 1       | Null       |
+--| 2       | Null       |
+--| 1       | Null       |
+--| 12      | Null       |
+--| 3       | 1          |
+--| 5       | 2          |
+--| 3       | 1          |
+--| 4       | 1          |
+--| 9       | 1          |
+--| 10      | 2          |
+--| 6       | 7          |
+--+---------+------------+
+--
+--Result table:
+--+---------+--------------------+
+--| post_id | number_of_comments |
+--+---------+--------------------+
+--| 1       | 3                  |
+--| 2       | 2                  |
+--| 12      | 0                  |
+--+---------+--------------------+
+--
+--The post with id 1 has three comments in the table with id 3, 4 and 9. The comment with id 3 is repeated in the table, we counted it only once.
+--The post with id 2 has two comments in the table with id 5 and 10.
+--The post with id 12 has no comments in the table.
+--The comment with id 6 is a comment on a deleted post with id 7 so we ignored it.
+--
+--MySQL:
+
+SELECT    post.sub_id                AS post_id,
+          Count(DISTINCT com.sub_id) AS number_of_comments
+FROM      submissions post
+LEFT JOIN submissions com
+ON        post.sub_id = com.parent_id
+WHERE     post.parent_id IS NULL
+GROUP BY  post.sub_id
+ORDER BY  1;
+
+--1543. Fix Product Name Format               [Revision]
+--Table: Sales
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| sale_id      | int     |
+--| product_name | varchar |
+--| sale_date    | date    |
+--+--------------+---------+
+--sale_id is the primary key for this table.
+--Each row of this table contains the product name and the date it was sold.
+--
+--Since table Sales was filled manually in the year 2000, product_name may contain leading and/or trailing white spaces, also they are case-insensitive.
+--
+--Write an SQL query to report
+--
+--product_name in lowercase without leading or trailing white spaces.
+--sale_date in the format ('YYYY-MM')
+--total the number of times the product was sold in this month.
+--Return the result table ordered by product_name in ascending order, in case of a tie order it by sale_date in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Sales
+--+------------+------------------+--------------+
+--| sale_id    | product_name     | sale_date    |
+--+------------+------------------+--------------+
+--| 1          |      LCPHONE     | 2000-01-16   |
+--| 2          |    LCPhone       | 2000-01-17   |
+--| 3          |     LcPhOnE      | 2000-02-18   |
+--| 4          |      LCKeyCHAiN  | 2000-02-19   |
+--| 5          |   LCKeyChain     | 2000-02-28   |
+--| 6          | Matryoshka       | 2000-03-31   |
+--+------------+------------------+--------------+
+--
+--Result table:
+--+--------------+--------------+----------+
+--| product_name | sale_date    | total    |
+--+--------------+--------------+----------+
+--| lcphone      | 2000-01      | 2        |
+--| lckeychain   | 2000-02      | 2        |
+--| lcphone      | 2000-02      | 1        |
+--| matryoshka   | 2000-03      | 1        |
+--+--------------+--------------+----------+
+--
+--In January, 2 LcPhones were sold, please note that the product names are not case sensitive and may contain spaces.
+--In Februery, 2 LCKeychains and 1 LCPhone were sold.
+--In March, 1 matryoshka was sold.
+--
+--MySQL:
+
+select
+    lower(trim(product_name)) as product_name ,
+    left(sale_date,7) as sale_date,
+    count(product_name) as total
+from
+    Sales
+group by left(sale_date,7),lower(trim(product_name))
+order by 1 asc, 2 asc;
+
+--1294. Weather Type in Each Country
+--Table: Countries
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| country_id    | int     |
+--| country_name  | varchar |
+--+---------------+---------+
+--country_id is the primary key for this table.
+--Each row of this table contains the ID and the name of one country.
+--
+--
+--Table: Weather
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| country_id    | int     |
+--| weather_state | varchar |
+--| day           | date    |
+--+---------------+---------+
+--(country_id, day) is the primary key for this table.
+--Each row of this table indicates the weather state in a country for one day.
+--
+--
+--Write an SQL query to find the type of weather in each country for November 2019.
+--
+--The type of weather is Cold if the average weather_state is less than or equal 15, Hot if the average weather_state is greater than or equal 25 and Warm otherwise.
+--
+--Return result table in any order.
+--
+--The query result format is in the following example:
+--
+--Countries table:
+--+------------+--------------+
+--| country_id | country_name |
+--+------------+--------------+
+--| 2          | USA          |
+--| 3          | Australia    |
+--| 7          | Peru         |
+--| 5          | China        |
+--| 8          | Morocco      |
+--| 9          | Spain        |
+--+------------+--------------+
+--Weather table:
+--+------------+---------------+------------+
+--| country_id | weather_state | day        |
+--+------------+---------------+------------+
+--| 2          | 15            | 2019-11-01 |
+--| 2          | 12            | 2019-10-28 |
+--| 2          | 12            | 2019-10-27 |
+--| 3          | -2            | 2019-11-10 |
+--| 3          | 0             | 2019-11-11 |
+--| 3          | 3             | 2019-11-12 |
+--| 5          | 16            | 2019-11-07 |
+--| 5          | 18            | 2019-11-09 |
+--| 5          | 21            | 2019-11-23 |
+--| 7          | 25            | 2019-11-28 |
+--| 7          | 22            | 2019-12-01 |
+--| 7          | 20            | 2019-12-02 |
+--| 8          | 25            | 2019-11-05 |
+--| 8          | 27            | 2019-11-15 |
+--| 8          | 31            | 2019-11-25 |
+--| 9          | 7             | 2019-10-23 |
+--| 9          | 3             | 2019-12-23 |
+--+------------+---------------+------------+
+--Result table:
+--+--------------+--------------+
+--| country_name | weather_type |
+--+--------------+--------------+
+--| USA          | Cold         |
+--| Austraila    | Cold         |
+--| Peru         | Hot          |
+--| China        | Warm         |
+--| Morocco      | Hot          |
+--+--------------+--------------+
+--Average weather_state in USA in November is (15) / 1 = 15 so weather type is Cold.
+--Average weather_state in Austraila in November is (-2 + 0 + 3) / 3 = 0.333 so weather type is Cold.
+--Average weather_state in Peru in November is (25) / 1 = 25 so weather type is Hot.
+--Average weather_state in China in November is (16 + 18 + 21) / 3 = 18.333 so weather type is Warm.
+--Average weather_state in Morocco in November is (25 + 27 + 31) / 3 = 27.667 so weather type is Hot.
+--We know nothing about average weather_state in Spain in November so we don't include it in the result table.
+--
+--MySQL:
+
+select
+        country_name,
+        case when avg(weather_state) <= 15 then 'Cold'
+             when avg(weather_state) >= 25 then 'Hot'
+             else 'Warm' end as weather_type
+from
+    countries
+    join Weather
+using (country_id)
+where left(day,7) = '2019-11'
+group by 1;
+
+--1075. Project Employees I   [Facebook][Revision][Need More understanding]
+--Table: Project
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| project_id  | int     |
+--| employee_id | int     |
+--+-------------+---------+
+--(project_id, employee_id) is the primary key of this table.
+--employee_id is a foreign key to Employee table.
+--Table: Employee
+--
+--+------------------+---------+
+--| Column Name      | Type    |
+--+------------------+---------+
+--| employee_id      | int     |
+--| name             | varchar |
+--| experience_years | int     |
+--+------------------+---------+
+--employee_id is the primary key of this table.
+--
+--
+--Write an SQL query that reports the average experience years of all the employees for each project, rounded to 2 digits.
+--
+--The query result format is in the following example:
+--
+--Project table:
+--+-------------+-------------+
+--| project_id  | employee_id |
+--+-------------+-------------+
+--| 1           | 1           |
+--| 1           | 2           |
+--| 1           | 3           |
+--| 2           | 1           |
+--| 2           | 4           |
+--+-------------+-------------+
+--
+--Employee table:
+--+-------------+--------+------------------+
+--| employee_id | name   | experience_years |
+--+-------------+--------+------------------+
+--| 1           | Khaled | 3                |
+--| 2           | Ali    | 2                |
+--| 3           | John   | 1                |
+--| 4           | Doe    | 2                |
+--+-------------+--------+------------------+
+--
+--Result table:
+--+-------------+---------------+
+--| project_id  | average_years |
+--+-------------+---------------+
+--| 1           | 2.00          |
+--| 2           | 2.50          |
+--+-------------+---------------+
+--The average experience years for the first project is (3 + 2 + 1) / 3 = 2.00 and for the second project is (3 + 2) / 2 = 2.50
+--
+--MySQL:
+
+select
+    p.project_id "project_id",
+    round(sum(e.experience_years)/count(p.employee_id),2) "average_years"
+from
+    Project p,
+    Employee e
+where
+    p.employee_id = e.employee_id
+group by
+    p.project_id
+;
+
+-- My Submission:
+
+select
+    p.project_id,
+    round(avg(e.experience_years),2) as average_years
+from
+    Project p,Employee e
+where
+    p.employee_id = e.employee_id
+group by
+    1;
+
+--603. Consecutive Available Seats
+--Several friends at a cinema ticket office would like to reserve consecutive available seats.
+--Can you help to query all the consecutive available seats order by the seat_id using the following cinema table?
+--| seat_id | free |
+--|---------|------|
+--| 1       | 1    |
+--| 2       | 0    |
+--| 3       | 1    |
+--| 4       | 1    |
+--| 5       | 1    |
+--
+--
+--Your query should return the following result for the sample case above.
+--
+--
+--| seat_id |
+--|---------|
+--| 3       |
+--| 4       |
+--| 5       |
+--Note:
+--The seat_id is an auto increment int, and free is bool ('1' means free, and '0' means occupied.).
+--Consecutive available seats are more than 2(inclusive) seats consecutively available.
+--
+--MySQL:
+
+select distinct a.seat_id
+from cinema a, cinema b
+where abs(a.seat_id-b.seat_id) = 1
+and a.free = b.free
+and a.free = 1 and b.free =1
+order by seat_id;
+
+
+--1113. Reported Posts   [Facebook] [Why no NULL condition is there?]
+--Table: Actions
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| user_id       | int     |
+--| post_id       | int     |
+--| action_date   | date    |
+--| action        | enum    |
+--| extra         | varchar |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--The action column is an ENUM type of ('view', 'like', 'reaction', 'comment', 'report', 'share').
+--The extra column has optional information about the action such as a reason for report or a type of reaction.
+--
+--
+--Write an SQL query that reports the number of posts reported yesterday for each report reason. Assume today is 2019-07-05.
+--
+--The query result format is in the following example:
+--
+--Actions table:
+--+---------+---------+-------------+--------+--------+
+--| user_id | post_id | action_date | action | extra  |
+--+---------+---------+-------------+--------+--------+
+--| 1       | 1       | 2019-07-01  | view   | null   |
+--| 1       | 1       | 2019-07-01  | like   | null   |
+--| 1       | 1       | 2019-07-01  | share  | null   |
+--| 2       | 4       | 2019-07-04  | view   | null   |
+--| 2       | 4       | 2019-07-04  | report | spam   |
+--| 3       | 4       | 2019-07-04  | view   | null   |
+--| 3       | 4       | 2019-07-04  | report | spam   |
+--| 4       | 3       | 2019-07-02  | view   | null   |
+--| 4       | 3       | 2019-07-02  | report | spam   |
+--| 5       | 2       | 2019-07-04  | view   | null   |
+--| 5       | 2       | 2019-07-04  | report | racism |
+--| 5       | 5       | 2019-07-04  | view   | null   |
+--| 5       | 5       | 2019-07-04  | report | racism |
+--+---------+---------+-------------+--------+--------+
+--
+--Result table:
+--+---------------+--------------+
+--| report_reason | report_count |
+--+---------------+--------------+
+--| spam          | 1            |
+--| racism        | 2            |
+--+---------------+--------------+
+--Note that we only care about report reasons with non zero number of reports.
+--
+--MySQL:
+
+select
+    extra "report_reason",
+    count(distinct post_id) "report_count"
+from
+    Actions
+where
+    action_date + 1 = '2019-07-05'
+    and action = 'report'
+group by
+    extra
+;
+
+
+--607. Sales Person       [Revision]
+--Description
+--
+--Given three tables: salesperson, company, orders.
+--Output all the names in the table salesperson, who didn’t have sales to company 'RED'.
+--
+--Example
+--Input
+--
+--Table: salesperson
+--
+--+----------+------+--------+-----------------+-----------+
+--| sales_id | name | salary | commission_rate | hire_date |
+--+----------+------+--------+-----------------+-----------+
+--|   1      | John | 100000 |     6           | 4/1/2006  |
+--|   2      | Amy  | 120000 |     5           | 5/1/2010  |
+--|   3      | Mark | 65000  |     12          | 12/25/2008|
+--|   4      | Pam  | 25000  |     25          | 1/1/2005  |
+--|   5      | Alex | 50000  |     10          | 2/3/2007  |
+--+----------+------+--------+-----------------+-----------+
+--The table salesperson holds the salesperson information. Every salesperson has a sales_id and a name.
+--Table: company
+--
+--+---------+--------+------------+
+--| com_id  |  name  |    city    |
+--+---------+--------+------------+
+--|   1     |  RED   |   Boston   |
+--|   2     | ORANGE |   New York |
+--|   3     | YELLOW |   Boston   |
+--|   4     | GREEN  |   Austin   |
+--+---------+--------+------------+
+--The table company holds the company information. Every company has a com_id and a name.
+--Table: orders
+--
+--+----------+------------+---------+----------+--------+
+--| order_id | order_date | com_id  | sales_id | amount |
+--+----------+------------+---------+----------+--------+
+--| 1        |   1/1/2014 |    3    |    4     | 100000 |
+--| 2        |   2/1/2014 |    4    |    5     | 5000   |
+--| 3        |   3/1/2014 |    1    |    1     | 50000  |
+--| 4        |   4/1/2014 |    1    |    4     | 25000  |
+--+----------+----------+---------+----------+--------+
+--The table orders holds the sales record information, salesperson and customer company are represented by sales_id and com_id.
+--output
+--
+--+------+
+--| name |
+--+------+
+--| Amy  |
+--| Mark |
+--| Alex |
+--+------+
+--Explanation
+--
+--According to order '3' and '4' in table orders, it is easy to tell only salesperson 'John' and 'Pam' have sales to company 'RED',
+--so we need to output all the other names in the table salesperson.
+--
+--MySQL:
+
+select
+    s.name "name"
+from
+    salesperson s
+where
+    s.sales_id not in (select
+                            o.sales_id
+                      from
+                            orders o
+                            inner join company c on (c.com_id = o.com_id and c.name = 'RED')
+                      )
+;
+
+
+182. Duplicate Emails       [Revision]
+Write a SQL query to find all duplicate emails in a table named Person.
+
++----+---------+
+| Id | Email   |
++----+---------+
+| 1  | a@b.com |
+| 2  | c@d.com |
+| 3  | a@b.com |
++----+---------+
+For example, your query should return the following for the above table:
+
++---------+
+| Email   |
++---------+
+| a@b.com |
++---------+
+Note: All emails are in lowercase
+
+
+MySQL:
+
+select
+    distinct p1.Email "Email"
+from
+    Person p1,
+    Person p2
+where
+    p1.id <> p2.id
+    and p1.Email = p2.Email
+;
+
+-- OR
+
+select Email
+from Person
+group by Email
+having count(1) > 1;
+
