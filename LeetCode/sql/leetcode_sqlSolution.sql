@@ -3427,3 +3427,1133 @@ from Person
 group by Email
 having count(1) > 1;
 
+--175. Combine Two Tables
+--Table: Person
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| PersonId    | int     |
+--| FirstName   | varchar |
+--| LastName    | varchar |
+--+-------------+---------+
+--PersonId is the primary key column for this table.
+--Table: Address
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| AddressId   | int     |
+--| PersonId    | int     |
+--| City        | varchar |
+--| State       | varchar |
+--+-------------+---------+
+--AddressId is the primary key column for this table.
+--
+--
+--Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people:
+--
+--FirstName, LastName, City, State
+--
+--MySQL:
+
+select
+    p.FirstName,
+    p.LastName,
+    a.City,
+    a.State
+From Person p
+left join Address a ON p.personId = a.personId;
+
+--1667. Fix Names in a Table          [Revision]
+--Table: Users
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| user_id        | int     |
+--| name           | varchar |
+--+----------------+---------+
+--user_id is the primary key for this table.
+--This table contains the ID and the name of the user. The name consists of only lowercase and uppercase characters.
+--
+--
+--Write an SQL query to fix the names so that only the first character is uppercase and the rest are lowercase.
+--
+--Return the result table ordered by user_id.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Users table:
+--+---------+-------+
+--| user_id | name  |
+--+---------+-------+
+--| 1       | aLice |
+--| 2       | bOB   |
+--+---------+-------+
+--
+--Result table:
+--+---------+-------+
+--| user_id | name  |
+--+---------+-------+
+--| 1       | Alice |
+--| 2       | Bob   |
+--+---------+-------+
+--
+--MySQL:
+
+SELECT
+    user_id,
+    CONCAT(UPPER(SUBSTRING(name,1,1)) , LOWER(SUBSTRING(name,2))) name
+FROM Users
+ORDER BY user_id ASC;
+
+SELECT
+    user_id,
+    CONCAT(UPPER(Left(name,1)), LOWER(RIGHT(name,(LENGTH(name) - 1)))) as 'name'
+FROM users
+ORDER BY user_id ASC;
+
+--181. Employees Earning More Than Their Managers         [Amazon]
+--The Employee table holds all employees including their managers. Every employee has an Id, and there is also a column for the manager Id.
+--
+--+----+-------+--------+-----------+
+--| Id | Name  | Salary | ManagerId |
+--+----+-------+--------+-----------+
+--| 1  | Joe   | 70000  | 3         |
+--| 2  | Henry | 80000  | 4         |
+--| 3  | Sam   | 60000  | NULL      |
+--| 4  | Max   | 90000  | NULL      |
+--+----+-------+--------+-----------+
+--Given the Employee table, write a SQL query that finds out employees who earn more than their managers. For the above table, Joe is the only employee who earns more than his manager.
+--
+--+----------+
+--| Employee |
+--+----------+
+--| Joe      |
+--+----------+
+--
+--MySQL:
+
+select
+    a.Name "Employee"
+from
+    Employee a,
+    Employee b
+where
+    a.ManagerId = b.Id
+    and a.Salary > b.Salary
+;
+
+--1322. Ads Performance       [FaceBook][Revision]
+--Table: Ads
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| ad_id         | int     |
+--| user_id       | int     |
+--| action        | enum    |
+--+---------------+---------+
+--(ad_id, user_id) is the primary key for this table.
+--Each row of this table contains the ID of an Ad, the ID of a user and the action taken by this user regarding this Ad.
+--The action column is an ENUM type of ('Clicked', 'Viewed', 'Ignored').
+--
+--
+--A company is running Ads and wants to calculate the performance of each Ad.
+--
+--Performance of the Ad is measured using Click-Through Rate (CTR) where:
+--
+--
+--
+--Write an SQL query to find the ctr of each Ad.
+--
+--Round ctr to 2 decimal points. Order the result table by ctr in descending order and by ad_id in ascending order in case of a tie.
+--
+--The query result format is in the following example:
+--
+--Ads table:
+--+-------+---------+---------+
+--| ad_id | user_id | action  |
+--+-------+---------+---------+
+--| 1     | 1       | Clicked |
+--| 2     | 2       | Clicked |
+--| 3     | 3       | Viewed  |
+--| 5     | 5       | Ignored |
+--| 1     | 7       | Ignored |
+--| 2     | 7       | Viewed  |
+--| 3     | 5       | Clicked |
+--| 1     | 4       | Viewed  |
+--| 2     | 11      | Viewed  |
+--| 1     | 2       | Clicked |
+--+-------+---------+---------+
+--Result table:
+--+-------+-------+
+--| ad_id | ctr   |
+--+-------+-------+
+--| 1     | 66.67 |
+--| 3     | 50.00 |
+--| 2     | 33.33 |
+--| 5     | 0.00  |
+--+-------+-------+
+--for ad_id = 1, ctr = (2/(2+1)) * 100 = 66.67
+--for ad_id = 2, ctr = (1/(1+2)) * 100 = 33.33
+--for ad_id = 3, ctr = (1/(1+1)) * 100 = 50.00
+--for ad_id = 5, ctr = 0.00, Note that ad_id = 5 has no clicks or views.
+--Note that we don't care about Ignored Ads.
+--Result table is ordered by the ctr. in case of a tie we order them by ad_id
+
+MySQL:
+
+SELECT
+    sub.ad_id,
+    IFNULL(ROUND((total_clicks/(total_clicks+total_views))*100, 2), 0.00) AS ctr
+FROM
+    (SELECT
+        ad_id,
+        SUM(CASE
+        WHEN action = 'Clicked' THEN 1 ELSE 0 END) AS total_clicks,
+        SUM(CASE
+        WHEN action = 'Viewed' THEN 1 ELSE 0 END) AS total_views
+    FROM ads
+    GROUP BY ad_id) AS sub
+ORDER BY ctr DESC, ad_id ASC;
+
+--183. Customers Who Never Order
+--Suppose that a website contains two tables, the Customers table and the Orders table. Write a SQL query to find all customers who never order anything.
+--
+--Table: Customers.
+--
+--+----+-------+
+--| Id | Name  |
+--+----+-------+
+--| 1  | Joe   |
+--| 2  | Henry |
+--| 3  | Sam   |
+--| 4  | Max   |
+--+----+-------+
+--Table: Orders.
+--
+--+----+------------+
+--| Id | CustomerId |
+--+----+------------+
+--| 1  | 3          |
+--| 2  | 1          |
+--+----+------------+
+--Using the above tables as example, return the following:
+--
+--+-----------+
+--| Customers |
+--+-----------+
+--| Henry     |
+--| Max       |
+--+-----------+
+--
+--MySQL:
+
+select
+    c.Name "Customers"
+from
+    Customers c
+    left outer join Orders o on (c.Id = o.CustomerId)
+where
+    o.Id is null
+order by
+    c.Id
+;
+
+
+--512. Game Play Analysis II      [Revision]
+--Table: Activity
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| player_id    | int     |
+--| device_id    | int     |
+--| event_date   | date    |
+--| games_played | int     |
+--+--------------+---------+
+--(player_id, event_date) is the primary key of this table.
+--This table shows the activity of players of some game.
+--Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
+--
+--
+--Write a SQL query that reports the device that is first logged in for each player.
+--
+--The query result format is in the following example:
+--
+--Activity table:
+--+-----------+-----------+------------+--------------+
+--| player_id | device_id | event_date | games_played |
+--+-----------+-----------+------------+--------------+
+--| 1         | 2         | 2016-03-01 | 5            |
+--| 1         | 2         | 2016-05-02 | 6            |
+--| 2         | 3         | 2017-06-25 | 1            |
+--| 3         | 1         | 2016-03-02 | 0            |
+--| 3         | 4         | 2018-07-03 | 5            |
+--+-----------+-----------+------------+--------------+
+--
+--Result table:
+--+-----------+-----------+
+--| player_id | device_id |
+--+-----------+-----------+
+--| 1         | 2         |
+--| 2         | 3         |
+--| 3         | 1         |
+--+-----------+-----------+
+--
+--MySQL:
+
+select
+    a1.player_id "player_id",
+    a1.device_id "device_id"
+from
+    Activity a1,
+    (select player_id, min(event_date) event_date from Activity group by player_id) a2
+where
+    a1.player_id = a2.player_id
+    and a1.event_date = a2.event_date
+;
+
+--1607. Sellers With No Sales
+--Table: Customer
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| customer_id   | int     |
+--| customer_name | varchar |
+--+---------------+---------+
+--customer_id is the primary key for this table.
+--Each row of this table contains the information of each customer in the WebStore.
+--
+--
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| sale_date     | date    |
+--| order_cost    | int     |
+--| customer_id   | int     |
+--| seller_id     | int     |
+--+---------------+---------+
+--order_id is the primary key for this table.
+--Each row of this table contains all orders made in the webstore.
+--sale_date is the date when the transaction was made between the customer (customer_id) and the seller (seller_id).
+--
+--
+--Table: Seller
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| seller_id     | int     |
+--| seller_name   | varchar |
+--+---------------+---------+
+--seller_id is the primary key for this table.
+--Each row of this table contains the information of each seller.
+--
+--
+--Write an SQL query to report the names of all sellers who did not make any sales in 2020.
+--
+--Return the result table ordered by seller_name in ascending order.
+--
+--The query result format is in the following example.
+--
+--Customer table:
+--+--------------+---------------+
+--| customer_id  | customer_name |
+--+--------------+---------------+
+--| 101          | Alice         |
+--| 102          | Bob           |
+--| 103          | Charlie       |
+--+--------------+---------------+
+--
+--Orders table:
+--+-------------+------------+--------------+-------------+-------------+
+--| order_id    | sale_date  | order_cost   | customer_id | seller_id   |
+--+-------------+------------+--------------+-------------+-------------+
+--| 1           | 2020-03-01 | 1500         | 101         | 1           |
+--| 2           | 2020-05-25 | 2400         | 102         | 2           |
+--| 3           | 2019-05-25 | 800          | 101         | 3           |
+--| 4           | 2020-09-13 | 1000         | 103         | 2           |
+--| 5           | 2019-02-11 | 700          | 101         | 2           |
+--+-------------+------------+--------------+-------------+-------------+
+--
+--Seller table:
+--+-------------+-------------+
+--| seller_id   | seller_name |
+--+-------------+-------------+
+--| 1           | Daniel      |
+--| 2           | Elizabeth   |
+--| 3           | Frank       |
+--+-------------+-------------+
+--
+--Result table:
+--+-------------+
+--| seller_name |
+--+-------------+
+--| Frank       |
+--+-------------+
+--Daniel made 1 sale in March 2020.
+--Elizabeth made 2 sales in 2020 and 1 sale in 2019.
+--Frank made 1 sale in 2019 but no sales in 2020.
+--
+--MySQL:
+
+select
+    seller_name
+from
+    Seller
+where seller_id not in
+                        (Select
+                                seller_id
+                        from
+                                Orders
+                        where
+                                left(sale_date,4) = '2020')
+order by 1;
+
+--OR
+
+select
+    seller_name
+from
+    seller
+where seller_name not in
+                        (
+                        select
+                            distinct seller_name
+                        from seller s join orders o
+                        on o.seller_id = s.seller_id
+                        where
+                            sale_date between '2020-01-01' and '2020-12-31'
+                        )
+order by seller_name asc ;
+
+
+--1084. Sales Analysis III        [Amazon]
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--| unit_price   | int     |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--Table: Sales
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| seller_id   | int     |
+--| product_id  | int     |
+--| buyer_id    | int     |
+--| sale_date   | date    |
+--| quantity    | int     |
+--| price       | int     |
+--+------ ------+---------+
+--This table has no primary key, it can have repeated rows.
+--product_id is a foreign key to Product table.
+--
+--
+--Write an SQL query that reports the products that were only sold in spring 2019. That is, between 2019-01-01 and 2019-03-31 inclusive.
+--
+--The query result format is in the following example:
+--
+--Product table:
+--+------------+--------------+------------+
+--| product_id | product_name | unit_price |
+--+------------+--------------+------------+
+--| 1          | S8           | 1000       |
+--| 2          | G4           | 800        |
+--| 3          | iPhone       | 1400       |
+--+------------+--------------+------------+
+--
+--Sales table:
+--+-----------+------------+----------+------------+----------+-------+
+--| seller_id | product_id | buyer_id | sale_date  | quantity | price |
+--+-----------+------------+----------+------------+----------+-------+
+--| 1         | 1          | 1        | 2019-01-21 | 2        | 2000  |
+--| 1         | 2          | 2        | 2019-02-17 | 1        | 800   |
+--| 2         | 2          | 3        | 2019-06-02 | 1        | 800   |
+--| 3         | 3          | 4        | 2019-05-13 | 2        | 2800  |
+--+-----------+------------+----------+------------+----------+-------+
+--
+--Result table:
+--+-------------+--------------+
+--| product_id  | product_name |
+--+-------------+--------------+
+--| 1           | S8           |
+--+-------------+--------------+
+--The product with id 1 was only sold in spring 2019 while the other two were sold after.
+--
+--MySQL:
+
+select
+    product_id,
+    product_name
+from
+    Product
+where product_id not in (
+                        select
+                            product_id
+                        from
+                            Sales
+                        where
+                            sale_date not between '2019-01-01' and '2019-03-31');
+
+--OR
+
+select p.product_id,p.product_name
+from Product p,Sales s
+where p.product_id = s.product_id
+and s.sale_date between '2019-01-01' and '2019-03-31'
+and p.product_id not in ( select product_id from Sales
+                                where sale_date > '2019-03-31'
+                                or sale_date < '2019-01-01')
+group by p.product_id
+order by p.product_id;
+
+--1141. User Activity for the Past 30 Days I
+--Table: Activity
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| user_id       | int     |
+--| session_id    | int     |
+--| activity_date | date    |
+--| activity_type | enum    |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--The activity_type column is an ENUM of type ('open_session', 'end_session', 'scroll_down', 'send_message').
+--The table shows the user activities for a social media website.
+--Note that each session belongs to exactly one user.
+--
+--
+--Write an SQL query to find the daily active user count for a period of 30 days ending 2019-07-27 inclusively. A user was active on some day if he/she made at least one activity on that day.
+--
+--The query result format is in the following example:
+--
+--Activity table:
+--+---------+------------+---------------+---------------+
+--| user_id | session_id | activity_date | activity_type |
+--+---------+------------+---------------+---------------+
+--| 1       | 1          | 2019-07-20    | open_session  |
+--| 1       | 1          | 2019-07-20    | scroll_down   |
+--| 1       | 1          | 2019-07-20    | end_session   |
+--| 2       | 4          | 2019-07-20    | open_session  |
+--| 2       | 4          | 2019-07-21    | send_message  |
+--| 2       | 4          | 2019-07-21    | end_session   |
+--| 3       | 2          | 2019-07-21    | open_session  |
+--| 3       | 2          | 2019-07-21    | send_message  |
+--| 3       | 2          | 2019-07-21    | end_session   |
+--| 4       | 3          | 2019-06-25    | open_session  |
+--| 4       | 3          | 2019-06-25    | end_session   |
+--+---------+------------+---------------+---------------+
+--
+--Result table:
+--+------------+--------------+
+--| day        | active_users |
+--+------------+--------------+
+--| 2019-07-20 | 2            |
+--| 2019-07-21 | 2            |
+--+------------+--------------+
+--Note that we do not care about days with zero active users.
+--
+--MySQL:
+
+select
+    activity_date as day,
+    count(distinct user_id) as active_users
+from
+    Activity
+where
+    activity_date between '2019-06-28' and '2019-07-27'
+group by activity_date
+having count(distinct user_id) > 0;
+
+--1076. Project Employees II      [Facebook]
+--Table: Project
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| project_id  | int     |
+--| employee_id | int     |
+--+-------------+---------+
+--(project_id, employee_id) is the primary key of this table.
+--employee_id is a foreign key to Employee table.
+--
+--
+--Table: Employee
+--
+--+------------------+---------+
+--| Column Name      | Type    |
+--+------------------+---------+
+--| employee_id      | int     |
+--| name             | varchar |
+--| experience_years | int     |
+--+------------------+---------+
+--employee_id is the primary key of this table.
+--
+--
+--Write an SQL query that reports all the projects that have the most employees.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Project table:
+--+-------------+-------------+
+--| project_id  | employee_id |
+--+-------------+-------------+
+--| 1           | 1           |
+--| 1           | 2           |
+--| 1           | 3           |
+--| 2           | 1           |
+--| 2           | 4           |
+--+-------------+-------------+
+--
+--Employee table:
+--+-------------+--------+------------------+
+--| employee_id | name   | experience_years |
+--+-------------+--------+------------------+
+--| 1           | Khaled | 3                |
+--| 2           | Ali    | 2                |
+--| 3           | John   | 1                |
+--| 4           | Doe    | 2                |
+--+-------------+--------+------------------+
+--
+--Result table:
+--+-------------+
+--| project_id  |
+--+-------------+
+--| 1           |
+--+-------------+
+--The first project has 3 employees while the second one has 2.
+--
+--MySQL:
+
+select p.project_id
+from
+(
+    select
+        project_id,
+        dense_rank() over (order by count(project_id) desc) as rnk
+    from
+        Project
+    group by project_id
+) p
+where p.rnk = 1
+order by p.project_id;
+
+--1495. Friendly Movies Streamed Last Month   [Amazon]
+--Table: TVProgram
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| program_date  | date    |
+--| content_id    | int     |
+--| channel       | varchar |
+--+---------------+---------+
+--(program_date, content_id) is the primary key for this table.
+--This table contains information of the programs on the TV.
+--content_id is the id of the program in some channel on the TV.
+--
+--
+--Table: Content
+--
+--+------------------+---------+
+--| Column Name      | Type    |
+--+------------------+---------+
+--| content_id       | varchar |
+--| title            | varchar |
+--| Kids_content     | enum    |
+--| content_type     | varchar |
+--+------------------+---------+
+--content_id is the primary key for this table.
+--Kids_content is an enum that takes one of the values ('Y', 'N') where:
+--'Y' means is content for kids otherwise 'N' is not content for kids.
+--content_type is the category of the content as movies, series, etc.
+--
+--
+--Write an SQL query to report the distinct titles of the kid-friendly movies streamed in June 2020.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--TVProgram table:
+--+--------------------+--------------+-------------+
+--| program_date       | content_id   | channel     |
+--+--------------------+--------------+-------------+
+--| 2020-06-10 08:00   | 1            | LC-Channel  |
+--| 2020-05-11 12:00   | 2            | LC-Channel  |
+--| 2020-05-12 12:00   | 3            | LC-Channel  |
+--| 2020-05-13 14:00   | 4            | Disney Ch   |
+--| 2020-06-18 14:00   | 4            | Disney Ch   |
+--| 2020-07-15 16:00   | 5            | Disney Ch   |
+--+--------------------+--------------+-------------+
+--
+--Content table:
+--+------------+----------------+---------------+---------------+
+--| content_id | title          | Kids_content  | content_type  |
+--+------------+----------------+---------------+---------------+
+--| 1          | Leetcode Movie | N             | Movies        |
+--| 2          | Alg. for Kids  | Y             | Series        |
+--| 3          | Database Sols  | N             | Series        |
+--| 4          | Aladdin        | Y             | Movies        |
+--| 5          | Cinderella     | Y             | Movies        |
+--+------------+----------------+---------------+---------------+
+--
+--Result table:
+--+--------------+
+--| title        |
+--+--------------+
+--| Aladdin      |
+--+--------------+
+--"Leetcode Movie" is not a content for kids.
+--"Alg. for Kids" is not a movie.
+--"Database Sols" is not a movie
+--"Alladin" is a movie, content for kids and was streamed in June 2020.
+--"Cinderella" was not streamed in June 2020.
+--
+--MySQL:
+
+select
+    distinct TITLE
+from
+    TVProgram
+    left join Content
+using (content_id)
+where Kids_content = 'Y'
+and left(program_date,7) = '2020-06'
+and content_type = 'Movies';
+
+--1083. Sales Analysis II             [Amazon]
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--| unit_price   | int     |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--Table: Sales
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| seller_id   | int     |
+--| product_id  | int     |
+--| buyer_id    | int     |
+--| sale_date   | date    |
+--| quantity    | int     |
+--| price       | int     |
+--+------ ------+---------+
+--This table has no primary key, it can have repeated rows.
+--product_id is a foreign key to Product table.
+--
+--
+--Write an SQL query that reports the buyers who have bought S8 but not iPhone. Note that S8 and iPhone are products present in the Product table.
+--
+--The query result format is in the following example:
+--
+--Product table:
+--+------------+--------------+------------+
+--| product_id | product_name | unit_price |
+--+------------+--------------+------------+
+--| 1          | S8           | 1000       |
+--| 2          | G4           | 800        |
+--| 3          | iPhone       | 1400       |
+--+------------+--------------+------------+
+--
+--Sales table:
+--+-----------+------------+----------+------------+----------+-------+
+--| seller_id | product_id | buyer_id | sale_date  | quantity | price |
+--+-----------+------------+----------+------------+----------+-------+
+--| 1         | 1          | 1        | 2019-01-21 | 2        | 2000  |
+--| 1         | 2          | 2        | 2019-02-17 | 1        | 800   |
+--| 2         | 1          | 3        | 2019-06-02 | 1        | 800   |
+--| 3         | 3          | 3        | 2019-05-13 | 2        | 2800  |
+--+-----------+------------+----------+------------+----------+-------+
+--
+--Result table:
+--+-------------+
+--| buyer_id    |
+--+-------------+
+--| 1           |
+--+-------------+
+--The buyer with id 1 bought an S8 but didn't buy an iPhone. The buyer with id 3 bought both.
+--
+--MySQL:
+
+select
+    p.buyer_id
+from
+    Sales p,
+    product q
+where p.product_id = q.product_id
+and q.product_name = 'S8'
+and p.buyer_id not in (
+                        select s.buyer_id
+                        from Sales s join Product p
+                        on s.product_id = p.product_id
+                        and  p.product_name = 'iPhone')
+group by p.buyer_id;
+
+
+--1731. The Number of Employees Which Report to Each Employee
+--Table: Employees
+--
+--+-------------+----------+
+--| Column Name | Type     |
+--+-------------+----------+
+--| employee_id | int      |
+--| name        | varchar  |
+--| reports_to  | int      |
+--| age         | int      |
+--+-------------+----------+
+--employee_id is the primary key for this table.
+--This table contains information about the employees and the id of the manager they report to. Some employees do not report to anyone (reports_to is null).
+--
+--
+--For this problem, we will consider a manager an employee who has at least 1 other employee reporting to them.
+--
+--Write an SQL query to report the ids and the names of all managers, the number of employees who report directly to them, and the average age of the reports rounded to the nearest integer.
+--
+--Return the result table ordered by employee_id.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Employees table:
+--+-------------+---------+------------+-----+
+--| employee_id | name    | reports_to | age |
+--+-------------+---------+------------+-----+
+--| 9           | Hercy   | null       | 43  |
+--| 6           | Alice   | 9          | 41  |
+--| 4           | Bob     | 9          | 36  |
+--| 2           | Winston | null       | 37  |
+--+-------------+---------+------------+-----+
+--
+--Result table:
+--+-------------+-------+---------------+-------------+
+--| employee_id | name  | reports_count | average_age |
+--+-------------+-------+---------------+-------------+
+--| 9           | Hercy | 2             | 39          |
+--+-------------+-------+---------------+-------------+
+--Hercy has 2 people report directly to him, Alice and Bob. Their average age is (41+36)/2 = 38.5, which is 39 after
+--
+
+
+--MySQL:
+
+-- Left Join:
+select
+    b.employee_id,
+    b.name,
+    count(a.employee_id),
+    avg(a.age)
+from
+    Employees a left join Employees b
+on a.reports_to = b.employee_id
+group by b.employee_id,b.name ;
+
+{"headers": ["employee_id", 	"name", 	"reports_to", 	"age", "employee_id", "name", 		"reports_to", 	"age"],
+		[9,	 	"Hercy", 	null, 		43, 	null, 		null, 		null, 		null],
+		[6,	 	"Alice", 	9, 		41, 	9, 		"Hercy", 	null, 		43],
+		[4,	 	"Bob", 		9, 		36, 	9, 		"Hercy", 	null, 		43],
+		[2,	 	"Winston", 	null, 		37, 	null, 		null, 		null, 		null]]}
+
+Output:
+
+{"headers": ["employee_id", "name", "count(a.employee_id)", "avg(a.age)"],
+"values": [[null, null, 2, 40.0000], [9, "Hercy", 2, 38.5000]]}
+
+Correct Solution:
+
+select
+    a.employee_id,
+    a.name,
+    count(*) reports_count ,
+    round(avg(b.age)) average_age
+from
+    Employees a, Employees b
+where
+    a.employee_id = b.reports_to
+group by 1,2
+order by 1
+
+
+--196. Delete Duplicate Emails       [Amazon]
+--Write a SQL query to delete all duplicate email entries in a table named Person, keeping only unique emails based on its smallest Id.
+--
+--+----+------------------+
+--| Id | Email            |
+--+----+------------------+
+--| 1  | john@example.com |
+--| 2  | bob@example.com  |
+--| 3  | john@example.com |
+--+----+------------------+
+--Id is the primary key column for this table.
+--For example, after running your query, the above Person table should have the following rows:
+--
+--+----+------------------+
+--| Id | Email            |
+--+----+------------------+
+--| 1  | john@example.com |
+--| 2  | bob@example.com  |
+--+----+------------------+
+--Note:
+--
+--Your output is the whole Person table after executing your sql. Use delete statement.
+
+--MySQL:
+
+DELETE
+FROM    Person
+WHERE   Id
+IN
+(
+SELECT  Id
+FROM
+    (
+    SELECT  Id, Email, Row_Number() OVER (PARTITION BY Email ORDER BY Id) as RowNumber
+    FROM    Person
+    ) Person1
+WHERE   Person1.RowNumber > 1 )
+
+--619. Biggest Single Number        [Revision]
+--Easy
+--
+--85
+--
+--78
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table my_numbers contains many numbers in column num including duplicated ones.
+--Can you write a SQL query to find the biggest number, which only appears once.
+--
+--+---+
+--|num|
+--+---+
+--| 8 |
+--| 8 |
+--| 3 |
+--| 3 |
+--| 1 |
+--| 4 |
+--| 5 |
+--| 6 |
+--For the sample data above, your query should return the following result:
+--+---+
+--|num|
+--+---+
+--| 6 |
+--Note:
+--If there is no such number, just output null.
+--
+--MySQL:
+
+select
+    IFNULL(max(p.num),null)   as num
+from (
+select
+    num
+from
+    my_numbers
+group by num
+having count(*) = 1) p;
+
+
+597. Friend Requests I: Overall Acceptance Rate
+
+--197. Rising Temperature
+--Table: Weather
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| recordDate    | date    |
+--| temperature   | int     |
+--+---------------+---------+
+--id is the primary key for this table.
+--This table contains information about the temperature in a certain day.
+--
+--
+--Write an SQL query to find all dates' id with higher temperature compared to its previous dates (yesterday).
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example:
+--
+--Weather
+--+----+------------+-------------+
+--| id | recordDate | Temperature |
+--+----+------------+-------------+
+--| 1  | 2015-01-01 | 10          |
+--| 2  | 2015-01-02 | 25          |
+--| 3  | 2015-01-03 | 20          |
+--| 4  | 2015-01-04 | 30          |
+--+----+------------+-------------+
+--
+--Result table:
+--+----+
+--| id |
+--+----+
+--| 2  |
+--| 4  |
+--+----+
+--In 2015-01-02, temperature was higher than the previous day (10 -> 25).
+--In 2015-01-04, temperature was higher than the previous day (20 -> 30).
+--
+--MySQL:
+
+select
+    w2.Id "Id"
+from
+    Weather w1,
+    Weather w2
+where
+    w1.RecordDate = w2.RecordDate - 1
+    and w2.Temperature > w1.Temperature
+;
+
+
+--596. Classes More Than 5 Students
+--There is a table courses with columns: student and class
+--
+--Please list out all classes which have more than or equal to 5 students.
+--
+--For example, the table:
+--
+--+---------+------------+
+--| student | class      |
+--+---------+------------+
+--| A       | Math       |
+--| B       | English    |
+--| C       | Math       |
+--| D       | Biology    |
+--| E       | Math       |
+--| F       | Computer   |
+--| G       | Math       |
+--| H       | Math       |
+--| I       | Math       |
+--+---------+------------+
+--Should output:
+--
+--+---------+
+--| class   |
+--+---------+
+--| Math    |
+--+---------+
+--
+--MySQL:
+
+select
+    class "class"
+from
+    courses
+group by
+    class
+having count(distinct student) >= 5
+;
+
+1142. User Activity for the Past 30 Days II
+Table: Activity
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| session_id    | int     |
+| activity_date | date    |
+| activity_type | enum    |
++---------------+---------+
+There is no primary key for this table, it may have duplicate rows.
+The activity_type column is an ENUM of type ('open_session', 'end_session', 'scroll_down', 'send_message').
+The table shows the user activities for a social media website.
+Note that each session belongs to exactly one user.
+
+
+Write an SQL query to find the average number of sessions per user for a period of 30 days ending 2019-07-27 inclusively, rounded to 2 decimal places. The sessions we want to count for a user are those with at least one activity in that time period.
+
+The query result format is in the following example:
+
+Activity table:
++---------+------------+---------------+---------------+
+| user_id | session_id | activity_date | activity_type |
++---------+------------+---------------+---------------+
+| 1       | 1          | 2019-07-20    | open_session  |
+| 1       | 1          | 2019-07-20    | scroll_down   |
+| 1       | 1          | 2019-07-20    | end_session   |
+| 2       | 4          | 2019-07-20    | open_session  |
+| 2       | 4          | 2019-07-21    | send_message  |
+| 2       | 4          | 2019-07-21    | end_session   |
+| 3       | 2          | 2019-07-21    | open_session  |
+| 3       | 2          | 2019-07-21    | send_message  |
+| 3       | 2          | 2019-07-21    | end_session   |
+| 3       | 5          | 2019-07-21    | open_session  |
+| 3       | 5          | 2019-07-21    | scroll_down   |
+| 3       | 5          | 2019-07-21    | end_session   |
+| 4       | 3          | 2019-06-25    | open_session  |
+| 4       | 3          | 2019-06-25    | end_session   |
++---------+------------+---------------+---------------+
+
+Result table:
++---------------------------+
+| average_sessions_per_user |
++---------------------------+
+| 1.33                      |
++---------------------------+
+User 1 and 2 each had 1 session in the past 30 days while user 3 had 2 sessions so the average is (1 + 1 + 2) / 3 = 1.33.
+--
+--176. Second Highest Salary
+--Write a SQL query to get the second highest salary from the Employee table.
+--
+--+----+--------+
+--| Id | Salary |
+--+----+--------+
+--| 1  | 100    |
+--| 2  | 200    |
+--| 3  | 300    |
+--+----+--------+
+--For example, given the above Employee table, the query should return 200 as the second highest salary. If there is no second highest salary, then the query should return null.
+--
+--+---------------------+
+--| SecondHighestSalary |
+--+---------------------+
+--| 200                 |
+--+---------------------+
+--
+--MySQL:
+
+select
+    max(Salary) as  SecondHighestSalary
+from Employee
+where
+    Salary not in (select max(Salary) from Employee);
+
+
+
+
