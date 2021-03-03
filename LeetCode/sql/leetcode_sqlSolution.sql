@@ -4217,50 +4217,88 @@ and p.buyer_id not in (
 group by p.buyer_id;
 
 
-1731. The Number of Employees Which Report to Each Employee
-Table: Employees
+--1731. The Number of Employees Which Report to Each Employee
+--Table: Employees
+--
+--+-------------+----------+
+--| Column Name | Type     |
+--+-------------+----------+
+--| employee_id | int      |
+--| name        | varchar  |
+--| reports_to  | int      |
+--| age         | int      |
+--+-------------+----------+
+--employee_id is the primary key for this table.
+--This table contains information about the employees and the id of the manager they report to. Some employees do not report to anyone (reports_to is null).
+--
+--
+--For this problem, we will consider a manager an employee who has at least 1 other employee reporting to them.
+--
+--Write an SQL query to report the ids and the names of all managers, the number of employees who report directly to them, and the average age of the reports rounded to the nearest integer.
+--
+--Return the result table ordered by employee_id.
+--
+--The query result format is in the following example:
+--
+--
+--
+--Employees table:
+--+-------------+---------+------------+-----+
+--| employee_id | name    | reports_to | age |
+--+-------------+---------+------------+-----+
+--| 9           | Hercy   | null       | 43  |
+--| 6           | Alice   | 9          | 41  |
+--| 4           | Bob     | 9          | 36  |
+--| 2           | Winston | null       | 37  |
+--+-------------+---------+------------+-----+
+--
+--Result table:
+--+-------------+-------+---------------+-------------+
+--| employee_id | name  | reports_count | average_age |
+--+-------------+-------+---------------+-------------+
+--| 9           | Hercy | 2             | 39          |
+--+-------------+-------+---------------+-------------+
+--Hercy has 2 people report directly to him, Alice and Bob. Their average age is (41+36)/2 = 38.5, which is 39 after
+--
 
-+-------------+----------+
-| Column Name | Type     |
-+-------------+----------+
-| employee_id | int      |
-| name        | varchar  |
-| reports_to  | int      |
-| age         | int      |
-+-------------+----------+
-employee_id is the primary key for this table.
-This table contains information about the employees and the id of the manager they report to. Some employees do not report to anyone (reports_to is null).
 
+--MySQL:
 
-For this problem, we will consider a manager an employee who has at least 1 other employee reporting to them.
+-- Left Join:
+select
+    b.employee_id,
+    b.name,
+    count(a.employee_id),
+    avg(a.age)
+from
+    Employees a left join Employees b
+on a.reports_to = b.employee_id
+group by b.employee_id,b.name ;
 
-Write an SQL query to report the ids and the names of all managers, the number of employees who report directly to them, and the average age of the reports rounded to the nearest integer.
+{"headers": ["employee_id", 	"name", 	"reports_to", 	"age", "employee_id", "name", 		"reports_to", 	"age"],
+		[9,	 	"Hercy", 	null, 		43, 	null, 		null, 		null, 		null],
+		[6,	 	"Alice", 	9, 		41, 	9, 		"Hercy", 	null, 		43],
+		[4,	 	"Bob", 		9, 		36, 	9, 		"Hercy", 	null, 		43],
+		[2,	 	"Winston", 	null, 		37, 	null, 		null, 		null, 		null]]}
 
-Return the result table ordered by employee_id.
+Output:
 
-The query result format is in the following example:
+{"headers": ["employee_id", "name", "count(a.employee_id)", "avg(a.age)"],
+"values": [[null, null, 2, 40.0000], [9, "Hercy", 2, 38.5000]]}
 
+Correct Solution:
 
-
-Employees table:
-+-------------+---------+------------+-----+
-| employee_id | name    | reports_to | age |
-+-------------+---------+------------+-----+
-| 9           | Hercy   | null       | 43  |
-| 6           | Alice   | 9          | 41  |
-| 4           | Bob     | 9          | 36  |
-| 2           | Winston | null       | 37  |
-+-------------+---------+------------+-----+
-
-Result table:
-+-------------+-------+---------------+-------------+
-| employee_id | name  | reports_count | average_age |
-+-------------+-------+---------------+-------------+
-| 9           | Hercy | 2             | 39          |
-+-------------+-------+---------------+-------------+
-Hercy has 2 people report directly to him, Alice and Bob. Their average age is (41+36)/2 = 38.5, which is 39 after
-
-MySQL:
+select
+    a.employee_id,
+    a.name,
+    count(*) reports_count ,
+    round(avg(b.age)) average_age
+from
+    Employees a, Employees b
+where
+    a.employee_id = b.reports_to
+group by 1,2
+order by 1
 
 
 --196. Delete Duplicate Emails       [Amazon]
@@ -4515,5 +4553,7 @@ select
 from Employee
 where
     Salary not in (select max(Salary) from Employee);
+
+
 
 

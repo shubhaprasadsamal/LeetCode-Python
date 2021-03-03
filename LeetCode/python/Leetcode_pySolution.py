@@ -1658,3 +1658,227 @@ class Solution:
 
         return n<=count
 
+# 572. Subtree of Another Tree      [Amazon]
+# Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
+#
+# Example 1:
+# Given tree s:
+#
+# 3
+# / \
+#     4   5
+# / \
+#     1   2
+# Given tree t:
+# 4
+# / \
+#     1   2
+# Return true, because t has the same structure and node values with a subtree of s.
+#
+#
+# Example 2:
+# Given tree s:
+#
+# 3
+# / \
+#     4   5
+# / \
+#     1   2
+# /
+# 0
+# Given tree t:
+# 4
+# / \
+#     1   2
+# Return false.
+
+# Solution:
+
+class Solution:
+    def isSubtree(self, s: TreeNode, t: TreeNode) -> bool:
+        if s is None and t is None:
+            return True
+        if t is None:       # Could be a child
+            return True
+        if s is None and t is not None:
+            return False
+        return self.isSame(s,t) or self.isSubtree(s.left,t) or self.isSubtree(s.right,t)     #'OR' because if any condition is true then it's a child tree
+
+    def isSame(self,s,t):
+        if s is None and t is None:
+            return True
+        if s is None or t is None:
+            return False
+        return s.val == t.val and self.isSame(s.left,t.left) and self.isSame(s.right,t.right)
+
+# 937. Reorder Data in Log Files
+# You are given an array of logs. Each log is a space-delimited string of words, where the first word is the identifier.
+#
+# There are two types of logs:
+#
+# Letter-logs: All words (except the identifier) consist of lowercase English letters.
+#                                                                             Digit-logs: All words (except the identifier) consist of digits.
+#     Reorder these logs so that:
+#
+# The letter-logs come before all digit-logs.
+#     The letter-logs are sorted lexicographically by their contents. If their contents are the same, then sort them lexicographically by their identifiers.
+#     The digit-logs maintain their relative ordering.
+#     Return the final order of the logs.
+#
+#
+#
+#     Example 1:
+#
+# Input: logs = ["dig1 8 1 5 1","let1 art can","dig2 3 6","let2 own kit dig","let3 art zero"]
+# Output: ["let1 art can","let3 art zero","let2 own kit dig","dig1 8 1 5 1","dig2 3 6"]
+# Explanation:
+# The letter-log contents are all different, so their ordering is "art can", "art zero", "own kit dig".
+#     The digit-logs have a relative order of "dig1 8 1 5 1", "dig2 3 6".
+#     Example 2:
+#
+# Input: logs = ["a1 9 2 3 1","g1 act car","zo4 4 7","ab1 off key dog","a8 act zoo"]
+# Output: ["g1 act car","a8 act zoo","ab1 off key dog","a1 9 2 3 1","zo4 4 7"]
+#
+#
+# Constraints:
+#
+# 1 <= logs.length <= 100
+# 3 <= logs[i].length <= 100
+# All the tokens of logs[i] are separated by a single space.
+#                                                         logs[i] is guaranteed to have an identifier and at least one word after the identifier
+
+# Solutions:
+
+class Solution:
+    def reorderLogFiles(self, logs: List[str]) -> List[str]:
+        letter_log = []
+        digit_log  = []
+        #Split the logs into letter logs and digit logs
+        for log in logs:
+            if log.split(" ")[1].isalpha():
+                letter_log.append(log)
+            else:
+                digit_log.append(log)
+
+        #Sort the letter logs lexicographically based on the content and then the identifiers
+
+        letter_log.sort(key=lambda x: (x.split(' ')[1:],x.split(' ')[0]))
+        return letter_log + digit_log
+
+
+# 21. Merge Two Sorted Lists
+# Merge two sorted linked lists and return it as a sorted list. The list should be made by splicing together the nodes of the first two lists.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: l1 = [1,2,4], l2 = [1,3,4]
+# Output: [1,1,2,3,4,4]
+# Example 2:
+#
+# Input: l1 = [], l2 = []
+# Output: []
+# Example 3:
+#
+# Input: l1 = [], l2 = [0]
+# Output: [0]
+
+# Solution:
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
+        prehead = ListNode(-1)
+
+        prev = prehead
+        while l1 and l2:
+            if l1.val <= l2.val:
+                prev.next = l1
+                l1 = l1.next
+            else:
+                prev.next = l2
+                l2 = l2.next
+            prev = prev.next
+
+        # At least one of l1 and l2 can still have nodes at this point, so connect
+        # the non-null list to the end of the merged list.
+        prev.next = l1 if l1 is not None else l2
+
+        return prehead.next
+
+# 819. Most Common Word
+# Given a paragraph and a list of banned words, return the most frequent word that is not in the list of banned words.  It is guaranteed there is at least one word that isn't banned, and that the answer is unique.
+#
+# Words in the list of banned words are given in lowercase, and free of punctuation.  Words in the paragraph are not case sensitive.  The answer is in lowercase.
+#
+#
+#
+# Example:
+#
+# Input:
+# paragraph = "Bob hit a ball, the hit BALL flew far after it was hit."
+# banned = ["hit"]
+# Output: "ball"
+# Explanation:
+# "hit" occurs 3 times, but it is a banned word.
+# "ball" occurs twice (and no other word does), so it is the most frequent non-banned word in the paragraph.
+# Note that words in the paragraph are not case sensitive,
+# that punctuation is ignored (even if adjacent to words, such as "ball,"),
+# and that "hit" isn't the answer even though it occurs more because it is banned.
+#
+# Solution:
+
+class Solution:
+    def mostCommonWord(self, paragraph: str, banned: List[str]) -> str:
+        paragraph = "".join(char.lower() if char.isalnum() else ' ' for char in paragraph)
+        words = paragraph.split()
+        mapper = {}
+        banned = {word.lower() for word in banned}
+        count = 0
+        res = ""
+        for word in words:
+            if word not in banned:
+                if word not in mapper:
+                    mapper[word] = 1
+                else:
+                    mapper[word] += 1
+                if mapper[word] > count:
+                    count = mapper[word]
+                    res = word
+        return res
+
+# 1710. Maximum Units on a Truck
+# You are assigned to put some amount of boxes onto one truck. You are given a 2D array boxTypes, where boxTypes[i] = [numberOfBoxesi, numberOfUnitsPerBoxi]:
+#
+# numberOfBoxesi is the number of boxes of type i.
+# numberOfUnitsPerBoxi is the number of units in each box of the type i.
+# You are also given an integer truckSize, which is the maximum number of boxes that can be put on the truck. You can choose any boxes to put on the truck as long as the number of boxes does not exceed truckSize.
+#
+# Return the maximum total number of units that can be put on the truck.
+#
+#
+#
+# Example 1:
+#
+# Input: boxTypes = [[1,3],[2,2],[3,1]], truckSize = 4
+# Output: 8
+# Explanation: There are:
+# - 1 box of the first type that contains 3 units.
+# - 2 boxes of the second type that contain 2 units each.
+# - 3 boxes of the third type that contain 1 unit each.
+# You can take all the boxes of the first and second types, and one box of the third type.
+# The total number of units will be = (1 * 3) + (2 * 2) + (1 * 1) = 8.
+# Example 2:
+#
+# Input: boxTypes = [[5,10],[2,5],[4,7],[3,9]], truckSize = 10
+# Output: 91
+#
+# Solution:
+
+
+
