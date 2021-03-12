@@ -1983,7 +1983,7 @@ group by
 where
     rnk = 1;
 
---1280. Students and Examinations   [Revision]
+--1280. Students and Examinations   [Revision ]
 --Table: Students
 --
 --+---------------+---------+
