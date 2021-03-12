@@ -2530,7 +2530,7 @@ from Followers
 group by user_id
 order by 1;
 
---1633. Percentage of Users Attended a Contest
+--1633. Percentage of Users Attended a Contest      [Revision]
 --Table: Users
 --
 --+-------------+---------+
