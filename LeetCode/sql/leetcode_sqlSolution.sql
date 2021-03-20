@@ -1983,7 +1983,7 @@ group by
 where
     rnk = 1;
 
---1280. Students and Examinations
+--1280. Students and Examinations   [Revision ]
 --Table: Students
 --
 --+---------------+---------+
@@ -2530,7 +2530,7 @@ from Followers
 group by user_id
 order by 1;
 
---1633. Percentage of Users Attended a Contest
+--1633. Percentage of Users Attended a Contest      [Revision]
 --Table: Users
 --
 --+-------------+---------+
