@@ -218,3 +218,117 @@ class Solution:
         construct_path(root,"")
         return paths
 
+# 637. Average of Levels in Binary Tree
+# Given a non-empty binary tree, return the average value of the nodes on each level in the form of an array.
+# Example 1:
+# Input:
+# 3
+# / \
+#     9  20
+# / \
+#     15   7
+# Output: [3, 14.5, 11]
+# Explanation:
+# The average value of nodes on level 0 is 3,  on level 1 is 14.5, and on level 2 is 11. Hence return [3, 14.5, 11].
+# Note:
+# The range of node's value is in the range of 32-bit signed integer.
+#
+# Solution:
+class Solution:
+    def averageOfLevels(self, root: TreeNode) -> List[float]:
+
+        result = []
+
+        if root is None:
+            return result
+
+        queue = []
+        queue.append(root)
+
+        while queue:
+            level = []
+            sub_queue = []
+
+            for x in queue:
+                level.append(x.val)
+                if x.left:
+                    sub_queue.append(x.left)
+                if x.right:
+                    sub_queue.append(x.right)
+
+            result.append(level)
+            queue = sub_queue
+
+
+        for i in range(len(result)):
+            result[i] = sum(result[i])/len(result[i])
+
+        return result
+
+# Solution2:
+class Solution:
+    def averageOfLevels(self, root: TreeNode) -> List[float]:
+        if root is None:
+            return []
+
+        queue = [root]
+        next_queue = []
+        avg = []
+        level_sum = 0
+
+        while queue:
+            for node in queue:
+                level_sum += node.val
+                if node.left:
+                    next_queue.append(node.left)
+                if node.right:
+                    next_queue.append(node.right)
+
+            avg.append(level_sum/len(queue))
+            queue = next_queue
+            level_sum = 0
+            next_queue = []
+
+        return avg
+
+#
+# 257. Binary Tree Paths
+# Given a binary tree, return all root-to-leaf paths.
+#
+# Note: A leaf is a node with no children.
+#
+# Example:
+#
+# Input:
+#
+# 1
+# / \
+#     2     3
+# \
+# 5
+#
+# Output: ["1->2->5", "1->3"]
+#
+# Explanation: All root-to-leaf paths are: 1->2->5, 1->3
+#
+# Solutions:
+class Solution:
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+
+        def construct_path(root,path):
+            if root:
+                path = path+str(root.val)
+
+                if  not root.left and not root.right:
+                    paths.append(path)
+                else:
+                    path = path + "->"
+                    construct_path(root.left,path)
+                    construct_path(root.right,path)
+
+        paths = []
+        construct_path(root,"")
+        return paths
+
+#
+
