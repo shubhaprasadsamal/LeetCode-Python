@@ -964,7 +964,8 @@ class Solution:
 
 
 # 219. Contains Duplicate II
-# Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j]
+# Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array
+# such that nums[i] = nums[j]
 # and the absolute difference between i and j is at most k.
 #
 # Example 1:
@@ -1142,7 +1143,8 @@ class Solution:
 # 121. Best Time to Buy and Sell Stock
 # You are given an array prices where prices[i] is the price of a given stock on the ith day.
 #
-# You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+# You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future
+# to sell that stock.
 #
 # Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
 #
@@ -1179,7 +1181,8 @@ class Solution:
 
 
 # 7. Reverse Integer
-# Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer
+# Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside
+# the signed 32-bit integer
 # range [-231, 231 - 1], then return 0.
 #
 # Assume the environment does not allow you to store 64-bit integers (signed or unsigned).
@@ -1226,33 +1229,6 @@ class Solution:
                 return out
 
 
-# 206. Reverse Linked List
-# Reverse a singly linked list.
-#
-# Example:
-#
-# Input: 1->2->3->4->5->NULL
-# Output: 5->4->3->2->1->NULL
-# Follow up:
-#
-# A linked list can be reversed either iteratively or recursively. Could you implement both?
-#
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def reverseList(self, head: ListNode) -> ListNode:
-        prev = None
-
-        while head:
-            temp = head
-            head = head.next
-            temp.next = prev
-            prev = temp
-        return prev
 
 
 # 605. Can Place Flowers
@@ -1284,59 +1260,6 @@ class Solution:
                 flowerbed[i] = 1
 
         return n<=count
-
-# 572. Subtree of Another Tree      [Amazon]
-# Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
-#
-# Example 1:
-# Given tree s:
-#
-# 3
-# / \
-#     4   5
-# / \
-#     1   2
-# Given tree t:
-# 4
-# / \
-#     1   2
-# Return true, because t has the same structure and node values with a subtree of s.
-#
-#
-# Example 2:
-# Given tree s:
-#
-# 3
-# / \
-#     4   5
-# / \
-#     1   2
-# /
-# 0
-# Given tree t:
-# 4
-# / \
-#     1   2
-# Return false.
-
-# Solution:
-
-class Solution:
-    def isSubtree(self, s: TreeNode, t: TreeNode) -> bool:
-        if s is None and t is None:
-            return True
-        if t is None:       # Could be a child
-            return True
-        if s is None and t is not None:
-            return False
-        return self.isSame(s,t) or self.isSubtree(s.left,t) or self.isSubtree(s.right,t)     #'OR' because if any condition is true then it's a child tree
-
-    def isSame(self,s,t):
-        if s is None and t is None:
-            return True
-        if s is None or t is None:
-            return False
-        return s.val == t.val and self.isSame(s.left,t.left) and self.isSame(s.right,t.right)
 
 # 937. Reorder Data in Log Files
 # You are given an array of logs. Each log is a space-delimited string of words, where the first word is the identifier.
