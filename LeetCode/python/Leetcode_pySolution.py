@@ -401,37 +401,7 @@ class Solution:
 # False	True	True
 # False	False	False
 
-# 203. Remove Linked List Elements
-# Remove all elements from a linked list of integers that have value val.
-#
-# Example:
-#
-# Input:  1->2->6->3->4->5->6, val = 6
-# Output: 1->2->3->4->5
-#
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def removeElements(self, head: ListNode, val: int) -> ListNode:
-        dummy = ListNode(None) #Create a virtual node to track the previous node of head
-        dummy.next = head
 
-        prev = dummy
-        cur = head
-
-        while cur:
-            if cur.val == val:
-                prev.next = cur.next
-            else:
-                prev = cur
-            cur = cur.next
-
-        return dummy.next # dummy has no value but dummy.next points to our whole linkedlist
-#
 #
 # 1047. Remove All Adjacent Duplicates In String
 # Given a string S of lowercase letters, a duplicate removal consists of choosing two adjacent and equal letters, and removing them.
@@ -964,7 +934,8 @@ class Solution:
 
 
 # 219. Contains Duplicate II
-# Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j]
+# Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array
+# such that nums[i] = nums[j]
 # and the absolute difference between i and j is at most k.
 #
 # Example 1:
@@ -1142,7 +1113,8 @@ class Solution:
 # 121. Best Time to Buy and Sell Stock
 # You are given an array prices where prices[i] is the price of a given stock on the ith day.
 #
-# You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+# You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future
+# to sell that stock.
 #
 # Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
 #
@@ -1179,7 +1151,8 @@ class Solution:
 
 
 # 7. Reverse Integer
-# Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer
+# Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside
+# the signed 32-bit integer
 # range [-231, 231 - 1], then return 0.
 #
 # Assume the environment does not allow you to store 64-bit integers (signed or unsigned).
@@ -1226,33 +1199,6 @@ class Solution:
                 return out
 
 
-# 206. Reverse Linked List
-# Reverse a singly linked list.
-#
-# Example:
-#
-# Input: 1->2->3->4->5->NULL
-# Output: 5->4->3->2->1->NULL
-# Follow up:
-#
-# A linked list can be reversed either iteratively or recursively. Could you implement both?
-#
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def reverseList(self, head: ListNode) -> ListNode:
-        prev = None
-
-        while head:
-            temp = head
-            head = head.next
-            temp.next = prev
-            prev = temp
-        return prev
 
 
 # 605. Can Place Flowers
@@ -1285,70 +1231,18 @@ class Solution:
 
         return n<=count
 
-# 572. Subtree of Another Tree      [Amazon]
-# Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
-#
-# Example 1:
-# Given tree s:
-#
-# 3
-# / \
-#     4   5
-# / \
-#     1   2
-# Given tree t:
-# 4
-# / \
-#     1   2
-# Return true, because t has the same structure and node values with a subtree of s.
-#
-#
-# Example 2:
-# Given tree s:
-#
-# 3
-# / \
-#     4   5
-# / \
-#     1   2
-# /
-# 0
-# Given tree t:
-# 4
-# / \
-#     1   2
-# Return false.
-
-# Solution:
-
-class Solution:
-    def isSubtree(self, s: TreeNode, t: TreeNode) -> bool:
-        if s is None and t is None:
-            return True
-        if t is None:       # Could be a child
-            return True
-        if s is None and t is not None:
-            return False
-        return self.isSame(s,t) or self.isSubtree(s.left,t) or self.isSubtree(s.right,t)     #'OR' because if any condition is true then it's a child tree
-
-    def isSame(self,s,t):
-        if s is None and t is None:
-            return True
-        if s is None or t is None:
-            return False
-        return s.val == t.val and self.isSame(s.left,t.left) and self.isSame(s.right,t.right)
-
 # 937. Reorder Data in Log Files
 # You are given an array of logs. Each log is a space-delimited string of words, where the first word is the identifier.
 #
 # There are two types of logs:
 #
 # Letter-logs: All words (except the identifier) consist of lowercase English letters.
-#                                                                             Digit-logs: All words (except the identifier) consist of digits.
+# Digit-logs: All words (except the identifier) consist of digits.
 #     Reorder these logs so that:
 #
 # The letter-logs come before all digit-logs.
-#     The letter-logs are sorted lexicographically by their contents. If their contents are the same, then sort them lexicographically by their identifiers.
+#     The letter-logs are sorted lexicographically by their contents. If their contents are the same,
+#     then sort them lexicographically by their identifiers.
 #     The digit-logs maintain their relative ordering.
 #     Return the final order of the logs.
 #
@@ -1372,7 +1266,7 @@ class Solution:
 # 1 <= logs.length <= 100
 # 3 <= logs[i].length <= 100
 # All the tokens of logs[i] are separated by a single space.
-#                                                         logs[i] is guaranteed to have an identifier and at least one word after the identifier
+# logs[i] is guaranteed to have an identifier and at least one word after the identifier
 
 # Solutions:
 
@@ -1393,55 +1287,12 @@ class Solution:
         return letter_log + digit_log
 
 
-# 21. Merge Two Sorted Lists
-# Merge two sorted linked lists and return it as a sorted list. The list should be made by splicing together the nodes of the first two lists.
-#
-#
-#
-# Example 1:
-#
-#
-# Input: l1 = [1,2,4], l2 = [1,3,4]
-# Output: [1,1,2,3,4,4]
-# Example 2:
-#
-# Input: l1 = [], l2 = []
-# Output: []
-# Example 3:
-#
-# Input: l1 = [], l2 = [0]
-# Output: [0]
-
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
-        prehead = ListNode(-1)
-
-        prev = prehead
-        while l1 and l2:
-            if l1.val <= l2.val:
-                prev.next = l1
-                l1 = l1.next
-            else:
-                prev.next = l2
-                l2 = l2.next
-            prev = prev.next
-
-        # At least one of l1 and l2 can still have nodes at this point, so connect
-        # the non-null list to the end of the merged list.
-        prev.next = l1 if l1 is not None else l2
-
-        return prehead.next
-
 # 819. Most Common Word
-# Given a paragraph and a list of banned words, return the most frequent word that is not in the list of banned words.  It is guaranteed there is at least one word that isn't banned, and that the answer is unique.
+# Given a paragraph and a list of banned words, return the most frequent word that is not in the list of banned words.
+# It is guaranteed there is at least one word that isn't banned, and that the answer is unique.
 #
-# Words in the list of banned words are given in lowercase, and free of punctuation.  Words in the paragraph are not case sensitive.  The answer is in lowercase.
+# Words in the list of banned words are given in lowercase, and free of punctuation.
+# Words in the paragraph are not case sensitive.  The answer is in lowercase.
 #
 #
 #
