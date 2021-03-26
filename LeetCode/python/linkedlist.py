@@ -56,6 +56,37 @@ class Solution:
             prev = temp
         return prev
 
+# 203. Remove Linked List Elements
+# Remove all elements from a linked list of integers that have value val.
+#
+# Example:
+#
+# Input:  1->2->6->3->4->5->6, val = 6
+# Output: 1->2->3->4->5
+#
+# Solution:
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def removeElements(self, head: ListNode, val: int) -> ListNode:
+        dummy = ListNode(None) #Create a virtual node to track the previous node of head
+        dummy.next = head
+
+        prev = dummy
+        cur = head
+
+        while cur:
+            if cur.val == val:
+                prev.next = cur.next
+            else:
+                prev = cur
+            cur = cur.next
+
+        return dummy.next # dummy has no value but dummy.next points to our whole linkedlist
+#
 
 # 21. Merge Two Sorted Lists
 # Merge two sorted linked lists and return it as a sorted list.

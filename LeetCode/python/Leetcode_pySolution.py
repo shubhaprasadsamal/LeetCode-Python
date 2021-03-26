@@ -401,37 +401,7 @@ class Solution:
 # False	True	True
 # False	False	False
 
-# 203. Remove Linked List Elements
-# Remove all elements from a linked list of integers that have value val.
-#
-# Example:
-#
-# Input:  1->2->6->3->4->5->6, val = 6
-# Output: 1->2->3->4->5
-#
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def removeElements(self, head: ListNode, val: int) -> ListNode:
-        dummy = ListNode(None) #Create a virtual node to track the previous node of head
-        dummy.next = head
 
-        prev = dummy
-        cur = head
-
-        while cur:
-            if cur.val == val:
-                prev.next = cur.next
-            else:
-                prev = cur
-            cur = cur.next
-
-        return dummy.next # dummy has no value but dummy.next points to our whole linkedlist
-#
 #
 # 1047. Remove All Adjacent Duplicates In String
 # Given a string S of lowercase letters, a duplicate removal consists of choosing two adjacent and equal letters, and removing them.
@@ -1267,11 +1237,12 @@ class Solution:
 # There are two types of logs:
 #
 # Letter-logs: All words (except the identifier) consist of lowercase English letters.
-#                                                                             Digit-logs: All words (except the identifier) consist of digits.
+# Digit-logs: All words (except the identifier) consist of digits.
 #     Reorder these logs so that:
 #
 # The letter-logs come before all digit-logs.
-#     The letter-logs are sorted lexicographically by their contents. If their contents are the same, then sort them lexicographically by their identifiers.
+#     The letter-logs are sorted lexicographically by their contents. If their contents are the same,
+#     then sort them lexicographically by their identifiers.
 #     The digit-logs maintain their relative ordering.
 #     Return the final order of the logs.
 #
@@ -1295,7 +1266,7 @@ class Solution:
 # 1 <= logs.length <= 100
 # 3 <= logs[i].length <= 100
 # All the tokens of logs[i] are separated by a single space.
-#                                                         logs[i] is guaranteed to have an identifier and at least one word after the identifier
+# logs[i] is guaranteed to have an identifier and at least one word after the identifier
 
 # Solutions:
 
@@ -1316,55 +1287,12 @@ class Solution:
         return letter_log + digit_log
 
 
-# 21. Merge Two Sorted Lists
-# Merge two sorted linked lists and return it as a sorted list. The list should be made by splicing together the nodes of the first two lists.
-#
-#
-#
-# Example 1:
-#
-#
-# Input: l1 = [1,2,4], l2 = [1,3,4]
-# Output: [1,1,2,3,4,4]
-# Example 2:
-#
-# Input: l1 = [], l2 = []
-# Output: []
-# Example 3:
-#
-# Input: l1 = [], l2 = [0]
-# Output: [0]
-
-# Solution:
-# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
-        prehead = ListNode(-1)
-
-        prev = prehead
-        while l1 and l2:
-            if l1.val <= l2.val:
-                prev.next = l1
-                l1 = l1.next
-            else:
-                prev.next = l2
-                l2 = l2.next
-            prev = prev.next
-
-        # At least one of l1 and l2 can still have nodes at this point, so connect
-        # the non-null list to the end of the merged list.
-        prev.next = l1 if l1 is not None else l2
-
-        return prehead.next
-
 # 819. Most Common Word
-# Given a paragraph and a list of banned words, return the most frequent word that is not in the list of banned words.  It is guaranteed there is at least one word that isn't banned, and that the answer is unique.
+# Given a paragraph and a list of banned words, return the most frequent word that is not in the list of banned words.
+# It is guaranteed there is at least one word that isn't banned, and that the answer is unique.
 #
-# Words in the list of banned words are given in lowercase, and free of punctuation.  Words in the paragraph are not case sensitive.  The answer is in lowercase.
+# Words in the list of banned words are given in lowercase, and free of punctuation.
+# Words in the paragraph are not case sensitive.  The answer is in lowercase.
 #
 #
 #
