@@ -589,3 +589,143 @@ class Solution:
 # res after pop:  []
 # i after pop:  1
 # x after pop:  4
+
+# 79. Word Search
+# Given an m x n grid of characters board and a string word, return true if word exists in the grid.
+# The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+#
+# Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+# Output: true
+#
+# Solution:
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+
+        ROWS = len(board)
+        COLUMNS = len(board[0])
+        visited = set()
+
+        # Better to have backtracking function inside main function so that
+        # all the base parameter can pass on to the function
+
+        def backtracking(r,c,i):
+
+            # print("r: ",r)
+            # print("c: ",c)
+            # print("i: ",i)
+            # print("board[r][c]: ",board[r][c])
+            # print("word[i]: ",word[i])
+
+
+            # if end of the string then True
+            if i == len(word):
+                # print("inside first True IF")
+                return True     # If this executed then that loop will not come to add step anymore
+
+            # if it become outof range and other false condition
+            if r<0 or r == ROWS or c<0 or c == COLUMNS or board[r][c] != word[i] or (r,c) in visited:
+                # print("inside second False IF")
+                return False    # If this executed then that loop will not come to add step anymore
+
+            # print("Before visited: ",visited)
+            visited.add((r,c))
+            # print("After visited: ",visited)
+            res =   (backtracking(r+1,c,i+1) or
+                     backtracking(r,c+1,i+1) or
+                     backtracking(r-1,c,i+1) or
+                     backtracking(r,c-1,i+1))
+            # print("res: ",res)
+
+            # print("Before visited remove: ",visited)
+            visited.remove((r,c))
+            # print("after visited remove: ",visited)
+            return res
+
+        for r in range(ROWS):
+            for c in range(COLUMNS):
+                # print("inside for r: ",r)
+                # print("inside for c: ",c)
+                if backtracking(r,c,0): return True
+
+        return False
+
+# 212. Word Search II [Need to learn about Data structure Trie for its optimal solution]
+# https://www.youtube.com/watch?v=asbcE9mZz_U
+#
+# Given an m x n board of characters and a list of strings words, return all words on the board.
+# Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+
+
+# 22. Generate Parentheses
+# Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+# Example 1:
+# Input: n = 3
+# Output: ["((()))","(()())","(())()","()(())","()()()"]
+#
+# Example 2:
+# Input: n = 1
+# Output: ["()"]
+
+# Solution:
+
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+
+        output = []
+
+        #left: Counter to count the open braces
+        #right: Counter to count the close braces
+
+        def backtracking(left,right,s):
+            if len(s) == 2*n:
+                output.append(s)
+            else:
+                # iteration to be continued until left counter is less than n
+                # right counter can't be greater than left counter
+                if left < n:
+                    s += "("
+                    backtracking(left+1,right,s)
+                    s=s[:-1] # String pop from the end
+                if left > right:
+                    s+= ")"
+                    backtracking(left,right+1,s)
+                    s=s[:-1]
+
+        backtracking(0,0,"")
+        return output
+
+# 78. Subsets
+# Given an integer array nums of unique elements, return all possible subsets (the power set).
+# The solution set must not contain duplicate subsets. Return the solution in any order.
+
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+
+        output = []
+        res = []
+        def backtracking(i):
+            if i >= len(nums[:]):
+
+                output.append(res[:])
+                print("output: ",output)
+
+            for x in range(i,len(nums)):
+                print("i: ",i)
+                print("x: ",x)
+
+                res.append(nums[x])
+                print("res: ",res)
+
+                backtracking(i+1)
+                res.pop()
+                print("res after pop: ",res)
+                print("i after pop: ",i)
+                print("nums[x] after pop: ",nums[x])
+                backtracking(i+1)
+
+        backtracking(0)
+        return output
+
+
+
