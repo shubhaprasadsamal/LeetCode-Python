@@ -214,5 +214,24 @@ nums = nums | mask
 Clear ith bit:
 ###############
 
+nums = 100110101
+pos  = 876543210
+Clear the 5th bit to 0 i.e. 100010101
+
+Solution:
+
+nums        = 100110101
+mask        = 111011111
+nums & mask = 100010101
+
+Programmatically:
+
+nums        = 100110101
+mask  = ~(1 << i)
+nums = nums & mask
+
+Find the number of bits to be changed inorder to convert a to b:
+#################################################################
+
 
 """
