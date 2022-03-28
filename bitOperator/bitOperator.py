@@ -93,7 +93,7 @@ a	  a << n (Bitwise left shift)
 12  12 << 2
 #   #####
 12 = 1100
-12 >> 2 = 110000 (48)
+12 << 2 = 110000 (48)
 
 
 How can we use this one in Program/Algorithm:
@@ -167,6 +167,52 @@ a = a ^ b (XOR) [101 ^ 111 = 010 (2)]
 b = a ^ b (XOR) [010 ^ 111 = 101 (5)]
 b = a ^ b (XOR) [010 ^ 101 = 111 (7)]
 
+Bit Masking:
+############
+$$$$$$$$$$$$$
+
+Find/Get ith bit:
+##################
+
+nums = 100110101
+pos  = 876543210
+Find/Get the 5th bit if its 1 or 0
+
+Solution:
+
+nums        = 100110101
+mask        = 000100000
+nums & mask = 000100000 => is the result's 5th element is 1 then nums's 5th element is 1 else 0
+
+Programmatically:
+
+nums        = 100110101
+mask  = 1 << i
+if nums & mask
+
+
+Set ith bit:
+#############
+
+nums = 100110101
+pos  = 876543210
+Set the 5th bit to 0 i.e. 100010101
+
+Solution:
+
+nums        = 100110101
+mask        = 000100000
+nums | mask = 100010101
+
+Programmatically:
+
+nums        = 100110101
+mask  = 1 << i
+nums = nums | mask
+
+
+Clear ith bit:
+###############
 
 
 """
