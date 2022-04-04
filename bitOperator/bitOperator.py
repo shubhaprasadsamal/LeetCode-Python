@@ -233,5 +233,20 @@ nums = nums & mask
 Find the number of bits to be changed inorder to convert a to b:
 #################################################################
 
+a                   = 10110
+b                   = 11011
+bits to be changed  =  11 1 = 3
+So total 3 bits are going to be changed
+
+Solution:
+
+if the bits are changed then we have to use ^ operator
+
+a     = 10110
+b     = 11011
+a ^ b = 01101
+
+Now the question becomes how to find total how many time bits are set i.e. bits are 1
+
 
 """
