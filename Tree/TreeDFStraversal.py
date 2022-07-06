@@ -9,6 +9,8 @@
 # For depth first, we can add all children to the stack, then pop and do a depth first on that node,
 # using the same stack. (Another Way to do that)
 
+# inorder = sorted(postorder) = sorted(preorder)
+
 # Pre-Ordered (recursive Way):
 class Node:
     def __init__(self,value):
@@ -68,3 +70,4 @@ tree.root.right.right = Node(7)
 print(tree.print_tree("pre_ordered"))
 print(tree.print_tree("in_ordered"))
 print(tree.print_tree("post_ordered"))
+
