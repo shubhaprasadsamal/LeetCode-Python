@@ -45,7 +45,7 @@ Operator	    Example	    Equivalent to
 <<=	        a <<= n	    a = a << n
 >>=	        a >>= n	    a = a >> n
 
-a	    b	aXORb(a^b)
+a	    b	aXORb(a^b) # whenever the task require to removing duplicate or finding one iof the duplicate is not present, use XOR operation
 #     #   #####
 0	    0	  0
 0	    1	  1
