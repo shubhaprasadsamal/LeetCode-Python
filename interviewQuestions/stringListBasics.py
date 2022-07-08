@@ -26,6 +26,19 @@
 # Convert String into Number:
 #############################
 
+def convert(strs):
+    nums = int(strs)
+    print("Nums: ",nums)
+    print("Nums Type: ",type(nums))
+
+strs = "123"
+convert(strs)
+
+# Output:
+# Nums:  123
+# Nums Type:  <class 'int'>
+
+
 # Convert string into List:
 ###########################
 
@@ -71,15 +84,15 @@
 
 
     # Type-2
-def convert(lst):
-    strs2 = ""
-    for x in lst:
-        strs2 += str(x)
-    print("String2: ",strs2)
-    print("String2 Type: ",type(strs2))
-
-lst2 = [1, 2, 3]
-convert(lst2)
+# def convert(lst):
+#     strs2 = ""
+#     for x in lst:
+#         strs2 += str(x)
+#     print("String2: ",strs2)
+#     print("String2 Type: ",type(strs2))
+#
+# lst2 = [1, 2, 3]
+# convert(lst2)
 
 # Output:
 # String2:  123
