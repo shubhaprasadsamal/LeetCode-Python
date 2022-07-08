@@ -27,4 +27,9 @@ def addition(strs):
 strs = '3265847308'
 print(addition(strs)) # 11
 
+3. Difference between List, Tuple, Set and Dictionary:
+
+
+
+
 

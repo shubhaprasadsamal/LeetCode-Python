@@ -317,3 +317,105 @@ class Solution(object):
             else:
                 dix[i] = 1
 
+# 268. Missing Number
+# Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [3,0,1]
+# Output: 2
+# Explanation: n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums.
+# Example 2:
+#
+# Input: nums = [0,1]
+# Output: 2
+# Explanation: n = 2 since there are 2 numbers, so all numbers are in the range [0,2]. 2 is the missing number in the range since it does not appear in nums.
+# Example 3:
+#
+# Input: nums = [9,6,4,2,3,5,7,0,1]
+# Output: 8
+# Explanation: n = 9 since there are 9 numbers, so all numbers are in the range [0,9]. 8 is the missing number in the range since it does not appear in nums.
+
+class Solution(object):
+    def missingNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+
+
+        missing = len(nums)
+
+        for i,x in enumerate(nums):
+            missing = missing^(i^x)
+
+        return missing
+
+# 283. Move Zeroes
+# Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+#
+# Note that you must do this in-place without making a copy of the array.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [0,1,0,3,12]
+# Output: [1,3,12,0,0]
+# Example 2:
+#
+# Input: nums = [0]
+# Output: [0]
+
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+
+        # S
+        i = 0
+        j = len(nums)-1
+
+        while i < j:
+            if nums[i] == 0:
+                x = nums.pop(i)
+                nums.append(x)
+                j-=1
+            else:
+                i+=1
+
+# 350. Intersection of Two Arrays II
+# Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.
+#
+#
+#
+# Example 1:
+#
+# Input: nums1 = [1,2,2,1], nums2 = [2,2]
+# Output: [2,2]
+# Example 2:
+#
+# Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+# Output: [4,9]
+# Explanation: [9,4] is also accepted.
+
+nums1.sort()
+nums2.sort()
+
+i = 0
+j = 0
+result = []
+while i < len(nums1) and j < len(nums2):
+    if nums1[i] == nums2[j]:
+        result.append(nums1[i])
+        i+=1
+        j+=1
+    elif nums1[i] <= nums2[j]:
+        i+=1
+    else:
+        j+=1
+
+return result
