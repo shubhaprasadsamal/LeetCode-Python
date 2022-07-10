@@ -460,3 +460,149 @@ class Solution(object):
         inorder(root)
         return output
 
+# 101. Symmetric Tree
+# Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [1,2,2,3,4,4,3]
+# Output: true
+# Example 2:
+#
+#
+# Input: root = [1,2,2,null,3,null,3]
+# Output: false
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def isSymmetric(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+
+        def isMirror(rLeft,rRight): # Take two arguments for left and right sode of root and compare
+            if rLeft is None and rRight is None:
+                return True
+            elif rLeft is None or rRight is None:
+                return False
+            elif rLeft and rRight:
+                if (rLeft.val == rRight.val) and isMirror(rLeft.left,rRight.right) and isMirror(rLeft.right,rRight.left): # Compare both the side values and position
+                    return True
+
+        return isMirror(root.left,root.right)
+
+# 104. Maximum Depth of Binary Tree
+# Given the root of a binary tree, return its maximum depth.
+#
+# A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [3,9,20,null,null,15,7]
+# Output: 3
+# Example 2:
+#
+# Input: root = [1,null,2]
+# Output: 2
+
+# Breadth First Search:
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        queue = []
+        height = 0
+
+        if not root:
+            return height
+        queue.append(root)
+
+        while queue:
+
+            temp = []
+            height += 1
+
+            for node in queue:
+                if node.left:
+                    temp.append(node.left)
+                if node.right:
+                    temp.append(node.right)
+
+            queue = temp
+
+        return height
+
+# Recurssion:
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+
+        return 1+max(self.maxDepth(root.left),self.maxDepth(root.right))
+
+# 202. Happy Number
+# Write an algorithm to determine if a number n is happy.
+#
+# A happy number is a number defined by the following process:
+#
+# Starting with any positive integer, replace the number by the sum of the squares of its digits.
+# Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.
+# Those numbers for which this process ends in 1 are happy.
+# Return true if n is a happy number, and false if not.
+#
+#
+#
+# Example 1:
+#
+# Input: n = 19
+# Output: true
+# Explanation:
+# 12 + 92 = 82
+# 82 + 22 = 68
+# 62 + 82 = 100
+# 12 + 02 + 02 = 1
+# Example 2:
+#
+# Input: n = 2
+# Output: false
+
+class Solution(object):
+    def isHappy(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+
+        def square(n):
+            total = 0
+            while n > 0:
+                r = n%10
+                r = r ** 2
+                total += r
+                n = n//10
+            return total
+
+        mapper = set()
+        while n not in mapper:
+            mapper.add(n)
+            n = square(n)
+            if n == 1:
+                return True
