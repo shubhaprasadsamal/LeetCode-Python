@@ -606,3 +606,120 @@ class Solution(object):
             n = square(n)
             if n == 1:
                 return True
+
+# 69. Sqrt(x)
+# Given a non-negative integer x, compute and return the square root of x.
+#
+# Since the return type is an integer, the decimal digits are truncated, and only the integer part of the result is returned.
+#
+# Note: You are not allowed to use any built-in exponent function or operator, such as pow(x, 0.5) or x ** 0.5.
+#
+#
+#
+# Example 1:
+#
+# Input: x = 4
+# Output: 2
+# Example 2:
+#
+# Input: x = 8
+# Output: 2
+# Explanation: The square root of 8 is 2.82842..., and since the decimal part is truncated, 2 is returned.
+
+class Solution(object):
+    def mySqrt(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        # By Binary Search
+
+        if x == 0 or x == 1:
+            return x
+
+        start = 1
+        end = x
+
+        while start <= end:
+
+            mid = (start + end)//2
+            mid_sqr = mid * mid
+
+            if mid_sqr == x:
+                return mid
+            if mid_sqr < x:
+                start = mid+1
+                ans = mid
+            else:
+                end = mid -1
+        return ans
+
+# 326. Power of Three
+# Given an integer n, return true if it is a power of three. Otherwise, return false.
+#
+# An integer n is a power of three, if there exists an integer x such that n == 3x.
+#
+#
+#
+# Example 1:
+#
+# Input: n = 27
+# Output: true
+# Example 2:
+#
+# Input: n = 0
+# Output: false
+# Example 3:
+#
+# Input: n = 9
+# Output: true
+
+class Solution(object):
+    def isPowerOfThree(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        # 27: 27/3 = 9(0) 9/3 = 3(0) 3/3 = 1
+        # 10: 10/3 = 3(1)
+        if n < 3 and n != 1:
+            return False
+
+        while n >= 3:
+            if n%3 != 0:
+                return False
+            n = n/3
+
+        return n == 1
+
+# 191. Number of 1 Bits
+# Write a function that takes an unsigned integer and returns the number of '1' bits it has (also known as the Hamming weight).
+# Example 1:
+#
+# Input: n = 00000000000000000000000000001011
+# Output: 3
+# Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+# Example 2:
+#
+# Input: n = 00000000000000000000000010000000
+# Output: 1
+# Explanation: The input binary string 00000000000000000000000010000000 has a total of one '1' bit.
+
+class Solution(object):
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        res = 0
+        while n:
+            if n&1 != 0: # n%2 != 0 | Lets' say 1011 & 0001 = 0001 hence not 0
+
+                res += 1
+
+            #update n
+            n = n>>1 #n/2 to get the new n | 1011 >> 1 = 0101 (Then new n)
+
+        return res
+
+
