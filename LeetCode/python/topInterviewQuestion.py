@@ -379,23 +379,30 @@ def missingNumber(self, nums):
 # Input: nums = [0]
 # Output: [0]
 
-class Solution:
-    def moveZeroes(self, nums: List[int]) -> None:
+class Solution(object):
+    def moveZeroes(self, nums):
         """
-        Do not return anything, modify nums in-place instead.
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
         """
+        # Quick Sort
+        # Idea here is to move all the non zero elements to the left
+        l = 0 # set the left as 1st element of the list and iterate the right through out the list
+        for r in range(len(nums)): # iterate the right through out the list
+            if nums[r] != 0:    # validate if the right element is not 0 then swap the element with left and in creament the left
+                nums[l],nums[r] = nums[r],nums[l]
+                l += 1
+        return nums
 
-        # S
-        i = 0
-        j = len(nums)-1
+#   Second Method
 
-        while i < j:
+        for i in range(len(nums)):
             if nums[i] == 0:
-                x = nums.pop(i)
-                nums.append(x)
-                j-=1
-            else:
-                i+=1
+                temp = nums[i]
+                nums.remove(nums[i]) # remove will remove the element by scanning the list starting from begining
+                nums.append(temp)
+
+        return nums
 
 # 350. Intersection of Two Arrays II
 # Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.
