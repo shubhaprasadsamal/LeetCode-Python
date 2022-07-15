@@ -338,20 +338,30 @@ class Solution(object):
 # Output: 8
 # Explanation: n = 9 since there are 9 numbers, so all numbers are in the range [0,9]. 8 is the missing number in the range since it does not appear in nums.
 
-class Solution(object):
-    def missingNumber(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
+cclass Solution(object):
+def missingNumber(self, nums):
+    """
+    :type nums: List[int]
+    :rtype: int
+    """
 
+    # Note: We are going to subtract between the sum of all the index number and sum of all the numbers in nums and we will get the missing number. Everything is self explanatory except why missing = len(nums) ? Because when we iterate over nums we are acuatlly iterating upto n-1th index not nth index. nth index has to be added up and hence we are assigning the nth idex by finding len(nums) to the variable at the first place
 
-        missing = len(nums)
+    #         missing = len(nums)
 
-        for i,x in enumerate(nums):
-            missing = missing^(i^x)
+    #         for i in range(len(nums)):
+    #             missing += (i-nums[i])
 
-        return missing
+    #         return missing
+
+    # Note: XOR operation results 0 between two/more same digits and it don't depends on the order of the operation. Hence if we do [0,1,2,3]^[3,0,1] then we will get the result as 2. missing = len(nums) is also for the same reason.
+
+    missing = len(nums)
+
+    for i in range(len(nums)):
+        missing = missing^(i^nums[i])
+
+    return missing
 
 # 283. Move Zeroes
 # Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.
