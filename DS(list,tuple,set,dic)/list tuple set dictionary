@@ -1,0 +1,43 @@
+List:
+
+1. Mutable
+2. Order based Collection
+3. Non-homogeneous Data Structure
+4. Represented by []
+5. Allows duplicate elements
+6. Can be nested
+7. Can be created using list() function
+
+
+Tuple:
+
+1. Immutable
+2. Order based Collection
+3. Non-homogeneous Data Structure
+4. Represented by ()
+5. Allows duplicate elements
+6. Can be nested
+7. Can be created using tuple() function
+8. Like list; it can be accessible by index
+
+
+Set:
+
+1. Mutable
+2. Un-order based Collection
+3. Non-homogeneous Data Structure
+4. Represented by {}
+5. NOT allows duplicate elements
+6. Can be nested
+7. Can be created using set() function
+
+
+Dictionary:
+
+1. Mutable
+2. Order based Collection
+3. Non-homogeneous Data Structure stores Key-Value pair
+4. Represented by {}
+5. NOT allows duplicate Key
+6. Can be nested
+7. Can be created using dict() function
