@@ -739,4 +739,47 @@ class Solution(object):
 
         return res
 
+# 3. Longest Substring Without Repeating Characters
+# Given a string s, find the length of the longest substring without repeating characters.
+#
+#
+#
+# Example 1:
+#
+# Input: s = "abcabcbb"
+# Output: 3
+# Explanation: The answer is "abc", with the length of 3.
+# Example 2:
+#
+# Input: s = "bbbbb"
+# Output: 1
+# Explanation: The answer is "b", with the length of 1.
+# Example 3:
+#
+# Input: s = "pwwkew"
+# Output: 3
+# Explanation: The answer is "wke", with the length of 3.
+# Notice that the answer must be a substring, "pwke" is a subsequence and not a substring.
 
+class Solution(object):
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        # Sliding window Method
+        if len(s) == 0:
+            return 0
+
+        size = 0
+        dix = {}
+        start = 0   # start with 0th index
+
+        for i in range(len(s)):
+            if s[i] in dix and start <= dix[s[i]]: # start <= dix[s[i]]: Since dix[s[i]] gives the first index of the repeate value hence idea here is to satisfy else condition and get the updated size
+                start = dix[s[i]] + 1 # increment the starting position by 1
+            else:
+                size = max(size,i-start+1) # i-start+1: the length of string between the index and the starting point
+            dix[s[i]] = i # this will update the duplicate value's updated position
+
+        return size
