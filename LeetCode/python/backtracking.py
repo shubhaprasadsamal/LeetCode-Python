@@ -1,8 +1,11 @@
 # Backtracking - DFS
 # Branch&Bound - BFS
 # https://www.youtube.com/watch?v=DKCbsiDBN6c
-# When we try to find out the all possible solution, we think of Backtracking but when we think of optimal solution
-# we think of Dynamic programing.
+# When we try to find out the all possible solution, we think of Backtracking
+# Ex: let's say there are 3 students and three chairs, how many different ways that
+#        we can arrange them (n!)
+# Here the solution can be represented as a tree which is called as state space Tree
+# but when we think of optimal solution then we think of Dynamic programing.
 #
 # Back Tracking pseudo code Template:
 #

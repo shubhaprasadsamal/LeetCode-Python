@@ -783,3 +783,140 @@ class Solution(object):
             dix[s[i]] = i # this will update the duplicate value's updated position
 
         return size
+
+# Medium:
+#########
+
+# 22. Generate Parentheses
+# Add to List
+#
+# Share
+# Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+#
+#
+#
+# Example 1:
+#
+# Input: n = 3
+# Output: ["((()))","(()())","(())()","()(())","()()()"]
+# Example 2:
+#
+# Input: n = 1
+# Output: ["()"]
+
+#BackTracking [When backtracking while we need the answer as all possible solution]
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+
+        # Backtracking beacause we have to find all possible solution
+        # Idea is here that there would be n open parathesis and n close parathensis
+
+        stack = []
+        res = []
+
+        def backtracking(openN,closeN):
+
+            if openN == closeN == n: #when we have all the open parathensis and corresponding close parathensis then return
+                res.append("".join(stack))
+                return
+
+            if openN > closeN: # when # of open parathesis is greater than # of close parathensis then add close parathensis
+                stack.append(")")
+                backtracking(openN,closeN+1)
+                stack.pop()
+
+            if openN < n: # when # of close parathesis is greater than # of open parathensis then add open parathensis
+                stack.append("(")
+                backtracking(openN+1,closeN)
+                stack.pop()
+
+        backtracking(0,0)
+        return res
+
+# 17. Letter Combinations of a Phone Number
+# Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+#
+# A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+# Example 1:
+#
+# Input: digits = "23"
+# Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+# Example 2:
+#
+# Input: digits = ""
+# Output: []
+# Example 3:
+#
+# Input: digits = "2"
+# Output: ["a","b","c"]
+
+class Solution(object):
+    def letterCombinations(self, digits):
+        """
+        :type digits: str
+        :rtype: List[str]
+        """
+        # Input: digits = "23"
+        # Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+        # BackTracking as we need all possible solution
+        res = []
+        digitsToChar = {"2":"abc","3":"def","4":"ghi","5":"jkl","6":"mno","7":"pqrs","8":"tuv","9":"wxyz"}
+
+        def backtracking(i,curString):
+            #   i = current digit inside the digits
+            #   curString = form the string
+
+            #   Base Case:
+            #   If both the length are same
+            if len(digits) == len(curString):
+                res.append(curString)
+                return # Need to understand why return ?
+
+
+            for j in digitsToChar[digits[i]]:
+                backtracking(i+1, curString + j)
+
+        if digits:
+            backtracking(0,"")
+
+        return  res
+
+# 49. Group Anagrams
+# Given an array of strings strs, group the anagrams together. You can return the answer in any order.
+#
+# An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+# Example 1:
+#
+# Input: strs = ["eat","tea","tan","ate","nat","bat"]
+# Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+# Example 2:
+#
+# Input: strs = [""]
+# Output: [[""]]
+# Example 3:
+#
+# Input: strs = ["a"]
+# Output: [["a"]]
+
+class Solution(object):
+    def groupAnagrams(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+
+        # Brute force
+        # Sorting method
+
+        resDic = {}
+
+        for i in strs:
+            word = "".join(sorted(i)) # Sort the every single string
+
+            if word in resDic:         # Check if sorted string is already there in dic as key
+                resDic[word].append(i)  # append the original string into the list value of dic
+            else:
+                resDic[word] = [i]      #   if not present then insert the key and value as list
+        print(resDic)       # {u'ant': [u'tan', u'nat'], u'abt': [u'bat'], u'aet': [u'eat', u'tea', u'ate']}
+        return list(resDic.values()) # get only the dic values into a list
+
