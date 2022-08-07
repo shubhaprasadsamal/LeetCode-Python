@@ -974,3 +974,46 @@ class Solution(object):
         print(resDic)       # {u'ant': [u'tan', u'nat'], u'abt': [u'bat'], u'aet': [u'eat', u'tea', u'ate']}
         return list(resDic.values()) # get only the dic values into a list
 
+# 139. Word Break
+# Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.
+#
+# Note that the same word in the dictionary may be reused multiple times in the segmentation.
+#
+#
+#
+# Example 1:
+#
+# Input: s = "leetcode", wordDict = ["leet","code"]
+# Output: true
+# Explanation: Return true because "leetcode" can be segmented as "leet code".
+# Example 2:
+#
+# Input: s = "applepenapple", wordDict = ["apple","pen"]
+# Output: true
+# Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+# Note that you are allowed to reuse a dictionary word.
+# Example 3:
+#
+# Input: s = "catsandog", wordDict = ["cats","dog","sand","and","cat"]
+# Output: false
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        # Dynamic Programming
+        dp = [False]*(len(s)+1) #   [False, False, False, False, False, False, False, False, False]
+        dp[len(s)] = True       #   [False, False, False, False, False, False, False, False, True]
+
+        # Iterate the element of the string from end:
+        for i in range(len(s)-1,-1, -1):
+            # print("i: ",i)
+            # match the word from wordDict with the sub words in s
+            for w in wordDict:
+                if (i+len(w)) <= len(s) and s[i:i+len(w)] == w:
+                    # print("i+len(w): ",i+len(w))
+                    # print("dp[i]: ",dp[i])
+                    # print("dp[i+len(w)]: ",dp[i+len(w)])
+                    # Assign last True value to dp[i]
+                    dp[i] = dp[i+len(w)]
+                if dp[i] == True:
+                    break
+        return dp[0]
