@@ -1000,6 +1000,7 @@ class Solution(object):
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
         # Dynamic Programming
+        #Create a list of False of one length more and mark the last as True
         dp = [False]*(len(s)+1) #   [False, False, False, False, False, False, False, False, False]
         dp[len(s)] = True       #   [False, False, False, False, False, False, False, False, True]
 
