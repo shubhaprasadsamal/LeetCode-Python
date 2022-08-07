@@ -1018,3 +1018,64 @@ class Solution:
                 if dp[i] == True:
                     break
         return dp[0]
+
+# 179. Largest Number
+# Given a list of non-negative integers nums, arrange them such that they form the largest number and return it.
+#
+# Since the result may be very large, so you need to return a string instead of an integer.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [10,2]
+# Output: "210"
+# Example 2:
+#
+# Input: nums = [3,30,34,5,9]
+# Output: "9534330"
+
+class Solution:
+    def largestNumber(self, nums: List[int]) -> str:
+        # convert integer to string so that string can be joined to form numbers and can be compared like integer
+        for i,n in enumerate(nums):
+            nums[i] = str(n)    #  nums = ["10","2"]
+
+        # use python inbuilt sorting funtion sorted(n,key = cmp_to_key(compare))
+        def compare(n1,n2):
+            if n1+n2 > n2+n1:
+                return -1
+            else:
+                return 1
+
+        nums = sorted(nums,key = cmp_to_key(compare)) # Python inbuilt function
+        #converting int first why: "000" it should be 0 not 000
+        return str(int("".join(nums)))
+
+
+class Solution:
+    def largestNumber(self, nums: List[int]) -> str:
+        # convert integer to string so that string can be joined to form numbers and can be compared like integer
+        nums = list(map(str,nums))
+
+        # If only one element is there inside the list
+        if len(nums) < 2:
+            return "".join(nums)
+
+        # Define a compare function
+        def compare(x,y):
+            if nums[x]+nums[y] > nums[y]+nums[x]:
+                return True
+
+
+        for x in range(len(nums)-1):
+            y = x+1
+            while x < len(nums) and y < len(nums):
+                if compare(x,y):
+                    pass
+                else:   # if found greater then swap the element
+                    nums[x],nums[y] = nums[y],nums[x]
+                y+=1
+
+        return str(int("".join(nums)))
+
