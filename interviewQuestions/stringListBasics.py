@@ -26,13 +26,13 @@
 # Convert String into Number:
 #############################
 
-def convert(strs):
-    nums = int(strs)
-    print("Nums: ",nums)
-    print("Nums Type: ",type(nums))
-
-strs = "123"
-convert(strs)
+# def convert(strs):
+#     nums = int(strs)
+#     print("Nums: ",nums)
+#     print("Nums Type: ",type(nums))
+#
+# strs = "123"
+# convert(strs)
 
 # Output:
 # Nums:  123
@@ -97,3 +97,73 @@ convert(strs)
 # Output:
 # String2:  123
 # String2 Type:  <class 'str'>
+
+# Convert List into Set:
+#############################
+
+# def convert(list):
+#     nums = set(list)
+#     print("Nums: ",nums)
+#     print("Nums Type: ",type(nums))
+#
+# list = [1,2,3]
+# convert(list)
+
+# Output:
+# Nums:  {1, 2, 3}
+# Nums Type:  <class 'set'>
+
+# Convert Set into List:
+#############################
+
+# def convert(Set):
+#     nums = list(set)
+#     print("Nums: ",nums)
+#     print("Nums Type: ",type(nums))
+#
+# set = {1,2,3}
+# convert(set)
+
+# Output:
+# Nums:  [1, 2, 3]
+# Nums Type:  <class 'list'>
+
+
+# Convert a List of lists into a Set of lists:
+##############################################
+
+# def convert(list):
+#     nums = set()
+#     for i in list:
+#         nums.add(tuple(i))
+#     print("Nums: ",nums)
+#     print("Nums Type: ",type(nums))
+#     return nums
+#
+# list = [[1,2,3],[2,3,4],[1,2,3],[3,4,5],[2,3,4]]
+# convert(list)
+
+# Output:
+# Nums:  {(3, 4, 5), (1, 2, 3), (2, 3, 4)}
+# Nums Type:  <class 'set'>
+
+
+# Convert a Set of lists into a List of lists:
+##############################################
+
+def convert(set1):
+    # nums = []
+    for i in set1:
+        print([list(i)])
+    # print("Nums: ",nums)
+    # print("Nums Type: ",type(nums))
+
+set1 = {[1,2,3],[2,3,4],[1,2,3],[3,4,5],[2,3,4]}
+convert(set1)
+
+# Output:
+# Not working
+
+# mat = [[1,2,3],[4,5,6],[1,2,3],[7,8,9],[4,5,6]]
+# print(set(tuple(row) for row in mat))
+# print([list(item) for item in set(tuple(row) for row in mat)])
