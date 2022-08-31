@@ -1079,3 +1079,191 @@ class Solution:
 
         return str(int("".join(nums)))
 
+# 21. Merge Two Sorted Lists:
+# You are given the heads of two sorted linked lists list1 and list2.
+#
+# Merge the two lists in a one sorted list. The list should be made by splicing together the nodes of the first two lists.
+#
+# Return the head of the merged linked list.
+# Input: list1 = [1,2,4], list2 = [1,3,4]
+# Output: [1,1,2,3,4,4]
+#
+# Example 2:
+#
+# Input: list1 = [], list2 = []
+# Output: []
+# Example 3:
+#
+# Input: list1 = [], list2 = [0]
+# Output: [0]
+
+#Iteration:
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+
+        # Create a dummy Node
+        dummy = ListNode()
+        tail = dummy
+
+        while list1 and list2:
+            if list1.val <= list2.val:
+                tail.next = list1
+                list1 = list1.next
+            else:
+                tail.next = list2
+                list2 = list2.next
+            # Update the tail Pointer
+            tail = tail.next
+
+        if list1:
+            tail.next = list1
+        else:
+            tail.next = list2
+        return dummy.next
+
+# Recursive
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+
+        if list1 is None:
+            return list2
+        if list2 is None:
+            return list1
+
+        if list1.val <= list2.val:
+            list1.next = self.mergeTwoLists(list1.next,list2)
+            return list1
+        else:
+            list2.next = self.mergeTwoLists(list1,list2.next)
+            return list2
+
+# 141. Linked List Cycle
+# Given head, the head of a linked list, determine if the linked list has a cycle in it.
+#
+# There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+#
+# Return true if there is a cycle in the linked list. Otherwise, return false.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: head = [3,2,0,-4], pos = 1
+# Output: true
+# Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
+# Example 2:
+#
+#
+# Input: head = [1,2], pos = 0
+# Output: true
+# Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
+# Example 3:
+#
+#
+# Input: head = [1], pos = -1
+# Output: false
+# Explanation: There is no cycle in the linked list.
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+
+        if head is None:
+            return False
+        slow = head
+        fast = head.next
+
+        while slow != fast:
+            if fast is None or fast.next is None:
+                return False
+            slow = slow.next
+            fast = fast.next.next
+        return True
+
+# 206. Reverse Linked List
+# Given the head of a singly linked list, reverse the list, and return the reversed list.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: head = [1,2,3,4,5]
+# Output: [5,4,3,2,1]
+# Example 2:
+#
+#
+# Input: head = [1,2]
+# Output: [2,1]
+# Example 3:
+#
+# Input: head = []
+# Output: []
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+
+        dummy = None
+        tail = dummy
+
+        while head:
+            ptr = head
+            head = head.next
+            ptr.next = tail
+            tail = ptr
+
+        return tail
+
+# 234. Palindrome Linked List
+# Given the head of a singly linked list, return true if it is a palindrome or false otherwise.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: head = [1,2,2,1]
+# Output: true
+# Example 2:
+#
+#
+# Input: head = [1,2]
+# Output: false
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+
+        result = []
+
+        while head:
+            result.append(head.val)
+            head = head.next
+
+        # Now check if the list is a pallindrum
+        if result == result[::-1]:
+            return True
+
+
+
+
