@@ -490,3 +490,241 @@ from
     inner join Logs l2 on (l1.num = l2.num and l1.id = l2.id - 1)
     inner join Logs l3 on (l1.num = l3.num and l1.id = l3.id - 2)
 ;
+
+--184. Department Highest Salary
+--Medium
+--
+--1314
+--
+--167
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Employee
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| id           | int     |
+--| name         | varchar |
+--| salary       | int     |
+--| departmentId | int     |
+--+--------------+---------+
+--id is the primary key column for this table.
+--departmentId is a foreign key of the ID from the Department table.
+--Each row of this table indicates the ID, name, and salary of an employee. It also contains the ID of their department.
+--
+--
+--Table: Department
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| id          | int     |
+--| name        | varchar |
+--+-------------+---------+
+--id is the primary key column for this table.
+--Each row of this table indicates the ID of a department and its name.
+--
+--
+--Write an SQL query to find employees who have the highest salary in each of the departments.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Employee table:
+--+----+-------+--------+--------------+
+--| id | name  | salary | departmentId |
+--+----+-------+--------+--------------+
+--| 1  | Joe   | 70000  | 1            |
+--| 2  | Jim   | 90000  | 1            |
+--| 3  | Henry | 80000  | 2            |
+--| 4  | Sam   | 60000  | 2            |
+--| 5  | Max   | 90000  | 1            |
+--+----+-------+--------+--------------+
+--Department table:
+--+----+-------+
+--| id | name  |
+--+----+-------+
+--| 1  | IT    |
+--| 2  | Sales |
+--+----+-------+
+--Output:
+--+------------+----------+--------+
+--| Department | Employee | Salary |
+--+------------+----------+--------+
+--| IT         | Jim      | 90000  |
+--| Sales      | Henry    | 80000  |
+--| IT         | Max      | 90000  |
+--+------------+----------+--------+
+--Explanation: Max and Jim both have the highest salary in the IT department and Henry has the highest salary in the Sales department.
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    d.name as Department ,
+    e.name as Employee ,
+    salary as Salary ,
+    dense_rank() over(partition by d.name order by salary desc) as rnk
+from
+   Employee e inner join  Department d
+on
+    e.departmentId = d.id
+)
+select
+    Department ,
+    Employee ,
+    Salary
+from
+    cte
+where
+    rnk = 1;
+
+--534. Game Play Analysis III
+--Medium
+--
+--301
+--
+--14
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Activity
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| player_id    | int     |
+--| device_id    | int     |
+--| event_date   | date    |
+--| games_played | int     |
+--+--------------+---------+
+--(player_id, event_date) is the primary key of this table.
+--This table shows the activity of players of some games.
+--Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on someday using some device.
+--
+--
+--Write an SQL query to report for each player and date, how many games played so far by the player. That is, the total number of games played by the player until that date. Check the example for clarity.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Activity table:
+--+-----------+-----------+------------+--------------+
+--| player_id | device_id | event_date | games_played |
+--+-----------+-----------+------------+--------------+
+--| 1         | 2         | 2016-03-01 | 5            |
+--| 1         | 2         | 2016-05-02 | 6            |
+--| 1         | 3         | 2017-06-25 | 1            |
+--| 3         | 1         | 2016-03-02 | 0            |
+--| 3         | 4         | 2018-07-03 | 5            |
+--+-----------+-----------+------------+--------------+
+--Output:
+--+-----------+------------+---------------------+
+--| player_id | event_date | games_played_so_far |
+--+-----------+------------+---------------------+
+--| 1         | 2016-03-01 | 5                   |
+--| 1         | 2016-05-02 | 11                  |
+--| 1         | 2017-06-25 | 12                  |
+--| 3         | 2016-03-02 | 0                   |
+--| 3         | 2018-07-03 | 5                   |
+--+-----------+------------+---------------------+
+--Explanation:
+--For the player with id 1, 5 + 6 = 11 games played by 2016-05-02, and 5 + 6 + 1 = 12 games played by 2017-06-25.
+--For the player with id 3, 0 + 5 = 5 games played by 2018-07-03.
+--Note that for each player we only care about the days when the player logged in.
+
+select
+    player_id ,
+    event_date ,
+    sum(games_played) over (partition by player_id order by event_date) as games_played_so_far
+from
+    Activity ;
+
+--550. Game Play Analysis IV
+--Medium
+--
+--249
+--
+--72
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Activity
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| player_id    | int     |
+--| device_id    | int     |
+--| event_date   | date    |
+--| games_played | int     |
+--+--------------+---------+
+--(player_id, event_date) is the primary key of this table.
+--This table shows the activity of players of some games.
+--Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on someday using some device.
+--
+--
+--Write an SQL query to report the fraction of players that logged in again on the day after the day they first logged in, rounded to 2 decimal places. In other words, you need to count the number of players that logged in for at least two consecutive days starting from their first login date, then divide that number by the total number of players.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Activity table:
+--+-----------+-----------+------------+--------------+
+--| player_id | device_id | event_date | games_played |
+--+-----------+-----------+------------+--------------+
+--| 1         | 2         | 2016-03-01 | 5            |
+--| 1         | 2         | 2016-03-02 | 6            |
+--| 2         | 3         | 2017-06-25 | 1            |
+--| 3         | 1         | 2016-03-02 | 0            |
+--| 3         | 4         | 2018-07-03 | 5            |
+--+-----------+-----------+------------+--------------+
+--Output:
+--+-----------+
+--| fraction  |
+--+-----------+
+--| 0.33      |
+--+-----------+
+--Explanation:
+--Only the player with id 1 logged back in after the first day he had logged in so the answer is 1/3 = 0.33
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    player_id,
+    event_date as cur_date ,
+    min(event_date) over(partition by player_id ) as next_date
+
+from
+    Activity
+)
+select
+    round(sum(case when (abs(next_date-cur_date) = 1) then 1 else 0 end)/count(distinct player_id),2) as fraction
+from
+    cte;
+
