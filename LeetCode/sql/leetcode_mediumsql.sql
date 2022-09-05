@@ -2279,3 +2279,298 @@ group by
 having
     sum(active_business)>1;
 
+--1132. Reported Posts II
+--Medium
+--
+--122
+--
+--469
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Actions
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| user_id       | int     |
+--| post_id       | int     |
+--| action_date   | date    |
+--| action        | enum    |
+--| extra         | varchar |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--The action column is an ENUM type of ('view', 'like', 'reaction', 'comment', 'report', 'share').
+--The extra column has optional information about the action, such as a reason for the report or a type of reaction.
+--
+--
+--Table: Removals
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| post_id       | int     |
+--| remove_date   | date    |
+--+---------------+---------+
+--post_id is the primary key of this table.
+--Each row in this table indicates that some post was removed due to being reported or as a result of an admin review.
+--
+--
+--Write an SQL query to find the average daily percentage of posts that got removed after being reported as spam, rounded to 2 decimal places.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Actions table:
+--+---------+---------+-------------+--------+--------+
+--| user_id | post_id | action_date | action | extra  |
+--+---------+---------+-------------+--------+--------+
+--| 1       | 1       | 2019-07-01  | view   | null   |
+--| 1       | 1       | 2019-07-01  | like   | null   |
+--| 1       | 1       | 2019-07-01  | share  | null   |
+--| 2       | 2       | 2019-07-04  | view   | null   |
+--| 2       | 2       | 2019-07-04  | report | spam   |
+--| 3       | 4       | 2019-07-04  | view   | null   |
+--| 3       | 4       | 2019-07-04  | report | spam   |
+--| 4       | 3       | 2019-07-02  | view   | null   |
+--| 4       | 3       | 2019-07-02  | report | spam   |
+--| 5       | 2       | 2019-07-03  | view   | null   |
+--| 5       | 2       | 2019-07-03  | report | racism |
+--| 5       | 5       | 2019-07-03  | view   | null   |
+--| 5       | 5       | 2019-07-03  | report | racism |
+--+---------+---------+-------------+--------+--------+
+--Removals table:
+--+---------+-------------+
+--| post_id | remove_date |
+--+---------+-------------+
+--| 2       | 2019-07-20  |
+--| 3       | 2019-07-18  |
+--+---------+-------------+
+--Output:
+--+-----------------------+
+--| average_daily_percent |
+--+-----------------------+
+--| 75.00                 |
+--+-----------------------+
+--Explanation:
+--The percentage for 2019-07-04 is 50% because only one post of two spam reported posts were removed.
+--The percentage for 2019-07-02 is 100% because one post was reported as spam and it was removed.
+--The other days had no spam reports so the average is (50 + 100) / 2 = 75%
+--Note that the output is only one number and that we do not care about the remove dates.
+
+with cte1 as
+(
+select
+    action_date,
+    (count(distinct r.post_id)/count(distinct a.post_id))*100 as percent
+from actions a
+left join removals r using (post_id)
+where action = 'report' and extra = 'spam'
+group by 1
+)
+
+select round(avg(percent), 2) as average_daily_percent from cte1;
+
+--1149. Article Views II
+--Medium
+--
+--101
+--
+--27
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Views
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| article_id    | int     |
+--| author_id     | int     |
+--| viewer_id     | int     |
+--| view_date     | date    |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--Each row of this table indicates that some viewer viewed an article (written by some author) on some date.
+--Note that equal author_id and viewer_id indicate the same person.
+--
+--
+--Write an SQL query to find all the people who viewed more than one article on the same date.
+--
+--Return the result table sorted by id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Views table:
+--+------------+-----------+-----------+------------+
+--| article_id | author_id | viewer_id | view_date  |
+--+------------+-----------+-----------+------------+
+--| 1          | 3         | 5         | 2019-08-01 |
+--| 3          | 4         | 5         | 2019-08-01 |
+--| 1          | 3         | 6         | 2019-08-02 |
+--| 2          | 7         | 7         | 2019-08-01 |
+--| 2          | 7         | 6         | 2019-08-02 |
+--| 4          | 7         | 1         | 2019-07-22 |
+--| 3          | 4         | 4         | 2019-07-21 |
+--| 3          | 4         | 4         | 2019-07-21 |
+--+------------+-----------+-----------+------------+
+--Output:
+--+------+
+--| id   |
+--+------+
+--| 5    |
+--| 6    |
+--+------+
+
+with cte as
+(
+select
+viewer_id ,
+view_date
+,count(distinct article_id)  as tot_view
+
+from
+    Views
+group by
+    1,2
+)
+select distinct viewer_id as id
+from cte
+where
+    tot_view > 1
+order by
+    1;
+
+--1158. Market Analysis I
+--Medium
+--
+--291
+--
+--49
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Users
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| user_id        | int     |
+--| join_date      | date    |
+--| favorite_brand | varchar |
+--+----------------+---------+
+--user_id is the primary key of this table.
+--This table has the info of the users of an online shopping website where users can sell and buy items.
+--
+--
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| order_date    | date    |
+--| item_id       | int     |
+--| buyer_id      | int     |
+--| seller_id     | int     |
+--+---------------+---------+
+--order_id is the primary key of this table.
+--item_id is a foreign key to the Items table.
+--buyer_id and seller_id are foreign keys to the Users table.
+--
+--
+--Table: Items
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| item_id       | int     |
+--| item_brand    | varchar |
+--+---------------+---------+
+--item_id is the primary key of this table.
+--
+--
+--Write an SQL query to find for each user, the join date and the number of orders they made as a buyer in 2019.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Users table:
+--+---------+------------+----------------+
+--| user_id | join_date  | favorite_brand |
+--+---------+------------+----------------+
+--| 1       | 2018-01-01 | Lenovo         |
+--| 2       | 2018-02-09 | Samsung        |
+--| 3       | 2018-01-19 | LG             |
+--| 4       | 2018-05-21 | HP             |
+--+---------+------------+----------------+
+--Orders table:
+--+----------+------------+---------+----------+-----------+
+--| order_id | order_date | item_id | buyer_id | seller_id |
+--+----------+------------+---------+----------+-----------+
+--| 1        | 2019-08-01 | 4       | 1        | 2         |
+--| 2        | 2018-08-02 | 2       | 1        | 3         |
+--| 3        | 2019-08-03 | 3       | 2        | 3         |
+--| 4        | 2018-08-04 | 1       | 4        | 2         |
+--| 5        | 2018-08-04 | 1       | 3        | 4         |
+--| 6        | 2019-08-05 | 2       | 2        | 4         |
+--+----------+------------+---------+----------+-----------+
+--Items table:
+--+---------+------------+
+--| item_id | item_brand |
+--+---------+------------+
+--| 1       | Samsung    |
+--| 2       | Lenovo     |
+--| 3       | LG         |
+--| 4       | HP         |
+--+---------+------------+
+--Output:
+--+-----------+------------+----------------+
+--| buyer_id  | join_date  | orders_in_2019 |
+--+-----------+------------+----------------+
+--| 1         | 2018-01-01 | 1              |
+--| 2         | 2018-02-09 | 2              |
+--| 3         | 2018-01-19 | 0              |
+--| 4         | 2018-05-21 | 0              |
+--+-----------+------------+----------------+
+
+with temp as (
+    select
+        buyer_id,
+        count(order_id) as order_count
+    from
+        orders
+    where
+        left(order_date,4) = '2019'
+    group by
+        buyer_id
+    )
+select
+    user_id as buyer_id,
+    join_date,
+    ifnull(t.order_count,0) as orders_in_2019
+from
+    Users u left join temp t
+on
+    u.user_id = t.buyer_id;
