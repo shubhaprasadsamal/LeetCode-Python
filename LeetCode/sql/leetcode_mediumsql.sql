@@ -2574,3 +2574,162 @@ from
     Users u left join temp t
 on
     u.user_id = t.buyer_id;
+
+
+--1164. Product Price at a Given Date
+--Medium
+--
+--301
+--
+--83
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Products
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| product_id    | int     |
+--| new_price     | int     |
+--| change_date   | date    |
+--+---------------+---------+
+--(product_id, change_date) is the primary key of this table.
+--Each row of this table indicates that the price of some product was changed to a new price at some date.
+--
+--
+--Write an SQL query to find the prices of all products on 2019-08-16. Assume the price of all products before any change is 10.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Products table:
+--+------------+-----------+-------------+
+--| product_id | new_price | change_date |
+--+------------+-----------+-------------+
+--| 1          | 20        | 2019-08-14  |
+--| 2          | 50        | 2019-08-14  |
+--| 1          | 30        | 2019-08-15  |
+--| 1          | 35        | 2019-08-16  |
+--| 2          | 65        | 2019-08-17  |
+--| 3          | 20        | 2019-08-18  |
+--+------------+-----------+-------------+
+--Output:
+--+------------+-------+
+--| product_id | price |
+--+------------+-------+
+--| 2          | 50    |
+--| 1          | 35    |
+--| 3          | 10    |
+--+------------+-------+
+
+with cte as
+(
+select
+     product_id,
+     new_price ,
+    row_number() over (partition by product_id order by change_date desc) as rnk
+from
+    Products
+where
+    change_date <= '2019-08-16'
+)
+select
+    a.product_id,
+    coalesce(c.new_price,10) as price
+from
+    (select distinct product_id from Products) a left join cte c
+on
+    a.product_id = c.product_id
+and
+    c.rnk = 1;
+
+--1174. Immediate Food Delivery II
+--Medium
+--
+--100
+--
+--50
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Delivery
+--
+--+-----------------------------+---------+
+--| Column Name                 | Type    |
+--+-----------------------------+---------+
+--| delivery_id                 | int     |
+--| customer_id                 | int     |
+--| order_date                  | date    |
+--| customer_pref_delivery_date | date    |
+--+-----------------------------+---------+
+--delivery_id is the primary key of this table.
+--The table holds information about food delivery to customers that make orders at some date and specify a preferred delivery date (on the same order date or after it).
+--
+--
+--If the customer's preferred delivery date is the same as the order date, then the order is called immediate; otherwise, it is called scheduled.
+--
+--The first order of a customer is the order with the earliest order date that the customer made. It is guaranteed that a customer has precisely one first order.
+--
+--Write an SQL query to find the percentage of immediate orders in the first orders of all customers, rounded to 2 decimal places.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Delivery table:
+--+-------------+-------------+------------+-----------------------------+
+--| delivery_id | customer_id | order_date | customer_pref_delivery_date |
+--+-------------+-------------+------------+-----------------------------+
+--| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+--| 2           | 2           | 2019-08-02 | 2019-08-02                  |
+--| 3           | 1           | 2019-08-11 | 2019-08-12                  |
+--| 4           | 3           | 2019-08-24 | 2019-08-24                  |
+--| 5           | 3           | 2019-08-21 | 2019-08-22                  |
+--| 6           | 2           | 2019-08-11 | 2019-08-13                  |
+--| 7           | 4           | 2019-08-09 | 2019-08-09                  |
+--+-------------+-------------+------------+-----------------------------+
+--Output:
+--+----------------------+
+--| immediate_percentage |
+--+----------------------+
+--| 50.00                |
+--+----------------------+
+--Explanation:
+--The customer id 1 has a first order with delivery id 1 and it is scheduled.
+--The customer id 2 has a first order with delivery id 2 and it is immediate.
+--The customer id 3 has a first order with delivery id 5 and it is scheduled.
+--The customer id 4 has a first order with delivery id 7 and it is immediate.
+--Hence, half the customers have immediate first orders.
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    customer_id,
+    order_date ,
+    customer_pref_delivery_date ,
+    rank() over(partition by customer_id order by order_date) as rnk
+from
+    Delivery
+)
+select
+    round((sum(if(order_date=customer_pref_delivery_date,1,0))/count(order_date))*100,2) as immediate_percentage
+from
+    cte
+where
+    rnk = 1;
+
