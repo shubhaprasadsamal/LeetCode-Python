@@ -1470,3 +1470,330 @@ select
 from
     cte;
 
+--614. Second Degree Follower
+--Medium
+--
+--127
+--
+--710
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Follow
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| followee    | varchar |
+--| follower    | varchar |
+--+-------------+---------+
+--(followee, follower) is the primary key column for this table.
+--Each row of this table indicates that the user follower follows the user followee on a social network.
+--There will not be a user following themself.
+--
+--
+--A second-degree follower is a user who:
+--
+--follows at least one user, and
+--is followed by at least one user.
+--Write an SQL query to report the second-degree users and the number of their followers.
+--
+--Return the result table ordered by follower in alphabetical order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Follow table:
+--+----------+----------+
+--| followee | follower |
+--+----------+----------+
+--| Alice    | Bob      |
+--| Bob      | Cena     |
+--| Bob      | Donald   |
+--| Donald   | Edward   |
+--+----------+----------+
+--Output:
+--+----------+-----+
+--| follower | num |
+--+----------+-----+
+--| Bob      | 2   |
+--| Donald   | 1   |
+--+----------+-----+
+--Explanation:
+--User Bob has 2 followers. Bob is a second-degree follower because he follows Alice, so we include him in the result table.
+--User Donald has 1 follower. Donald is a second-degree follower because he follows Bob, so we include him in the result table.
+--User Alice has 1 follower. Alice is not a second-degree follower because she does not follow anyone, so we don not include her in the result table.
+
+# Write your MySQL query statement below
+
+select
+    f1.follower,
+    count(distinct f2.follower) as num
+from
+    Follow f1 join Follow f2
+on
+    f1.follower = f2.followee
+group by
+    1
+order by
+    1;
+
+--626. Exchange Seats
+--Medium
+--
+--779
+--
+--386
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Seat
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| id          | int     |
+--| student     | varchar |
+--+-------------+---------+
+--id is the primary key column for this table.
+--Each row of this table indicates the name and the ID of a student.
+--id is a continuous increment.
+--
+--
+--Write an SQL query to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped.
+--
+--Return the result table ordered by id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Seat table:
+--+----+---------+
+--| id | student |
+--+----+---------+
+--| 1  | Abbot   |
+--| 2  | Doris   |
+--| 3  | Emerson |
+--| 4  | Green   |
+--| 5  | Jeames  |
+--+----+---------+
+--Output:
+--+----+---------+
+--| id | student |
+--+----+---------+
+--| 1  | Doris   |
+--| 2  | Abbot   |
+--| 3  | Green   |
+--| 4  | Emerson |
+--| 5  | Jeames  |
+--+----+---------+
+--Explanation:
+--Note that if the number of students is odd, there is no need to change the last one's seat.
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    id,
+    student,
+    lead(id,1) over(order by id) as next,
+    lag(id,1) over(order by id) as prev
+from
+    Seat
+)
+select
+    case when id%2 != 0 and next is null then id
+        when id%2 != 0 and next is not null then next
+        when id%2 =0 then prev end as id,
+        student
+from
+    cte
+order by
+1;
+
+--1045. Customers Who Bought All Products
+--Medium
+--
+--210
+--
+--38
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Customer
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| customer_id | int     |
+--| product_key | int     |
+--+-------------+---------+
+--There is no primary key for this table. It may contain duplicates.
+--product_key is a foreign key to Product table.
+--
+--
+--Table: Product
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| product_key | int     |
+--+-------------+---------+
+--product_key is the primary key column for this table.
+--
+--
+--Write an SQL query to report the customer ids from the Customer table that bought all the products in the Product table.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Customer table:
+--+-------------+-------------+
+--| customer_id | product_key |
+--+-------------+-------------+
+--| 1           | 5           |
+--| 2           | 6           |
+--| 3           | 5           |
+--| 3           | 6           |
+--| 1           | 6           |
+--+-------------+-------------+
+--Product table:
+--+-------------+
+--| product_key |
+--+-------------+
+--| 5           |
+--| 6           |
+--+-------------+
+--Output:
+--+-------------+
+--| customer_id |
+--+-------------+
+--| 1           |
+--| 3           |
+--+-------------+
+--Explanation:
+--The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.
+
+select
+    customer_id
+from
+    Customer
+group by
+    customer_id
+having
+    count(distinct product_key) = (select count(*) from Product )
+
+--1070. Product Sales Analysis III
+--Medium
+--
+--77
+--
+--308
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Sales
+--
+--+-------------+-------+
+--| Column Name | Type  |
+--+-------------+-------+
+--| sale_id     | int   |
+--| product_id  | int   |
+--| year        | int   |
+--| quantity    | int   |
+--| price       | int   |
+--+-------------+-------+
+--(sale_id, year) is the primary key of this table.
+--product_id is a foreign key to Product table.
+--Each row of this table shows a sale on the product product_id in a certain year.
+--Note that the price is per unit.
+--
+--
+--Table: Product
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| product_id   | int     |
+--| product_name | varchar |
+--+--------------+---------+
+--product_id is the primary key of this table.
+--Each row of this table indicates the product name of each product.
+--
+--
+--Write an SQL query that selects the product id, year, quantity, and price for the first year of every product sold.
+--
+--Return the resulting table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Sales table:
+--+---------+------------+------+----------+-------+
+--| sale_id | product_id | year | quantity | price |
+--+---------+------------+------+----------+-------+
+--| 1       | 100        | 2008 | 10       | 5000  |
+--| 2       | 100        | 2009 | 12       | 5000  |
+--| 7       | 200        | 2011 | 15       | 9000  |
+--+---------+------------+------+----------+-------+
+--Product table:
+--+------------+--------------+
+--| product_id | product_name |
+--+------------+--------------+
+--| 100        | Nokia        |
+--| 200        | Apple        |
+--| 300        | Samsung      |
+--+------------+--------------+
+--Output:
+--+------------+------------+----------+-------+
+--| product_id | first_year | quantity | price |
+--+------------+------------+----------+-------+
+--| 100        | 2008       | 10       | 5000  |
+--| 200        | 2011       | 15       | 9000  |
+--+------------+------------+----------+-------+
+
+# Write your MySQL query statement below
+select
+    product_id ,
+    year as first_year ,
+    quantity ,
+    price
+from
+    (
+select
+    product_id ,
+    year,
+    quantity ,
+    price,
+    rank() over(partition by product_id  order by year) as rnk
+from
+    Sales
+        )a
+        where a.rnk = 1;
+
