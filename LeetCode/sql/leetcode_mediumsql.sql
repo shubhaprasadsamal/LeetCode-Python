@@ -1994,3 +1994,205 @@ group by
 having
     sum(case when dispatch_date > DATE_SUB('2019-06-23', INTERVAL 1 YEAR) THEN quantity else 0 end) < 10
     ;
+
+--1107. New Users Daily Count
+--Medium
+--
+--120
+--
+--131
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Traffic
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| user_id       | int     |
+--| activity      | enum    |
+--| activity_date | date    |
+--+---------------+---------+
+--There is no primary key for this table, it may have duplicate rows.
+--The activity column is an ENUM type of ('login', 'logout', 'jobs', 'groups', 'homepage').
+--
+--
+--Write an SQL query to reports for every date within at most 90 days from today, the number of users that logged in for the first time on that date. Assume today is 2019-06-30.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Traffic table:
+--+---------+----------+---------------+
+--| user_id | activity | activity_date |
+--+---------+----------+---------------+
+--| 1       | login    | 2019-05-01    |
+--| 1       | homepage | 2019-05-01    |
+--| 1       | logout   | 2019-05-01    |
+--| 2       | login    | 2019-06-21    |
+--| 2       | logout   | 2019-06-21    |
+--| 3       | login    | 2019-01-01    |
+--| 3       | jobs     | 2019-01-01    |
+--| 3       | logout   | 2019-01-01    |
+--| 4       | login    | 2019-06-21    |
+--| 4       | groups   | 2019-06-21    |
+--| 4       | logout   | 2019-06-21    |
+--| 5       | login    | 2019-03-01    |
+--| 5       | logout   | 2019-03-01    |
+--| 5       | login    | 2019-06-21    |
+--| 5       | logout   | 2019-06-21    |
+--+---------+----------+---------------+
+--Output:
+--+------------+-------------+
+--| login_date | user_count  |
+--+------------+-------------+
+--| 2019-05-01 | 1           |
+--| 2019-06-21 | 2           |
+--+------------+-------------+
+--Explanation:
+--Note that we only care about dates with non zero user count.
+--The user with id 5 first logged in on 2019-03-01 so he's not counted on 2019-06-21.
+
+-- Solution -1
+--############
+# Write your MySQL query statement below
+with cte as
+(
+select
+
+    user_id,
+    activity_date ,
+    row_number() over(partition by user_id order by activity_date) as rnk
+
+from
+    Traffic
+where
+    activity = 'login'
+)
+select
+    activity_date as login_date,
+    count(user_id) as user_count
+from
+    cte
+where
+    activity_date >= date_sub('2019-06-30', INTERVAL 90 DAY)
+and
+    rnk = 1
+group by
+    1
+order by
+    1 desc;
+
+-- Solution -2
+--############
+# Write your MySQL query statement below
+with cte as
+(
+select
+
+    user_id,
+    min(activity_date) as  login_date
+from
+    Traffic
+where
+    activity = 'login'
+group by
+    1
+)
+select
+    login_date,
+    count(user_id) as user_count
+from
+    cte
+where
+    login_date >= date_sub('2019-06-30', INTERVAL 90 DAY)
+group by
+    1
+order by
+    1 desc;
+
+
+
+--1112. Highest Grade For Each Student
+--Medium
+--
+--220
+--
+--11
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Enrollments
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| student_id    | int     |
+--| course_id     | int     |
+--| grade         | int     |
+--+---------------+---------+
+--(student_id, course_id) is the primary key of this table.
+--
+--
+--Write a SQL query to find the highest grade with its corresponding course for each student. In case of a tie, you should find the course with the smallest course_id.
+--
+--Return the result table ordered by student_id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Enrollments table:
+--+------------+-------------------+
+--| student_id | course_id | grade |
+--+------------+-----------+-------+
+--| 2          | 2         | 95    |
+--| 2          | 3         | 95    |
+--| 1          | 1         | 90    |
+--| 1          | 2         | 99    |
+--| 3          | 1         | 80    |
+--| 3          | 2         | 75    |
+--| 3          | 3         | 82    |
+--+------------+-----------+-------+
+--Output:
+--+------------+-------------------+
+--| student_id | course_id | grade |
+--+------------+-----------+-------+
+--| 1          | 2         | 99    |
+--| 2          | 2         | 95    |
+--| 3          | 3         | 82    |
+--+------------+-----------+-------+
+
+with cte as
+(
+select
+    student_id,
+    course_id,
+    grade,
+    dense_rank() over (partition by student_id order by grade desc,course_id) as rnk
+from
+    Enrollments
+)
+select
+    student_id
+    ,course_id
+    ,grade
+from
+    cte
+where
+    rnk = 1;
+
+
