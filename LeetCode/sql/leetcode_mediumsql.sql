@@ -1049,3 +1049,180 @@ order by
     rate desc, question_id
 limit 1
     ;
+
+--580. Count Student Number in Departments
+--Medium
+--
+--205
+--
+--33
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Student
+--
+--+--------------+---------+
+--| Column Name  | Type    |
+--+--------------+---------+
+--| student_id   | int     |
+--| student_name | varchar |
+--| gender       | varchar |
+--| dept_id      | int     |
+--+--------------+---------+
+--student_id is the primary key column for this table.
+--dept_id is a foreign key to dept_id in the Department tables.
+--Each row of this table indicates the name of a student, their gender, and the id of their department.
+--
+--
+--Table: Department
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| dept_id     | int     |
+--| dept_name   | varchar |
+--+-------------+---------+
+--dept_id is the primary key column for this table.
+--Each row of this table contains the id and the name of a department.
+--
+--
+--Write an SQL query to report the respective department name and number of students majoring in each department for all departments in the Department table (even ones with no current students).
+--
+--Return the result table ordered by student_number in descending order. In case of a tie, order them by dept_name alphabetically.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Student table:
+--+------------+--------------+--------+---------+
+--| student_id | student_name | gender | dept_id |
+--+------------+--------------+--------+---------+
+--| 1          | Jack         | M      | 1       |
+--| 2          | Jane         | F      | 1       |
+--| 3          | Mark         | M      | 2       |
+--+------------+--------------+--------+---------+
+--Department table:
+--+---------+-------------+
+--| dept_id | dept_name   |
+--+---------+-------------+
+--| 1       | Engineering |
+--| 2       | Science     |
+--| 3       | Law         |
+--+---------+-------------+
+--Output:
+--+-------------+----------------+
+--| dept_name   | student_number |
+--+-------------+----------------+
+--| Engineering | 2              |
+--| Science     | 1              |
+--| Law         | 0              |
+--+-------------+----------------+
+
+select
+    dept_name,
+    ifnull(count(student_id),0) as student_number
+from
+    Department d left join Student s
+on
+    d.dept_id = s.dept_id
+group by
+    1
+order by
+    2 desc,1
+
+--585. Investments in 2016
+--Medium
+--
+--204
+--
+--223
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Insurance
+--
+--+-------------+-------+
+--| Column Name | Type  |
+--+-------------+-------+
+--| pid         | int   |
+--| tiv_2015    | float |
+--| tiv_2016    | float |
+--| lat         | float |
+--| lon         | float |
+--+-------------+-------+
+--pid is the primary key column for this table.
+--Each row of this table contains information about one policy where:
+--pid is the policyholder's policy ID.
+--tiv_2015 is the total investment value in 2015 and tiv_2016 is the total investment value in 2016.
+--lat is the latitude of the policy holder's city.
+--lon is the longitude of the policy holder's city.
+--
+--
+--Write an SQL query to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:
+--
+--have the same tiv_2015 value as one or more other policyholders, and
+--are not located in the same city like any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).
+--Round tiv_2016 to two decimal places.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Insurance table:
+--+-----+----------+----------+-----+-----+
+--| pid | tiv_2015 | tiv_2016 | lat | lon |
+--+-----+----------+----------+-----+-----+
+--| 1   | 10       | 5        | 10  | 10  |
+--| 2   | 20       | 20       | 20  | 20  |
+--| 3   | 10       | 30       | 20  | 20  |
+--| 4   | 10       | 40       | 40  | 40  |
+--+-----+----------+----------+-----+-----+
+--Output:
+--+----------+
+--| tiv_2016 |
+--+----------+
+--| 45.00    |
+--+----------+
+--Explanation:
+--The first record in the table, like the last record, meets both of the two criteria.
+--The tiv_2015 value 10 is the same as the third and fourth records, and its location is unique.
+--
+--The second record does not meet any of the two criteria. Its tiv_2015 is not like any other policyholders and its location is the same as the third record, which makes the third record fail, too.
+--So, the result is the sum of tiv_2016 of the first and last record, which is 45.
+
+# Write your MySQL query statement below
+
+select
+    round(sum(tiv_2016), 2) as "tiv_2016"
+from
+    Insurance i1
+where
+    tiv_2015 in (select
+                    tiv_2015
+                from
+                    Insurance
+                group by
+                    tiv_2015
+                having
+                    count(*) > 1
+                )
+    and (lat, lon) in (select
+                                lat, lon
+                             from
+                                Insurance
+                             group by
+                                lat, lon
+                             having
+                                count(*) = 1
+                             )
