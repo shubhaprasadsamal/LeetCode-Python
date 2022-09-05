@@ -1399,3 +1399,74 @@ SELECT id,
                 "Leaf" end as type
 FROM tree
 
+--612. Shortest Distance in a Plane
+--Medium
+--
+--180
+--
+--64
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Point2D
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| x           | int  |
+--| y           | int  |
+--+-------------+------+
+--(x, y) is the primary key column for this table.
+--Each row of this table indicates the position of a point on the X-Y plane.
+--
+--
+--The distance between two points p1(x1, y1) and p2(x2, y2) is sqrt((x2 - x1)2 + (y2 - y1)2).
+--
+--Write an SQL query to report the shortest distance between any two points from the Point2D table. Round the distance to two decimal points.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Point2D table:
+--+----+----+
+--| x  | y  |
+--+----+----+
+--| -1 | -1 |
+--| 0  | 0  |
+--| -1 | -2 |
+--+----+----+
+--Output:
+--+----------+
+--| shortest |
+--+----------+
+--| 1.00     |
+--+----------+
+--Explanation: The shortest distance is 1.00 from point (-1, -1) to (-1, 2).
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    p1.x as x1,
+    p1.y as y1,
+    p2.x as x2,
+    p2.y as y2
+
+from
+    Point2D p1 join Point2D p2
+on
+    p1.x != p2.x
+OR
+    p1.y != p2.y
+)
+select
+    round(min(sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))),2) as shortest
+from
+    cte;
+
