@@ -1797,3 +1797,200 @@ from
         )a
         where a.rnk = 1;
 
+--1077. Project Employees III
+--Medium
+--
+--200
+--
+--7
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Project
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| project_id  | int     |
+--| employee_id | int     |
+--+-------------+---------+
+--(project_id, employee_id) is the primary key of this table.
+--employee_id is a foreign key to Employee table.
+--Each row of this table indicates that the employee with employee_id is working on the project with project_id.
+--
+--
+--Table: Employee
+--
+--+------------------+---------+
+--| Column Name      | Type    |
+--+------------------+---------+
+--| employee_id      | int     |
+--| name             | varchar |
+--| experience_years | int     |
+--+------------------+---------+
+--employee_id is the primary key of this table.
+--Each row of this table contains information about one employee.
+--
+--
+--Write an SQL query that reports the most experienced employees in each project. In case of a tie, report all employees with the maximum number of experience years.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Project table:
+--+-------------+-------------+
+--| project_id  | employee_id |
+--+-------------+-------------+
+--| 1           | 1           |
+--| 1           | 2           |
+--| 1           | 3           |
+--| 2           | 1           |
+--| 2           | 4           |
+--+-------------+-------------+
+--Employee table:
+--+-------------+--------+------------------+
+--| employee_id | name   | experience_years |
+--+-------------+--------+------------------+
+--| 1           | Khaled | 3                |
+--| 2           | Ali    | 2                |
+--| 3           | John   | 3                |
+--| 4           | Doe    | 2                |
+--+-------------+--------+------------------+
+--Output:
+--+-------------+---------------+
+--| project_id  | employee_id   |
+--+-------------+---------------+
+--| 1           | 1             |
+--| 1           | 3             |
+--| 2           | 1             |
+--+-------------+---------------+
+--Explanation: Both employees with id 1 and 3 have the most experience among the employees of the first project. For the second project, the employee with id 1 has the most experience.
+
+with cte as
+(
+select
+    p.project_id
+    ,p.employee_id
+    ,rank() over (partition by p.project_id order by experience_years desc) as rnk
+
+from
+    Project p join Employee e
+on
+    p.employee_id = e.employee_id
+)
+select
+    project_id,
+    employee_id
+from
+    cte
+where
+    rnk = 1;
+
+--1098. Unpopular Books
+--Medium
+--
+--164
+--
+--479
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Books
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| book_id        | int     |
+--| name           | varchar |
+--| available_from | date    |
+--+----------------+---------+
+--book_id is the primary key of this table.
+--
+--
+--Table: Orders
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| order_id       | int     |
+--| book_id        | int     |
+--| quantity       | int     |
+--| dispatch_date  | date    |
+--+----------------+---------+
+--order_id is the primary key of this table.
+--book_id is a foreign key to the Books table.
+--
+--
+--Write an SQL query that reports the books that have sold less than 10 copies in the last year, excluding books that have been available for less than one month from today. Assume today is 2019-06-23.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Books table:
+--+---------+--------------------+----------------+
+--| book_id | name               | available_from |
+--+---------+--------------------+----------------+
+--| 1       | "Kalila And Demna" | 2010-01-01     |
+--| 2       | "28 Letters"       | 2012-05-12     |
+--| 3       | "The Hobbit"       | 2019-06-10     |
+--| 4       | "13 Reasons Why"   | 2019-06-01     |
+--| 5       | "The Hunger Games" | 2008-09-21     |
+--+---------+--------------------+----------------+
+--Orders table:
+--+----------+---------+----------+---------------+
+--| order_id | book_id | quantity | dispatch_date |
+--+----------+---------+----------+---------------+
+--| 1        | 1       | 2        | 2018-07-26    |
+--| 2        | 1       | 1        | 2018-11-05    |
+--| 3        | 3       | 8        | 2019-06-11    |
+--| 4        | 4       | 6        | 2019-06-05    |
+--| 5        | 4       | 5        | 2019-06-20    |
+--| 6        | 5       | 9        | 2009-02-02    |
+--| 7        | 5       | 8        | 2010-04-13    |
+--+----------+---------+----------+---------------+
+--Output:
+--+-----------+--------------------+
+--| book_id   | name               |
+--+-----------+--------------------+
+--| 1         | "Kalila And Demna" |
+--| 2         | "28 Letters"       |
+--| 5         | "The Hunger Games" |
+--+-----------+--------------------+
+
+# Write your MySQL query statement below
+
+select
+    b.book_id,
+    b.name
+from
+   Books b left join  Orders o
+on
+    b.book_id = o.book_id
+where
+    b.book_id not in (select
+                            distinct book_id
+                        from
+                            Books
+                        where
+                            datediff('2019-06-23',available_from) <= 30)
+group by
+    1,2
+having
+    sum(case when dispatch_date > DATE_SUB('2019-06-23', INTERVAL 1 YEAR) THEN quantity else 0 end) < 10
+    ;
