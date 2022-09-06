@@ -158,3 +158,150 @@ on
     t1.team_name    != t2.team_name   ;
 
 
+--2356. Number of Unique Subjects Taught by Each Teacher
+--Easy
+--
+--13
+--
+--4
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Teacher
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| teacher_id  | int  |
+--| subject_id  | int  |
+--| dept_id     | int  |
+--+-------------+------+
+--(subject_id, dept_id) is the primary key for this table.
+--Each row in this table indicates that the teacher with teacher_id teaches the subject subject_id in the department dept_id.
+--
+--
+--Write an SQL query to report the number of unique subjects each teacher teaches in the university.
+--
+--Return the result table in any order.
+--
+--The query result format is shown in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Teacher table:
+--+------------+------------+---------+
+--| teacher_id | subject_id | dept_id |
+--+------------+------------+---------+
+--| 1          | 2          | 3       |
+--| 1          | 2          | 4       |
+--| 1          | 3          | 3       |
+--| 2          | 1          | 1       |
+--| 2          | 2          | 1       |
+--| 2          | 3          | 1       |
+--| 2          | 4          | 1       |
+--+------------+------------+---------+
+--Output:
+--+------------+-----+
+--| teacher_id | cnt |
+--+------------+-----+
+--| 1          | 2   |
+--| 2          | 4   |
+--+------------+-----+
+--Explanation:
+--Teacher 1:
+--  - They teach subject 2 in departments 3 and 4.
+--  - They teach subject 3 in department 3.
+--Teacher 2:
+--  - They teach subject 1 in department 1.
+--  - They teach subject 2 in department 1.
+--  - They teach subject 3 in department 1.
+--  - They teach subject 4 in department 1.
+
+# Write your MySQL query statement below
+select
+    teacher_id ,
+    count(distinct subject_id ) as cnt
+from
+    Teacher
+group by
+    1;
+
+--2377. Sort the Olympic Table
+--Easy
+--
+--12
+--
+--0
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Olympic
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| country       | varchar |
+--| gold_medals   | int     |
+--| silver_medals | int     |
+--| bronze_medals | int     |
+--+---------------+---------+
+--country is the primary key for this table.
+--Each row in this table shows a country name and the number of gold, silver, and bronze medals it won in the Olympic games.
+--
+--
+--The Olympic table is sorted according to the following rules:
+--
+--The country with more gold medals comes first.
+--If there is a tie in the gold medals, the country with more silver medals comes first.
+--If there is a tie in the silver medals, the country with more bronze medals comes first.
+--If there is a tie in the bronze medals, the countries with the tie are sorted in ascending order lexicographically.
+--Write an SQL query to sort the Olympic table
+--
+--The query result format is shown in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Olympic table:
+--+-------------+-------------+---------------+---------------+
+--| country     | gold_medals | silver_medals | bronze_medals |
+--+-------------+-------------+---------------+---------------+
+--| China       | 10          | 10            | 20            |
+--| South Sudan | 0           | 0             | 1             |
+--| USA         | 10          | 10            | 20            |
+--| Israel      | 2           | 2             | 3             |
+--| Egypt       | 2           | 2             | 2             |
+--+-------------+-------------+---------------+---------------+
+--Output:
+--+-------------+-------------+---------------+---------------+
+--| country     | gold_medals | silver_medals | bronze_medals |
+--+-------------+-------------+---------------+---------------+
+--| China       | 10          | 10            | 20            |
+--| USA         | 10          | 10            | 20            |
+--| Israel      | 2           | 2             | 3             |
+--| Egypt       | 2           | 2             | 2             |
+--| South Sudan | 0           | 0             | 1             |
+--+-------------+-------------+---------------+---------------+
+--Explanation:
+--The tie between China and USA is broken by their lexicographical names. Since "China" is lexicographically smaller than "USA", it comes first.
+--Israel comes before Egypt because it has more bronze medals.
+
+# Write your MySQL query statement below
+select
+    country     ,
+    gold_medals ,
+    silver_medals ,
+    bronze_medals
+from
+    Olympic
+order by
+    2 desc, 3 desc, 4 desc, 1;
