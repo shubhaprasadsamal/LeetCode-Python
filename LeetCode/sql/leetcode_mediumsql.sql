@@ -3422,4 +3422,216 @@ from
 group by
     rnk;
 
+--1308. Running Total for Different Genders
+--Medium
+--
+--163
+--
+--48
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Scores
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| player_name   | varchar |
+--| gender        | varchar |
+--| day           | date    |
+--| score_points  | int     |
+--+---------------+---------+
+--(gender, day) is the primary key for this table.
+--A competition is held between the female team and the male team.
+--Each row of this table indicates that a player_name and with gender has scored score_point in someday.
+--Gender is 'F' if the player is in the female team and 'M' if the player is in the male team.
+--
+--
+--Write an SQL query to find the total score for each gender on each day.
+--
+--Return the result table ordered by gender and day in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Scores table:
+--+-------------+--------+------------+--------------+
+--| player_name | gender | day        | score_points |
+--+-------------+--------+------------+--------------+
+--| Aron        | F      | 2020-01-01 | 17           |
+--| Alice       | F      | 2020-01-07 | 23           |
+--| Bajrang     | M      | 2020-01-07 | 7            |
+--| Khali       | M      | 2019-12-25 | 11           |
+--| Slaman      | M      | 2019-12-30 | 13           |
+--| Joe         | M      | 2019-12-31 | 3            |
+--| Jose        | M      | 2019-12-18 | 2            |
+--| Priya       | F      | 2019-12-31 | 23           |
+--| Priyanka    | F      | 2019-12-30 | 17           |
+--+-------------+--------+------------+--------------+
+--Output:
+--+--------+------------+-------+
+--| gender | day        | total |
+--+--------+------------+-------+
+--| F      | 2019-12-30 | 17    |
+--| F      | 2019-12-31 | 40    |
+--| F      | 2020-01-01 | 57    |
+--| F      | 2020-01-07 | 80    |
+--| M      | 2019-12-18 | 2     |
+--| M      | 2019-12-25 | 13    |
+--| M      | 2019-12-30 | 26    |
+--| M      | 2019-12-31 | 29    |
+--| M      | 2020-01-07 | 36    |
+--+--------+------------+-------+
+--Explanation:
+--For the female team:
+--The first day is 2019-12-30, Priyanka scored 17 points and the total score for the team is 17.
+--The second day is 2019-12-31, Priya scored 23 points and the total score for the team is 40.
+--The third day is 2020-01-01, Aron scored 17 points and the total score for the team is 57.
+--The fourth day is 2020-01-07, Alice scored 23 points and the total score for the team is 80.
+--
+--For the male team:
+--The first day is 2019-12-18, Jose scored 2 points and the total score for the team is 2.
+--The second day is 2019-12-25, Khali scored 11 points and the total score for the team is 13.
+--The third day is 2019-12-30, Slaman scored 13 points and the total score for the team is 26.
+--The fourth day is 2019-12-31, Joe scored 3 points and the total score for the team is 29.
+--The fifth day is 2020-01-07, Bajrang scored 7 points and the total score for the team is 36.
+
+
+select
+   gender
+   ,day
+   ,sum(score_points) over (partition by gender order by day) as total
+from
+    Scores
+order by
+    1,2;
+
+--1321. Restaurant Growth
+--Medium
+--
+--303
+--
+--49
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Customer
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| customer_id   | int     |
+--| name          | varchar |
+--| visited_on    | date    |
+--| amount        | int     |
+--+---------------+---------+
+--(customer_id, visited_on) is the primary key for this table.
+--This table contains data about customer transactions in a restaurant.
+--visited_on is the date on which the customer with ID (customer_id) has visited the restaurant.
+--amount is the total paid by a customer.
+--
+--
+--You are the restaurant owner and you want to analyze a possible expansion (there will be at least one customer every day).
+--
+--Write an SQL query to compute the moving average of how much the customer paid in a seven days window (i.e., current day + 6 days before). average_amount should be rounded to two decimal places.
+--
+--Return result table ordered by visited_on in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Customer table:
+--+-------------+--------------+--------------+-------------+
+--| customer_id | name         | visited_on   | amount      |
+--+-------------+--------------+--------------+-------------+
+--| 1           | Jhon         | 2019-01-01   | 100         |
+--| 2           | Daniel       | 2019-01-02   | 110         |
+--| 3           | Jade         | 2019-01-03   | 120         |
+--| 4           | Khaled       | 2019-01-04   | 130         |
+--| 5           | Winston      | 2019-01-05   | 110         |
+--| 6           | Elvis        | 2019-01-06   | 140         |
+--| 7           | Anna         | 2019-01-07   | 150         |
+--| 8           | Maria        | 2019-01-08   | 80          |
+--| 9           | Jaze         | 2019-01-09   | 110         |
+--| 1           | Jhon         | 2019-01-10   | 130         |
+--| 3           | Jade         | 2019-01-10   | 150         |
+--+-------------+--------------+--------------+-------------+
+--Output:
+--+--------------+--------------+----------------+
+--| visited_on   | amount       | average_amount |
+--+--------------+--------------+----------------+
+--| 2019-01-07   | 860          | 122.86         |
+--| 2019-01-08   | 840          | 120            |
+--| 2019-01-09   | 840          | 120            |
+--| 2019-01-10   | 1000         | 142.86         |
+--+--------------+--------------+----------------+
+--Explanation:
+--1st moving average from 2019-01-01 to 2019-01-07 has an average_amount of (100 + 110 + 120 + 130 + 110 + 140 + 150)/7 = 122.86
+--2nd moving average from 2019-01-02 to 2019-01-08 has an average_amount of (110 + 120 + 130 + 110 + 140 + 150 + 80)/7 = 120
+--3rd moving average from 2019-01-03 to 2019-01-09 has an average_amount of (120 + 130 + 110 + 140 + 150 + 80 + 110)/7 = 120
+--4th moving average from 2019-01-04 to 2019-01-10 has an average_amount of (130 + 110 + 140 + 150 + 80 + 110 + 130 + 150)/7 = 142.86
+
+with temp1 as (
+        select
+            visited_on,
+            sum(amount) as amount
+        from
+            Customer
+        group by
+            visited_on
+),
+temp2 as (
+    select
+        visited_on,
+        sum(amount) over (order by visited_on rows between 6 PRECEDING and current row) as amount,
+        dense_rank() over (order by visited_on) as rnk
+from
+    temp1
+)
+
+select
+    visited_on,
+    amount,
+    round(amount/7,2) as average_amount
+from
+    temp2
+where rnk > 6;
+
+select
+    b.visited_on,
+    b.amount,
+    b.average_amount
+from
+(
+        select
+            a.visited_on,
+            sum(a.amount) over (order by a.visited_on rows between 6 preceding and current row) as amount,
+            round(avg(a.amount) over (order by a.visited_on rows between 6 preceding and current row),2) as average_amount ,
+            LAG(a.visited_on,6) over (order by visited_on) as start_date
+        from
+
+        (
+                            select
+                            visited_on,
+                            sum(amount) as amount
+                        from
+                            Customer
+                        group by
+                            visited_on
+        ) a
+    ) b
+where
+    b.start_date is not null;
 
