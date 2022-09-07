@@ -3127,4 +3127,299 @@ group by
 order by
     3 desc,1;
 
+--1264. Page Recommendations
+--Medium
+--
+--178
+--
+--15
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Friendship
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| user1_id      | int     |
+--| user2_id      | int     |
+--+---------------+---------+
+--(user1_id, user2_id) is the primary key for this table.
+--Each row of this table indicates that there is a friendship relation between user1_id and user2_id.
+--
+--
+--Table: Likes
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| user_id     | int     |
+--| page_id     | int     |
+--+-------------+---------+
+--(user_id, page_id) is the primary key for this table.
+--Each row of this table indicates that user_id likes page_id.
+--
+--
+--Write an SQL query to recommend pages to the user with user_id = 1 using the pages that your friends liked. It should not recommend pages you already liked.
+--
+--Return result table in any order without duplicates.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Friendship table:
+--+----------+----------+
+--| user1_id | user2_id |
+--+----------+----------+
+--| 1        | 2        |
+--| 1        | 3        |
+--| 1        | 4        |
+--| 2        | 3        |
+--| 2        | 4        |
+--| 2        | 5        |
+--| 6        | 1        |
+--+----------+----------+
+--Likes table:
+--+---------+---------+
+--| user_id | page_id |
+--+---------+---------+
+--| 1       | 88      |
+--| 2       | 23      |
+--| 3       | 24      |
+--| 4       | 56      |
+--| 5       | 11      |
+--| 6       | 33      |
+--| 2       | 77      |
+--| 3       | 77      |
+--| 6       | 88      |
+--+---------+---------+
+--Output:
+--+------------------+
+--| recommended_page |
+--+------------------+
+--| 23               |
+--| 24               |
+--| 56               |
+--| 33               |
+--| 77               |
+--+------------------+
+--Explanation:
+--User one is friend with users 2, 3, 4 and 6.
+--Suggested pages are 23 from user 2, 24 from user 3, 56 from user 3 and 33 from user 6.
+--Page 77 is suggested from both user 2 and user 3.
+--Page 88 is not suggested because user 1 already likes it.
+
+with cte as
+(
+select
+     distinct page_id as recommended_page
+from
+    Friendship f1 join Likes l
+on
+    f1.user1_id = l.user_id
+and
+    f1.user2_id = 1
+UNION
+select
+     distinct page_id as recommended_page
+from
+    Friendship f2 join Likes l
+on
+    f2.user2_id = l.user_id
+and
+    f2.user1_id = 1
+) select recommended_page from cte
+where recommended_page not in (select page_id from Likes where user_id = 1);
+
+--1270. All People Report to the Given Manager
+--Medium
+--
+--319
+--
+--23
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Employees
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| employee_id   | int     |
+--| employee_name | varchar |
+--| manager_id    | int     |
+--+---------------+---------+
+--employee_id is the primary key for this table.
+--Each row of this table indicates that the employee with ID employee_id and name employee_name reports his work to his/her direct manager with manager_id
+--The head of the company is the employee with employee_id = 1.
+--
+--
+--Write an SQL query to find employee_id of all employees that directly or indirectly report their work to the head of the company.
+--
+--The indirect relation between managers will not exceed three managers as the company is small.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Employees table:
+--+-------------+---------------+------------+
+--| employee_id | employee_name | manager_id |
+--+-------------+---------------+------------+
+--| 1           | Boss          | 1          |
+--| 3           | Alice         | 3          |
+--| 2           | Bob           | 1          |
+--| 4           | Daniel        | 2          |
+--| 7           | Luis          | 4          |
+--| 8           | Jhon          | 3          |
+--| 9           | Angela        | 8          |
+--| 77          | Robert        | 1          |
+--+-------------+---------------+------------+
+--Output:
+--+-------------+
+--| employee_id |
+--+-------------+
+--| 2           |
+--| 77          |
+--| 4           |
+--| 7           |
+--+-------------+
+--Explanation:
+--The head of the company is the employee with employee_id 1.
+--The employees with employee_id 2 and 77 report their work directly to the head of the company.
+--The employee with employee_id 4 reports their work indirectly to the head of the company 4 --> 2 --> 1.
+--The employee with employee_id 7 reports their work indirectly to the head of the company 7 --> 4 --> 2 --> 1.
+--The employees with employee_id 3, 8, and 9 do not report their work to the head of the company directly or indirectly.
+
+-- Recursion:
+with recursive CTE_EMP as
+(
+select employee_id from Employees  e
+where employee_id=1
+    union
+select e.employee_id from CTE_EMP ce
+join Employees e
+on ce.employee_id=e.manager_id
+ )
+select * from CTE_EMP
+where employee_id!=1;
+
+-- Normal:
+
+select
+    e1.employee_id
+from
+    Employees e1 join Employees e2
+on
+    e1.manager_id = e2.employee_id and
+    e1.employee_id != 1 # to exclude the head of the company from the list
+join
+    Employees e3
+on
+    e2.manager_id = e3.employee_id
+join
+    Employees e4
+on
+    e3.manager_id = e4.employee_id
+
+where
+    (e1.manager_id = 1 )
+or
+    e2.manager_id = 1
+or
+    e3.manager_id = 1
+;
+
+
+--1285. Find the Start and End Number of Continuous Ranges
+--Medium
+--
+--407
+--
+--27
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Logs
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| log_id        | int     |
+--+---------------+---------+
+--log_id is the primary key for this table.
+--Each row of this table contains the ID in a log Table.
+--
+--
+--Write an SQL query to find the start and end number of continuous ranges in the table Logs.
+--
+--Return the result table ordered by start_id.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Logs table:
+--+------------+
+--| log_id     |
+--+------------+
+--| 1          |
+--| 2          |
+--| 3          |
+--| 7          |
+--| 8          |
+--| 10         |
+--+------------+
+--Output:
+--+------------+--------------+
+--| start_id   | end_id       |
+--+------------+--------------+
+--| 1          | 3            |
+--| 7          | 8            |
+--| 10         | 10           |
+--+------------+--------------+
+--Explanation:
+--The result table should contain all ranges in table Logs.
+--From 1 to 3 is contained in the table.
+--From 4 to 6 is missing in the table
+--From 7 to 8 is contained in the table.
+--Number 9 is missing from the table.
+--Number 10 is contained in the table.
+
+# Write your MySQL query statement below
+
+with cte as
+(
+select
+    log_id,
+    (log_id - row_number() over(order by log_id)) as rnk
+from
+   Logs
+)
+select
+    min(log_id) as start_id   ,
+    max(log_id) as end_id
+from
+    cte
+group by
+    rnk;
+
 
