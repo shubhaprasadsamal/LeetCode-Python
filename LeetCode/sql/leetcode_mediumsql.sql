@@ -3865,3 +3865,292 @@ where
     highest != 1
 and
     lowest != 1;
+
+--1393. Capital Gain/Loss
+--Medium
+--
+--393
+--
+--30
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Stocks
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| stock_name    | varchar |
+--| operation     | enum    |
+--| operation_day | int     |
+--| price         | int     |
+--+---------------+---------+
+--(stock_name, operation_day) is the primary key for this table.
+--The operation column is an ENUM of type ('Sell', 'Buy')
+--Each row of this table indicates that the stock which has stock_name had an operation on the day operation_day with the price.
+--It is guaranteed that each 'Sell' operation for a stock has a corresponding 'Buy' operation in a previous day. It is also guaranteed that each 'Buy' operation for a stock has a corresponding 'Sell' operation in an upcoming day.
+--
+--
+--Write an SQL query to report the Capital gain/loss for each stock.
+--
+--The Capital gain/loss of a stock is the total gain or loss after buying and selling the stock one or many times.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Stocks table:
+--+---------------+-----------+---------------+--------+
+--| stock_name    | operation | operation_day | price  |
+--+---------------+-----------+---------------+--------+
+--| Leetcode      | Buy       | 1             | 1000   |
+--| Corona Masks  | Buy       | 2             | 10     |
+--| Leetcode      | Sell      | 5             | 9000   |
+--| Handbags      | Buy       | 17            | 30000  |
+--| Corona Masks  | Sell      | 3             | 1010   |
+--| Corona Masks  | Buy       | 4             | 1000   |
+--| Corona Masks  | Sell      | 5             | 500    |
+--| Corona Masks  | Buy       | 6             | 1000   |
+--| Handbags      | Sell      | 29            | 7000   |
+--| Corona Masks  | Sell      | 10            | 10000  |
+--+---------------+-----------+---------------+--------+
+--Output:
+--+---------------+-------------------+
+--| stock_name    | capital_gain_loss |
+--+---------------+-------------------+
+--| Corona Masks  | 9500              |
+--| Leetcode      | 8000              |
+--| Handbags      | -23000            |
+--+---------------+-------------------+
+--Explanation:
+--Leetcode stock was bought at day 1 for 1000$ and was sold at day 5 for 9000$. Capital gain = 9000 - 1000 = 8000$.
+--Handbags stock was bought at day 17 for 30000$ and was sold at day 29 for 7000$. Capital loss = 7000 - 30000 = -23000$.
+--Corona Masks stock was bought at day 1 for 10$ and was sold at day 3 for 1010$. It was bought again at day 4 for 1000$ and was sold at day 5 for 500$. At last, it was bought at day 6 for 1000$ and was sold at day 10 for 10000$. Capital gain/loss is the sum of capital gains/losses for each ('Buy' --> 'Sell') operation = (1010 - 10) + (500 - 1000) + (10000 - 1000) = 1000 - 500 + 9000 = 9500$.
+
+select
+    stock_name
+    ,sum(case when operation = 'Buy' then -price else price end) as capital_gain_loss
+from
+    Stocks
+group by
+    1;
+
+--1398. Customers Who Bought Products A and B but Not C
+--Medium
+--
+--205
+--
+--10
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Customers
+--
+--+---------------------+---------+
+--| Column Name         | Type    |
+--+---------------------+---------+
+--| customer_id         | int     |
+--| customer_name       | varchar |
+--+---------------------+---------+
+--customer_id is the primary key for this table.
+--customer_name is the name of the customer.
+--
+--
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| customer_id   | int     |
+--| product_name  | varchar |
+--+---------------+---------+
+--order_id is the primary key for this table.
+--customer_id is the id of the customer who bought the product "product_name".
+--
+--
+--Write an SQL query to report the customer_id and customer_name of customers who bought products "A", "B" but did not buy the product "C" since we want to recommend them to purchase this product.
+--
+--Return the result table ordered by customer_id.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Customers table:
+--+-------------+---------------+
+--| customer_id | customer_name |
+--+-------------+---------------+
+--| 1           | Daniel        |
+--| 2           | Diana         |
+--| 3           | Elizabeth     |
+--| 4           | Jhon          |
+--+-------------+---------------+
+--Orders table:
+--+------------+--------------+---------------+
+--| order_id   | customer_id  | product_name  |
+--+------------+--------------+---------------+
+--| 10         |     1        |     A         |
+--| 20         |     1        |     B         |
+--| 30         |     1        |     D         |
+--| 40         |     1        |     C         |
+--| 50         |     2        |     A         |
+--| 60         |     3        |     A         |
+--| 70         |     3        |     B         |
+--| 80         |     3        |     D         |
+--| 90         |     4        |     C         |
+--+------------+--------------+---------------+
+--Output:
+--+-------------+---------------+
+--| customer_id | customer_name |
+--+-------------+---------------+
+--| 3           | Elizabeth     |
+--+-------------+---------------+
+--Explanation: Only the customer_id with id 3 bought the product A and B but not the product C.
+
+# Write your MySQL query statement below
+
+with cte as
+(
+select
+   distinct c.customer_id,
+   c.customer_name,
+   sum(if(o.product_name = 'A',1,0)) as A,
+   sum(if(o.product_name = 'B',1,0)) as B,
+   sum(if(o.product_name = 'C',1,0)) as C
+from
+    Customers c join Orders o
+on
+    c.customer_id = o.customer_id
+group by
+    c.customer_id
+)
+select
+    customer_id,
+    customer_name
+from
+    cte
+where
+    A > 0
+and
+    B > 0
+and
+    C = 0;
+
+--1440. Evaluate Boolean Expression
+--Medium
+--
+--154
+--
+--10
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table Variables:
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| name          | varchar |
+--| value         | int     |
+--+---------------+---------+
+--name is the primary key for this table.
+--This table contains the stored variables and their values.
+--
+--
+--Table Expressions:
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| left_operand  | varchar |
+--| operator      | enum    |
+--| right_operand | varchar |
+--+---------------+---------+
+--(left_operand, operator, right_operand) is the primary key for this table.
+--This table contains a boolean expression that should be evaluated.
+--operator is an enum that takes one of the values ('<', '>', '=')
+--The values of left_operand and right_operand are guaranteed to be in the Variables table.
+--
+--
+--Write an SQL query to evaluate the boolean expressions in Expressions table.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Variables table:
+--+------+-------+
+--| name | value |
+--+------+-------+
+--| x    | 66    |
+--| y    | 77    |
+--+------+-------+
+--Expressions table:
+--+--------------+----------+---------------+
+--| left_operand | operator | right_operand |
+--+--------------+----------+---------------+
+--| x            | >        | y             |
+--| x            | <        | y             |
+--| x            | =        | y             |
+--| y            | >        | x             |
+--| y            | <        | x             |
+--| x            | =        | x             |
+--+--------------+----------+---------------+
+--Output:
+--+--------------+----------+---------------+-------+
+--| left_operand | operator | right_operand | value |
+--+--------------+----------+---------------+-------+
+--| x            | >        | y             | false |
+--| x            | <        | y             | true  |
+--| x            | =        | y             | false |
+--| y            | >        | x             | true  |
+--| y            | <        | x             | false |
+--| x            | =        | x             | true  |
+--+--------------+----------+---------------+-------+
+--Explanation:
+--As shown, you need to find the value of each boolean expression in the table using the variables table.
+
+# Write your MySQL query statement below
+
+select
+    left_operand,
+    operator ,
+    right_operand ,
+    # v1.name,
+    # v1.value,
+    # v2.name,
+    # v2.value,
+    case when operator = '=' and v1.value = v2.value then "true"
+        when operator = '>' and v1.value > v2.value then "true"
+        when operator = '<' and v1.value < v2.value then "true"
+        else "false" end as value
+from
+    Expressions e join Variables v1
+on
+    e.left_operand = v1.name
+join
+    Variables v2
+on
+   e.right_operand  = v2.name  ;
+
+
