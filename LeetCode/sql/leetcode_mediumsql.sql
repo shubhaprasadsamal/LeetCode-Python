@@ -4154,3 +4154,517 @@ on
    e.right_operand  = v2.name  ;
 
 
+--1445. Apples & Oranges
+--Medium
+--
+--178
+--
+--17
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Sales
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| sale_date     | date    |
+--| fruit         | enum    |
+--| sold_num      | int     |
+--+---------------+---------+
+--(sale_date, fruit) is the primary key for this table.
+--This table contains the sales of "apples" and "oranges" sold each day.
+--
+--
+--Write an SQL query to report the difference between the number of apples and oranges sold each day.
+--
+--Return the result table ordered by sale_date.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Sales table:
+--+------------+------------+-------------+
+--| sale_date  | fruit      | sold_num    |
+--+------------+------------+-------------+
+--| 2020-05-01 | apples     | 10          |
+--| 2020-05-01 | oranges    | 8           |
+--| 2020-05-02 | apples     | 15          |
+--| 2020-05-02 | oranges    | 15          |
+--| 2020-05-03 | apples     | 20          |
+--| 2020-05-03 | oranges    | 0           |
+--| 2020-05-04 | apples     | 15          |
+--| 2020-05-04 | oranges    | 16          |
+--+------------+------------+-------------+
+--Output:
+--+------------+--------------+
+--| sale_date  | diff         |
+--+------------+--------------+
+--| 2020-05-01 | 2            |
+--| 2020-05-02 | 0            |
+--| 2020-05-03 | 20           |
+--| 2020-05-04 | -1           |
+--+------------+--------------+
+--Explanation:
+--Day 2020-05-01, 10 apples and 8 oranges were sold (Difference  10 - 8 = 2).
+--Day 2020-05-02, 15 apples and 15 oranges were sold (Difference 15 - 15 = 0).
+--Day 2020-05-03, 20 apples and 0 oranges were sold (Difference 20 - 0 = 20).
+--Day 2020-05-04, 15 apples and 16 oranges were sold (Difference 15 - 16 = -1).
+
+select
+    sale_date,
+    sum(case when fruit = 'apples' then sold_num end) - sum(case when fruit = 'oranges' then sold_num end) as diff
+
+from
+    Sales
+group by
+    1;
+
+--1454. Active Users
+--Medium
+--
+--319
+--
+--30
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Accounts
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| name          | varchar |
+--+---------------+---------+
+--id is the primary key for this table.
+--This table contains the account id and the user name of each account.
+--
+--
+--Table: Logins
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| id            | int     |
+--| login_date    | date    |
+--+---------------+---------+
+--There is no primary key for this table, it may contain duplicates.
+--This table contains the account id of the user who logged in and the login date. A user may log in multiple times in the day.
+--
+--
+--Active users are those who logged in to their accounts for five or more consecutive days.
+--
+--Write an SQL query to find the id and the name of active users.
+--
+--Return the result table ordered by id.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Accounts table:
+--+----+----------+
+--| id | name     |
+--+----+----------+
+--| 1  | Winston  |
+--| 7  | Jonathan |
+--+----+----------+
+--Logins table:
+--+----+------------+
+--| id | login_date |
+--+----+------------+
+--| 7  | 2020-05-30 |
+--| 1  | 2020-05-30 |
+--| 7  | 2020-05-31 |
+--| 7  | 2020-06-01 |
+--| 7  | 2020-06-02 |
+--| 7  | 2020-06-02 |
+--| 7  | 2020-06-03 |
+--| 1  | 2020-06-07 |
+--| 7  | 2020-06-10 |
+--+----+------------+
+--Output:
+--+----+----------+
+--| id | name     |
+--+----+----------+
+--| 7  | Jonathan |
+--+----+----------+
+--Explanation:
+--User Winston with id = 1 logged in 2 times only in 2 different days, so, Winston is not an active user.
+--User Jonathan with id = 7 logged in 7 times in 6 different days, five of them were consecutive days, so, Jonathan is an active user.
+
+# Write your MySQL query statement below
+SELECT
+    DISTINCT t1.id,
+    a.name
+FROM Logins t1
+JOIN Logins t2
+ON t1.id = t2.id
+AND DATEDIFF(t2.login_date, t1.login_date) BETWEEN 1 AND 4
+JOIN Accounts a
+ON t1.id = a.id
+GROUP BY t1.id, t1.login_date
+HAVING COUNT(DISTINCT t2.login_date) = 4;
+
+--1468. Calculate Salaries
+--Medium
+--
+--92
+--
+--16
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table Salaries:
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| company_id    | int     |
+--| employee_id   | int     |
+--| employee_name | varchar |
+--| salary        | int     |
+--+---------------+---------+
+--(company_id, employee_id) is the primary key for this table.
+--This table contains the company id, the id, the name, and the salary for an employee.
+--
+--
+--Write an SQL query to find the salaries of the employees after applying taxes. Round the salary to the nearest integer.
+--
+--The tax rate is calculated for each company based on the following criteria:
+--
+--0% If the max salary of any employee in the company is less than $1000.
+--24% If the max salary of any employee in the company is in the range [1000, 10000] inclusive.
+--49% If the max salary of any employee in the company is greater than $10000.
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+
+with comp_sal as
+(
+select
+    company_id
+    ,max(salary) as max_sal
+from
+    Salaries
+group by
+    1
+)
+select
+    s.company_id
+    ,employee_id
+    ,employee_name
+    ,round(case when max_sal < 1000 then salary
+        when (max_sal>= 1000 and max_sal <= 10000) then (salary - salary*24/100)
+        when max_sal> 10000  then (salary - salary*49/100)
+    end) as salary
+from
+    Salaries s join comp_sal c
+on
+    s.company_id = c.company_id ;
+
+--1501. Countries You Can Safely Invest In
+--Medium
+--
+--222
+--
+--32
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table Person:
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| id             | int     |
+--| name           | varchar |
+--| phone_number   | varchar |
+--+----------------+---------+
+--id is the primary key for this table.
+--Each row of this table contains the name of a person and their phone number.
+--Phone number will be in the form 'xxx-yyyyyyy' where xxx is the country code (3 characters) and yyyyyyy is the phone number (7 characters) where x and y are digits. Both can contain leading zeros.
+--
+--
+--Table Country:
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| name           | varchar |
+--| country_code   | varchar |
+--+----------------+---------+
+--country_code is the primary key for this table.
+--Each row of this table contains the country name and its code. country_code will be in the form 'xxx' where x is digits.
+--
+--
+--Table Calls:
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| caller_id   | int  |
+--| callee_id   | int  |
+--| duration    | int  |
+--+-------------+------+
+--There is no primary key for this table, it may contain duplicates.
+--Each row of this table contains the caller id, callee id and the duration of the call in minutes. caller_id != callee_id
+--
+--
+--A telecommunications company wants to invest in new countries. The company intends to invest in the countries where the average call duration of the calls in this country is strictly greater than the global average call duration.
+--
+--Write an SQL query to find the countries where this company can invest.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Person table:
+--+----+----------+--------------+
+--| id | name     | phone_number |
+--+----+----------+--------------+
+--| 3  | Jonathan | 051-1234567  |
+--| 12 | Elvis    | 051-7654321  |
+--| 1  | Moncef   | 212-1234567  |
+--| 2  | Maroua   | 212-6523651  |
+--| 7  | Meir     | 972-1234567  |
+--| 9  | Rachel   | 972-0011100  |
+--+----+----------+--------------+
+--Country table:
+--+----------+--------------+
+--| name     | country_code |
+--+----------+--------------+
+--| Peru     | 051          |
+--| Israel   | 972          |
+--| Morocco  | 212          |
+--| Germany  | 049          |
+--| Ethiopia | 251          |
+--+----------+--------------+
+--Calls table:
+--+-----------+-----------+----------+
+--| caller_id | callee_id | duration |
+--+-----------+-----------+----------+
+--| 1         | 9         | 33       |
+--| 2         | 9         | 4        |
+--| 1         | 2         | 59       |
+--| 3         | 12        | 102      |
+--| 3         | 12        | 330      |
+--| 12        | 3         | 5        |
+--| 7         | 9         | 13       |
+--| 7         | 1         | 3        |
+--| 9         | 7         | 1        |
+--| 1         | 7         | 7        |
+--+-----------+-----------+----------+
+--Output:
+--+----------+
+--| country  |
+--+----------+
+--| Peru     |
+--+----------+
+--Explanation:
+--The average call duration for Peru is (102 + 102 + 330 + 330 + 5 + 5) / 6 = 145.666667
+--The average call duration for Israel is (33 + 4 + 13 + 13 + 3 + 1 + 1 + 7) / 8 = 9.37500
+--The average call duration for Morocco is (33 + 4 + 59 + 59 + 3 + 7) / 6 = 27.5000
+--Global call duration average = (2 * (33 + 4 + 59 + 102 + 330 + 5 + 13 + 3 + 1 + 7)) / 20 = 55.70000
+--Since Peru is the only country where the average call duration is greater than the global average, it is the only recommended country.
+
+with person_country as
+(
+    select
+        p.id as p_id,
+        c.name as cntry_name
+    from
+        Person  p join Country c
+    on
+        left(p.phone_number,3) = c.country_code
+),
+average as
+(
+    select
+        avg(duration)
+    from
+        Calls
+),
+duration as
+(
+    select
+        caller_id,
+        sum(call_duration) as call_duration,
+        sum(call_count) as call_count
+    from
+        (
+            select
+           caller_id ,
+            sum(duration) as call_duration,
+            count(caller_id) as call_count
+        from
+           Calls
+        group by
+            caller_id
+        UNION
+        select
+           callee_id as caller_id,
+            sum(duration) as call_duration,
+            count(callee_id) as call_count
+        from
+           Calls
+        group by
+            callee_id
+            )a
+        group by a.caller_id
+)
+select cntry_name as country from
+(select
+    cntry_name,
+    sum(call_duration)/sum(call_count) as cntry_avg
+
+from
+    person_country p join duration d
+on
+   p.p_id = d.caller_id
+group by
+    cntry_name
+having
+    sum(call_duration)/sum(call_count) > (select * from average)
+    )a;
+
+--1532. The Most Recent Three Orders
+--Medium
+--
+--105
+--
+--9
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Customers
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| customer_id   | int     |
+--| name          | varchar |
+--+---------------+---------+
+--customer_id is the primary key for this table.
+--This table contains information about customers.
+--
+--
+--Table: Orders
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| order_id      | int     |
+--| order_date    | date    |
+--| customer_id   | int     |
+--| cost          | int     |
+--+---------------+---------+
+--order_id is the primary key for this table.
+--This table contains information about the orders made by customer_id.
+--Each customer has one order per day.
+--
+--
+--Write an SQL query to find the most recent three orders of each user. If a user ordered less than three orders, return all of their orders.
+--
+--Return the result table ordered by customer_name in ascending order and in case of a tie by the customer_id in ascending order. If there is still a tie, order them by order_date in descending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Customers table:
+--+-------------+-----------+
+--| customer_id | name      |
+--+-------------+-----------+
+--| 1           | Winston   |
+--| 2           | Jonathan  |
+--| 3           | Annabelle |
+--| 4           | Marwan    |
+--| 5           | Khaled    |
+--+-------------+-----------+
+--Orders table:
+--+----------+------------+-------------+------+
+--| order_id | order_date | customer_id | cost |
+--+----------+------------+-------------+------+
+--| 1        | 2020-07-31 | 1           | 30   |
+--| 2        | 2020-07-30 | 2           | 40   |
+--| 3        | 2020-07-31 | 3           | 70   |
+--| 4        | 2020-07-29 | 4           | 100  |
+--| 5        | 2020-06-10 | 1           | 1010 |
+--| 6        | 2020-08-01 | 2           | 102  |
+--| 7        | 2020-08-01 | 3           | 111  |
+--| 8        | 2020-08-03 | 1           | 99   |
+--| 9        | 2020-08-07 | 2           | 32   |
+--| 10       | 2020-07-15 | 1           | 2    |
+--+----------+------------+-------------+------+
+--Output:
+--+---------------+-------------+----------+------------+
+--| customer_name | customer_id | order_id | order_date |
+--+---------------+-------------+----------+------------+
+--| Annabelle     | 3           | 7        | 2020-08-01 |
+--| Annabelle     | 3           | 3        | 2020-07-31 |
+--| Jonathan      | 2           | 9        | 2020-08-07 |
+--| Jonathan      | 2           | 6        | 2020-08-01 |
+--| Jonathan      | 2           | 2        | 2020-07-30 |
+--| Marwan        | 4           | 4        | 2020-07-29 |
+--| Winston       | 1           | 8        | 2020-08-03 |
+--| Winston       | 1           | 1        | 2020-07-31 |
+--| Winston       | 1           | 10       | 2020-07-15 |
+--+---------------+-------------+----------+------------+
+--Explanation:
+--Winston has 4 orders, we discard the order of "2020-06-10" because it is the oldest order.
+--Annabelle has only 2 orders, we return them.
+--Jonathan has exactly 3 orders.
+--Marwan ordered only one time.
+--We sort the result table by customer_name in ascending order, by customer_id in ascending order, and by order_date in descending order in case of a tie.
+
+with order_details as
+(
+select
+    name as customer_name
+    ,c.customer_id
+    ,order_id
+    ,order_date
+    ,dense_rank() over (partition by c.customer_id order by order_date desc) as rnk
+from
+    Customers c join Orders o
+on
+    c.customer_id = o.customer_id
+)
+select
+    customer_name
+    ,customer_id
+    ,order_id
+    ,order_date
+from
+    order_details
+where
+    rnk <= 3
+order by
+    1,2,4 desc;
