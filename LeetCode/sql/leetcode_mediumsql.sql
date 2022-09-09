@@ -4906,4 +4906,170 @@ from
 where
 	case when customer_id = rnk then 1 else rnk end is not null;
 
+--1699. Number of Calls Between Two Persons
+--Medium
+--
+--173
+--
+--11
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Calls
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| from_id     | int     |
+--| to_id       | int     |
+--| duration    | int     |
+--+-------------+---------+
+--This table does not have a primary key, it may contain duplicates.
+--This table contains the duration of a phone call between from_id and to_id.
+--from_id != to_id
+--
+--
+--Write an SQL query to report the number of calls and the total call duration between each pair of distinct persons (person1, person2) where person1 < person2.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Calls table:
+--+---------+-------+----------+
+--| from_id | to_id | duration |
+--+---------+-------+----------+
+--| 1       | 2     | 59       |
+--| 2       | 1     | 11       |
+--| 1       | 3     | 20       |
+--| 3       | 4     | 100      |
+--| 3       | 4     | 200      |
+--| 3       | 4     | 200      |
+--| 4       | 3     | 499      |
+--+---------+-------+----------+
+--Output:
+--+---------+---------+------------+----------------+
+--| person1 | person2 | call_count | total_duration |
+--+---------+---------+------------+----------------+
+--| 1       | 2       | 2          | 70             |
+--| 1       | 3       | 1          | 20             |
+--| 3       | 4       | 4          | 999            |
+--+---------+---------+------------+----------------+
+--Explanation:
+--Users 1 and 2 had 2 calls and the total duration is 70 (59 + 11).
+--Users 1 and 3 had 1 call and the total duration is 20.
+--Users 3 and 4 had 4 calls and the total duration is 999 (100 + 200 + 200 + 499).
 
+# Write your MySQL query statement below
+
+with cte as
+(
+select
+    case when from_id < to_id then from_id  else to_id end as person1 ,
+    case when from_id > to_id then from_id  else to_id end as person2 ,
+    duration
+from
+    Calls
+)
+select
+    person1,
+    person2,
+    count(duration) as call_count,
+    sum(duration) as total_duration
+from
+    cte
+group by
+    1,2;
+
+--1709. Biggest Window Between Visits
+--Medium
+--
+--134
+--
+--8
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: UserVisits
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| user_id     | int  |
+--| visit_date  | date |
+--+-------------+------+
+--This table does not have a primary key.
+--This table contains logs of the dates that users visited a certain retailer.
+--
+--
+--Assume today's date is '2021-1-1'.
+--
+--Write an SQL query that will, for each user_id, find out the largest window of days between each visit and the one right after it (or today if you are considering the last visit).
+--
+--Return the result table ordered by user_id.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--UserVisits table:
+--+---------+------------+
+--| user_id | visit_date |
+--+---------+------------+
+--| 1       | 2020-11-28 |
+--| 1       | 2020-10-20 |
+--| 1       | 2020-12-3  |
+--| 2       | 2020-10-5  |
+--| 2       | 2020-12-9  |
+--| 3       | 2020-11-11 |
+--+---------+------------+
+--Output:
+--+---------+---------------+
+--| user_id | biggest_window|
+--+---------+---------------+
+--| 1       | 39            |
+--| 2       | 65            |
+--| 3       | 51            |
+--+---------+---------------+
+--Explanation:
+--For the first user, the windows in question are between dates:
+--    - 2020-10-20 and 2020-11-28 with a total of 39 days.
+--    - 2020-11-28 and 2020-12-3 with a total of 5 days.
+--    - 2020-12-3 and 2021-1-1 with a total of 29 days.
+--Making the biggest window the one with 39 days.
+--For the second user, the windows in question are between dates:
+--    - 2020-10-5 and 2020-12-9 with a total of 65 days.
+--    - 2020-12-9 and 2021-1-1 with a total of 23 days.
+--Making the biggest window the one with 65 days.
+--For the third user, the only window in question is between dates 2020-11-11 and 2021-1-1 with a total of 51 days.
+
+# Write your MySQL query statement below
+
+with cte as
+(
+select
+    user_id,
+    visit_date ,
+    ifnull(lead(visit_date) over(partition by user_id order by visit_date),'2021-1-1') as next_vixit
+from
+    UserVisits
+)
+select
+    user_id,
+   max(datediff(next_vixit,visit_date)) as biggest_window
+from
+    cte
+group by
+    1;
