@@ -5170,3 +5170,1004 @@ from
     Boxes b left join Chests c
 on
     b.chest_id = c.chest_id;
+
+--1747. Leetflex Banned Accounts
+--Medium
+--
+--104
+--
+--6
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: LogInfo
+--
+--+-------------+----------+
+--| Column Name | Type     |
+--+-------------+----------+
+--| account_id  | int      |
+--| ip_address  | int      |
+--| login       | datetime |
+--| logout      | datetime |
+--+-------------+----------+
+--There is no primary key for this table, and it may contain duplicates.
+--The table contains information about the login and logout dates of Leetflex accounts. It also contains the IP address from which the account was logged in and out.
+--It is guaranteed that the logout time is after the login time.
+--
+--
+--Write an SQL query to find the account_id of the accounts that should be banned from Leetflex. An account should be banned if it was logged in at some moment from two different IP addresses.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--LogInfo table:
+--+------------+------------+---------------------+---------------------+
+--| account_id | ip_address | login               | logout              |
+--+------------+------------+---------------------+---------------------+
+--| 1          | 1          | 2021-02-01 09:00:00 | 2021-02-01 09:30:00 |
+--| 1          | 2          | 2021-02-01 08:00:00 | 2021-02-01 11:30:00 |
+--| 2          | 6          | 2021-02-01 20:30:00 | 2021-02-01 22:00:00 |
+--| 2          | 7          | 2021-02-02 20:30:00 | 2021-02-02 22:00:00 |
+--| 3          | 9          | 2021-02-01 16:00:00 | 2021-02-01 16:59:59 |
+--| 3          | 13         | 2021-02-01 17:00:00 | 2021-02-01 17:59:59 |
+--| 4          | 10         | 2021-02-01 16:00:00 | 2021-02-01 17:00:00 |
+--| 4          | 11         | 2021-02-01 17:00:00 | 2021-02-01 17:59:59 |
+--+------------+------------+---------------------+---------------------+
+--Output:
+--+------------+
+--| account_id |
+--+------------+
+--| 1          |
+--| 4          |
+--+------------+
+--Explanation:
+--Account ID 1 --> The account was active from "2021-02-01 09:00:00" to "2021-02-01 09:30:00" with two different IP addresses (1 and 2). It should be banned.
+--Account ID 2 --> The account was active from two different addresses (6, 7) but in two different times.
+--Account ID 3 --> The account was active from two different addresses (9, 13) on the same day but they do not intersect at any moment.
+--Account ID 4 --> The account was active from "2021-02-01 17:00:00" to "2021-02-01 17:00:00" with two different IP addresses (10 and 11). It should be banned.
+
+# Write your MySQL query statement below
+
+select
+   distinct  l1.account_id
+
+from
+   LogInfo l1 join LogInfo l2
+on
+    l1.account_id = l2.account_id
+and
+    l1.ip_address != l2.ip_address
+where
+    l2.login  between l1.login and l1.logout
+or
+   l2.logout  between l1.login and l1.logout  ;
+
+--1783. Grand Slam Titles
+--Medium
+--
+--148
+--
+--3
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Players
+--
+--+----------------+---------+
+--| Column Name    | Type    |
+--+----------------+---------+
+--| player_id      | int     |
+--| player_name    | varchar |
+--+----------------+---------+
+--player_id is the primary key for this table.
+--Each row in this table contains the name and the ID of a tennis player.
+--
+--
+--Table: Championships
+--
+--+---------------+---------+
+--| Column Name   | Type    |
+--+---------------+---------+
+--| year          | int     |
+--| Wimbledon     | int     |
+--| Fr_open       | int     |
+--| US_open       | int     |
+--| Au_open       | int     |
+--+---------------+---------+
+--year is the primary key for this table.
+--Each row of this table contains the IDs of the players who won one each tennis tournament of the grand slam.
+--
+--
+--Write an SQL query to report the number of grand slam tournaments won by each player. Do not include the players who did not win any tournament.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Players table:
+--+-----------+-------------+
+--| player_id | player_name |
+--+-----------+-------------+
+--| 1         | Nadal       |
+--| 2         | Federer     |
+--| 3         | Novak       |
+--+-----------+-------------+
+--Championships table:
+--+------+-----------+---------+---------+---------+
+--| year | Wimbledon | Fr_open | US_open | Au_open |
+--+------+-----------+---------+---------+---------+
+--| 2018 | 1         | 1       | 1       | 1       |
+--| 2019 | 1         | 1       | 2       | 2       |
+--| 2020 | 2         | 1       | 2       | 2       |
+--+------+-----------+---------+---------+---------+
+--Output:
+--+-----------+-------------+-------------------+
+--| player_id | player_name | grand_slams_count |
+--+-----------+-------------+-------------------+
+--| 2         | Federer     | 5                 |
+--| 1         | Nadal       | 7                 |
+--+-----------+-------------+-------------------+
+--Explanation:
+--Player 1 (Nadal) won 7 titles: Wimbledon (2018, 2019), Fr_open (2018, 2019, 2020), US_open (2018), and Au_open (2018).
+--Player 2 (Federer) won 5 titles: Wimbledon (2020), US_open (2019, 2020), and Au_open (2019, 2020).
+--Player 3 (Novak) did not win anything, we did not include them in the result table.
+
+-- Solution 1:
+select
+    p.player_id,
+    p.player_name,
+    sum(if (player_id = Wimbledon,1,0)) + sum(if (player_id = Fr_open,1,0)) + sum(if (player_id = US_open,1,0)) + sum(if (player_id = Au_open,1,0)) as grand_slams_count
+from
+   Players p join  Championships c
+on
+    p.player_id = c.Wimbledon or p.player_id = c.Fr_open  or p.player_id = c.US_open  or p.player_id = c.Au_open
+group by
+    p.player_id;
+
+-- Solution-2
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    case when Wimbledon then Wimbledon end as player_id,
+    case when Wimbledon then 1 end as grand_slams
+from
+    Championships
+UNION ALL
+select
+    case when Fr_open then Fr_open end as player_id,
+    case when Fr_open then 1 end as grand_slams
+from
+    Championships
+UNION ALL
+select
+    case when US_open then US_open end as player_id,
+    case when US_open then 1 end as grand_slams
+from
+    Championships
+UNION ALL
+select
+    case when Au_open then Au_open end as player_id,
+    case when Au_open then 1 end as grand_slams
+from
+    Championships
+)
+select
+    p.player_id ,
+    p.player_name ,
+    sum(grand_slams) as grand_slams_count
+from
+    cte c join Players p
+on
+    c.player_id = p.player_id
+group by
+    1;
+
+--1811. Find Interview Candidates
+--Medium
+--
+--143
+--
+--22
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Contests
+--
+--+--------------+------+
+--| Column Name  | Type |
+--+--------------+------+
+--| contest_id   | int  |
+--| gold_medal   | int  |
+--| silver_medal | int  |
+--| bronze_medal | int  |
+--+--------------+------+
+--contest_id is the primary key for this table.
+--This table contains the LeetCode contest ID and the user IDs of the gold, silver, and bronze medalists.
+--It is guaranteed that any consecutive contests have consecutive IDs and that no ID is skipped.
+--
+--
+--Table: Users
+--
+--+-------------+---------+
+--| Column Name | Type    |
+--+-------------+---------+
+--| user_id     | int     |
+--| mail        | varchar |
+--| name        | varchar |
+--+-------------+---------+
+--user_id is the primary key for this table.
+--This table contains information about the users.
+--
+--
+--Write an SQL query to report the name and the mail of all interview candidates. A user is an interview candidate if at least one of these two conditions is true:
+--
+--The user won any medal in three or more consecutive contests.
+--The user won the gold medal in three or more different contests (not necessarily consecutive).
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Contests table:
+--+------------+------------+--------------+--------------+
+--| contest_id | gold_medal | silver_medal | bronze_medal |
+--+------------+------------+--------------+--------------+
+--| 190        | 1          | 5            | 2            |
+--| 191        | 2          | 3            | 5            |
+--| 192        | 5          | 2            | 3            |
+--| 193        | 1          | 3            | 5            |
+--| 194        | 4          | 5            | 2            |
+--| 195        | 4          | 2            | 1            |
+--| 196        | 1          | 5            | 2            |
+--+------------+------------+--------------+--------------+
+--Users table:
+--+---------+--------------------+-------+
+--| user_id | mail               | name  |
+--+---------+--------------------+-------+
+--| 1       | sarah@leetcode.com | Sarah |
+--| 2       | bob@leetcode.com   | Bob   |
+--| 3       | alice@leetcode.com | Alice |
+--| 4       | hercy@leetcode.com | Hercy |
+--| 5       | quarz@leetcode.com | Quarz |
+--+---------+--------------------+-------+
+--Output:
+--+-------+--------------------+
+--| name  | mail               |
+--+-------+--------------------+
+--| Sarah | sarah@leetcode.com |
+--| Bob   | bob@leetcode.com   |
+--| Alice | alice@leetcode.com |
+--| Quarz | quarz@leetcode.com |
+--+-------+--------------------+
+--Explanation:
+--Sarah won 3 gold medals (190, 193, and 196), so we include her in the result table.
+--Bob won a medal in 3 consecutive contests (190, 191, and 192), so we include him in the result table.
+--    - Note that he also won a medal in 3 other consecutive contests (194, 195, and 196).
+--Alice won a medal in 3 consecutive contests (191, 192, and 193), so we include her in the result table.
+--Quarz won a medal in 5 consecutive contests (190, 191, 192, 193, and 194), so we include them in the result table.
+
+# Write your MySQL query statement below
+with cte1 as
+(
+select
+    u.user_id ,
+    mail,
+    name,
+    contest_id ,
+    if(user_id = gold_medal,1,0) as gold_medal ,
+    if(user_id = silver_medal ,1,0) as silver_medal  ,
+    if(user_id = bronze_medal ,1,0) as bronze_medal  ,
+    # lead(contest_id,1) over(order by contest_id) as next_con
+    contest_id-row_number() over(partition by u.user_id order by contest_id) as cat
+from
+    Contests c join Users u
+on
+    c.gold_medal = u.user_id or c.silver_medal  = u.user_id or c.bronze_medal  = u.user_id
+order by
+    1
+)
+# select * from cte1 where name in ('Benjamin')
+,
+cte2 as
+(
+            select
+                name,
+                mail,
+                sum(gold_medal) over (partition by name,mail) as gold_medal,
+                # sum(if(next_con-contest_id = 1,1,0)) as any_medal
+                count(cat) over(partition by name,mail,cat) as any_medal
+            from
+                cte1
+)
+# select * from cte2;
+        select
+            distinct name,
+            mail
+        from
+            cte2
+        where
+            any_medal >= 3 or gold_medal >=3;
+
+--1831. Maximum Transaction Each Day
+--Medium
+--
+--51
+--
+--1
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Transactions
+--
+--+----------------+----------+
+--| Column Name    | Type     |
+--+----------------+----------+
+--| transaction_id | int      |
+--| day            | datetime |
+--| amount         | int      |
+--+----------------+----------+
+--transaction_id is the primary key for this table.
+--Each row contains information about one transaction.
+--
+--
+--Write an SQL query to report the IDs of the transactions with the maximum amount on their respective day. If in one day there are multiple such transactions, return all of them.
+--
+--Return the result table ordered by transaction_id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Transactions table:
+--+----------------+--------------------+--------+
+--| transaction_id | day                | amount |
+--+----------------+--------------------+--------+
+--| 8              | 2021-4-3 15:57:28  | 57     |
+--| 9              | 2021-4-28 08:47:25 | 21     |
+--| 1              | 2021-4-29 13:28:30 | 58     |
+--| 5              | 2021-4-28 16:39:59 | 40     |
+--| 6              | 2021-4-29 23:39:28 | 58     |
+--+----------------+--------------------+--------+
+--Output:
+--+----------------+
+--| transaction_id |
+--+----------------+
+--| 1              |
+--| 5              |
+--| 6              |
+--| 8              |
+--+----------------+
+--Explanation:
+--"2021-4-3"  --> We have one transaction with ID 8, so we add 8 to the result table.
+--"2021-4-28" --> We have two transactions with IDs 5 and 9. The transaction with ID 5 has an amount of 40, while the transaction with ID 9 has an amount of 21. We only include the transaction with ID 5 as it has the maximum amount this day.
+--"2021-4-29" --> We have two transactions with IDs 1 and 6. Both transactions have the same amount of 58, so we include both in the result table.
+--We order the result table by transaction_id after collecting these IDs.
+
+# Write your MySQL query statement below
+with temp as (
+select
+    transaction_id,
+    dense_rank() over (partition by left(day,10) order by amount desc) as rnk
+from
+    Transactions
+)
+
+select transaction_id
+from temp
+where rnk = 1
+order by 1;
+
+--1867. Orders With Maximum Quantity Above Average
+--Medium
+--
+--49
+--
+--179
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: OrdersDetails
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| order_id    | int  |
+--| product_id  | int  |
+--| quantity    | int  |
+--+-------------+------+
+--(order_id, product_id) is the primary key for this table.
+--A single order is represented as multiple rows, one row for each product in the order.
+--Each row of this table contains the quantity ordered of the product product_id in the order order_id.
+--
+--
+--You are running an e-commerce site that is looking for imbalanced orders. An imbalanced order is one whose maximum quantity is strictly greater than the average quantity of every order (including itself).
+--
+--The average quantity of an order is calculated as (total quantity of all products in the order) / (number of different products in the order). The maximum quantity of an order is the highest quantity of any single product in the order.
+--
+--Write an SQL query to find the order_id of all imbalanced orders.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--OrdersDetails table:
+--+----------+------------+----------+
+--| order_id | product_id | quantity |
+--+----------+------------+----------+
+--| 1        | 1          | 12       |
+--| 1        | 2          | 10       |
+--| 1        | 3          | 15       |
+--| 2        | 1          | 8        |
+--| 2        | 4          | 4        |
+--| 2        | 5          | 6        |
+--| 3        | 3          | 5        |
+--| 3        | 4          | 18       |
+--| 4        | 5          | 2        |
+--| 4        | 6          | 8        |
+--| 5        | 7          | 9        |
+--| 5        | 8          | 9        |
+--| 3        | 9          | 20       |
+--| 2        | 9          | 4        |
+--+----------+------------+----------+
+--Output:
+--+----------+
+--| order_id |
+--+----------+
+--| 1        |
+--| 3        |
+--+----------+
+--Explanation:
+--The average quantity of each order is:
+--- order_id=1: (12+10+15)/3 = 12.3333333
+--- order_id=2: (8+4+6+4)/4 = 5.5
+--- order_id=3: (5+18+20)/3 = 14.333333
+--- order_id=4: (2+8)/2 = 5
+--- order_id=5: (9+9)/2 = 9
+--
+--The maximum quantity of each order is:
+--- order_id=1: max(12, 10, 15) = 15
+--- order_id=2: max(8, 4, 6, 4) = 8
+--- order_id=3: max(5, 18, 20) = 20
+--- order_id=4: max(2, 8) = 8
+--- order_id=5: max(9, 9) = 9
+--
+--Orders 1 and 3 are imbalanced because they have a maximum quantity that exceeds the average quantity of every order.
+
+# Write your MySQL query statement below
+with cte as
+(
+select
+    order_id ,
+    sum(quantity)/count(distinct product_id ) as avg_qty,
+    max(quantity) max_qty
+from
+    OrdersDetails
+group by
+    1
+)
+# select * from cte;
+select
+    order_id
+from
+    cte
+where
+    max_qty > (select max(avg_qty) from cte);
+
+-- 1875. Group Employees of the Same Salary
+-- Medium
+--
+-- 48
+--
+-- 4
+--
+-- Add to List
+--
+-- Share
+-- SQL Schema
+-- Table: Employees
+--
+-- +-------------+---------+
+-- | Column Name | Type    |
+-- +-------------+---------+
+-- | employee_id | int     |
+-- | name        | varchar |
+-- | salary      | int     |
+-- +-------------+---------+
+-- employee_id is the primary key for this table.
+-- Each row of this table indicates the employee ID, employee name, and salary.
+--
+--
+-- A company wants to divide the employees into teams such that all the members on each team have the same salary. The teams should follow these criteria:
+--
+-- Each team should consist of at least two employees.
+-- All the employees on a team should have the same salary.
+-- All the employees of the same salary should be assigned to the same team.
+-- If the salary of an employee is unique, we do not assign this employee to any team.
+-- A team's ID is assigned based on the rank of the team's salary relative to the other teams' salaries, where the team with the lowest salary has team_id = 1. Note that the salaries for employees not on a team are not included in this ranking.
+-- Write an SQL query to get the team_id of each employee that is in a team.
+--
+-- Return the result table ordered by team_id in ascending order. In case of a tie, order it by employee_id in ascending order.
+--
+-- The query result format is in the following example.
+--
+--
+--
+-- Example 1:
+--
+-- Input:
+-- Employees table:
+-- +-------------+---------+--------+
+-- | employee_id | name    | salary |
+-- +-------------+---------+--------+
+-- | 2           | Meir    | 3000   |
+-- | 3           | Michael | 3000   |
+-- | 7           | Addilyn | 7400   |
+-- | 8           | Juan    | 6100   |
+-- | 9           | Kannon  | 7400   |
+-- +-------------+---------+--------+
+-- Output:
+-- +-------------+---------+--------+---------+
+-- | employee_id | name    | salary | team_id |
+-- +-------------+---------+--------+---------+
+-- | 2           | Meir    | 3000   | 1       |
+-- | 3           | Michael | 3000   | 1       |
+-- | 7           | Addilyn | 7400   | 2       |
+-- | 9           | Kannon  | 7400   | 2       |
+-- +-------------+---------+--------+---------+
+-- Explanation:
+-- Meir (employee_id=2) and Michael (employee_id=3) are in the same team because they have the same salary of 3000.
+-- Addilyn (employee_id=7) and Kannon (employee_id=9) are in the same team because they have the same salary of 7400.
+-- Juan (employee_id=8) is not included in any team because their salary of 6100 is unique (i.e. no other employee has the same salary).
+-- The team IDs are assigned as follows (based on salary ranking, lowest first):
+-- - team_id=1: Meir and Michael, a salary of 3000
+-- - team_id=2: Addilyn and Kannon, a salary of 7400
+-- Juan's salary of 6100 is not included in the ranking because they are not on a team.
+
+-- Solution-1:
+select
+    employee_id,
+    name,
+    salary,
+    dense_rank() over (order by salary) as team_id
+from
+    Employees
+where
+    salary in
+    (select distinct salary from Employees group by salary having count(salary)>1);
+
+-- solution-2:
+# Write your MySQL query statement below
+
+with cte as
+(
+select
+    employee_id,
+    name        ,
+    salary      ,
+    count(employee_id) over(partition by salary) as dist_sal
+from
+    Employees
+)
+select
+    employee_id,
+    name        ,
+    salary      ,
+    dense_rank() over (order by salary) as team_id
+from
+    cte
+where
+    dist_sal != 1;
+
+--1907. Count Salary Categories
+--Medium
+--
+--44
+--
+--18
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Accounts
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| account_id  | int  |
+--| income      | int  |
+--+-------------+------+
+--account_id is the primary key for this table.
+--Each row contains information about the monthly income for one bank account.
+--
+--
+--Write an SQL query to report the number of bank accounts of each salary category. The salary categories are:
+--
+--"Low Salary": All the salaries strictly less than $20000.
+--"Average Salary": All the salaries in the inclusive range [$20000, $50000].
+--"High Salary": All the salaries strictly greater than $50000.
+--The result table must contain all three categories. If there are no accounts in a category, then report 0.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Accounts table:
+--+------------+--------+
+--| account_id | income |
+--+------------+--------+
+--| 3          | 108939 |
+--| 2          | 12747  |
+--| 8          | 87709  |
+--| 6          | 91796  |
+--+------------+--------+
+--Output:
+--+----------------+----------------+
+--| category       | accounts_count |
+--+----------------+----------------+
+--| Low Salary     | 1              |
+--| Average Salary | 0              |
+--| High Salary    | 3              |
+--+----------------+----------------+
+--Explanation:
+--Low Salary: Account 2.
+--Average Salary: No accounts.
+--High Salary: Accounts 3, 6, and 8.
+
+# Write your MySQL query statement below
+
+with cte1 as
+(
+select
+    case
+        when income < 20000 then "Low Salary"
+        when income <= 50000 and income >= 20000 then "Average Salary"
+        when income > 50000 then "High Salary" end as category,
+    account_id
+from
+   Accounts
+),
+cte2 as
+(
+select "Low Salary" as category
+UNION
+select "Average Salary"  as category
+UNION
+select "High Salary" as category
+
+)
+select
+    c2.category,
+    sum(if(account_id,1,0)) as accounts_count
+from
+    cte2 c2 left join cte1 c1
+on
+    c2.category = c1.category
+group by
+    1;
+
+--1934. Confirmation Rate
+--Medium
+--
+--39
+--
+--14
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Signups
+--
+--+----------------+----------+
+--| Column Name    | Type     |
+--+----------------+----------+
+--| user_id        | int      |
+--| time_stamp     | datetime |
+--+----------------+----------+
+--user_id is the primary key for this table.
+--Each row contains information about the signup time for the user with ID user_id.
+--
+--
+--Table: Confirmations
+--
+--+----------------+----------+
+--| Column Name    | Type     |
+--+----------------+----------+
+--| user_id        | int      |
+--| time_stamp     | datetime |
+--| action         | ENUM     |
+--+----------------+----------+
+--(user_id, time_stamp) is the primary key for this table.
+--user_id is a foreign key with a reference to the Signups table.
+--action is an ENUM of the type ('confirmed', 'timeout')
+--Each row of this table indicates that the user with ID user_id requested a confirmation message at time_stamp and that confirmation message was either confirmed ('confirmed') or expired without confirming ('timeout').
+--
+--
+--The confirmation rate of a user is the number of 'confirmed' messages divided by the total number of requested confirmation messages. The confirmation rate of a user that did not request any confirmation messages is 0. Round the confirmation rate to two decimal places.
+--
+--Write an SQL query to find the confirmation rate of each user.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Signups table:
+--+---------+---------------------+
+--| user_id | time_stamp          |
+--+---------+---------------------+
+--| 3       | 2020-03-21 10:16:13 |
+--| 7       | 2020-01-04 13:57:59 |
+--| 2       | 2020-07-29 23:09:44 |
+--| 6       | 2020-12-09 10:39:37 |
+--+---------+---------------------+
+--Confirmations table:
+--+---------+---------------------+-----------+
+--| user_id | time_stamp          | action    |
+--+---------+---------------------+-----------+
+--| 3       | 2021-01-06 03:30:46 | timeout   |
+--| 3       | 2021-07-14 14:00:00 | timeout   |
+--| 7       | 2021-06-12 11:57:29 | confirmed |
+--| 7       | 2021-06-13 12:58:28 | confirmed |
+--| 7       | 2021-06-14 13:59:27 | confirmed |
+--| 2       | 2021-01-22 00:00:00 | confirmed |
+--| 2       | 2021-02-28 23:59:59 | timeout   |
+--+---------+---------------------+-----------+
+--Output:
+--+---------+-------------------+
+--| user_id | confirmation_rate |
+--+---------+-------------------+
+--| 6       | 0.00              |
+--| 3       | 0.00              |
+--| 7       | 1.00              |
+--| 2       | 0.50              |
+--+---------+-------------------+
+--Explanation:
+--User 6 did not request any confirmation messages. The confirmation rate is 0.
+--User 3 made 2 requests and both timed out. The confirmation rate is 0.
+--User 7 made 3 requests and all were confirmed. The confirmation rate is 1.
+--User 2 made 2 requests where one was confirmed and the other timed out. The confirmation rate is 1 / 2 = 0.5.
+
+# Write your MySQL query statement below
+
+select
+    s.user_id ,
+    round(sum(if(action = 'confirmed',1,0))/count(s.user_id),2) as confirmation_rate
+from
+    Signups s left join Confirmations c
+on
+    s.user_id = c.user_id
+group by
+    1;
+
+--1949. Strong Friendship
+--Medium
+--
+--96
+--
+--52
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Friendship
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| user1_id    | int  |
+--| user2_id    | int  |
+--+-------------+------+
+--(user1_id, user2_id) is the primary key for this table.
+--Each row of this table indicates that the users user1_id and user2_id are friends.
+--Note that user1_id < user2_id.
+--
+--
+--A friendship between a pair of friends x and y is strong if x and y have at least three common friends.
+--
+--Write an SQL query to find all the strong friendships.
+--
+--Note that the result table should not contain duplicates with user1_id < user2_id.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Friendship table:
+--+----------+----------+
+--| user1_id | user2_id |
+--+----------+----------+
+--| 1        | 2        |
+--| 1        | 3        |
+--| 2        | 3        |
+--| 1        | 4        |
+--| 2        | 4        |
+--| 1        | 5        |
+--| 2        | 5        |
+--| 1        | 7        |
+--| 3        | 7        |
+--| 1        | 6        |
+--| 3        | 6        |
+--| 2        | 6        |
+--+----------+----------+
+--Output:
+--+----------+----------+---------------+
+--| user1_id | user2_id | common_friend |
+--+----------+----------+---------------+
+--| 1        | 2        | 4             |
+--| 1        | 3        | 3             |
+--+----------+----------+---------------+
+--Explanation:
+--Users 1 and 2 have 4 common friends (3, 4, 5, and 6).
+--Users 1 and 3 have 3 common friends (2, 6, and 7).
+--We did not include the friendship of users 2 and 3 because they only have two common friends (1 and 6).
+
+
+# Write your MySQL query statement below
+
+WITH friendsCTE AS
+(
+SELECT
+    user1_id AS friend,
+    user2_id AS friendWith
+FROM Friendship
+UNION
+SELECT
+    user2_id AS friend,
+    user1_id AS friendWith
+FROM Friendship
+)
+
+SELECT
+    F.user1_id,
+    F.user2_id,
+    COUNT(*) AS common_friend
+FROM Friendship F
+JOIN friendsCTE F1 ON F.user1_id  = F1.friend
+JOIN friendsCTE F2 ON F.user2_id  = F2.friend
+AND F1.friendWith = F2.friendWith
+GROUP BY 1, 2
+HAVING COUNT(*) >= 3;
+
+--1951. All the Pairs With the Maximum Number of Common Followers
+--Medium
+--
+--59
+--
+--5
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Relations
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| user_id     | int  |
+--| follower_id | int  |
+--+-------------+------+
+--(user_id, follower_id) is the primary key for this table.
+--Each row of this table indicates that the user with ID follower_id is following the user with ID user_id.
+--
+--
+--Write an SQL query to find all the pairs of users with the maximum number of common followers. In other words, if the maximum number of common followers between any two users is maxCommon, then you have to return all pairs of users that have maxCommon common followers.
+--
+--The result table should contain the pairs user1_id and user2_id where user1_id < user2_id.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Relations table:
+--+---------+-------------+
+--| user_id | follower_id |
+--+---------+-------------+
+--| 1       | 3           |
+--| 2       | 3           |
+--| 7       | 3           |
+--| 1       | 4           |
+--| 2       | 4           |
+--| 7       | 4           |
+--| 1       | 5           |
+--| 2       | 6           |
+--| 7       | 5           |
+--+---------+-------------+
+--Output:
+--+----------+----------+
+--| user1_id | user2_id |
+--+----------+----------+
+--| 1        | 7        |
+--+----------+----------+
+--Explanation:
+--Users 1 and 2 have two common followers (3 and 4).
+--Users 1 and 7 have three common followers (3, 4, and 5).
+--Users 2 and 7 have two common followers (3 and 4).
+--Since the maximum number of common followers between any two users is 3, we return all pairs of users with three common followers, which is only the pair (1, 7). We return the pair as (1, 7), not as (7, 1).
+--Note that we do not have any information about the users that follow users 3, 4, and 5, so we consider them to have 0 followers.
+
+# Write your MySQL query statement below
+
+with cte1 as
+(
+select
+    distinct r1.user_id as user1_id ,
+    r2.user_id as user2_id,
+    rank() over(order by count(*) desc) as rnk
+from
+    Relations r1 join Relations r2
+on
+    r1.follower_id = r2.follower_id
+and
+    r1.user_id < r2.user_id
+group by
+    1,2
+)
+# select * from cte1
+
+select
+    user1_id,
+    user2_id
+from
+    cte1
+where
+
+    rnk = 1;
+
