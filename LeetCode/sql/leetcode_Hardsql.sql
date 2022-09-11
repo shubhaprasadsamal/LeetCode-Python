@@ -1070,3 +1070,130 @@ WHERE
     )
 ORDER BY
     a.student_id ASC;
+
+--2153. The Number of Passengers in Each Bus II
+--Hard
+--
+--37
+--
+--17
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Buses
+--
+--+--------------+------+
+--| Column Name  | Type |
+--+--------------+------+
+--| bus_id       | int  |
+--| arrival_time | int  |
+--| capacity     | int  |
+--+--------------+------+
+--bus_id is the primary key column for this table.
+--Each row of this table contains information about the arrival time of a bus at the LeetCode station and its capacity (the number of empty seats it has).
+--No two buses will arrive at the same time and all bus capacities will be positive integers.
+--
+--
+--Table: Passengers
+--
+--+--------------+------+
+--| Column Name  | Type |
+--+--------------+------+
+--| passenger_id | int  |
+--| arrival_time | int  |
+--+--------------+------+
+--passenger_id is the primary key column for this table.
+--Each row of this table contains information about the arrival time of a passenger at the LeetCode station.
+--
+--
+--Buses and passengers arrive at the LeetCode station. If a bus arrives at the station at a time tbus and a passenger arrived at a time tpassenger where tpassenger <= tbus and the passenger did not catch any bus, the passenger will use that bus. In addition, each bus has a capacity. If at the moment the bus arrives at the station there are more passengers waiting than its capacity capacity, only capacity passengers will use the bus.
+--
+--Write an SQL query to report the number of users that used each bus.
+--
+--Return the result table ordered by bus_id in ascending order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Buses table:
+--+--------+--------------+----------+
+--| bus_id | arrival_time | capacity |
+--+--------+--------------+----------+
+--| 1      | 2            | 1        |
+--| 2      | 4            | 10       |
+--| 3      | 7            | 2        |
+--+--------+--------------+----------+
+--Passengers table:
+--+--------------+--------------+
+--| passenger_id | arrival_time |
+--+--------------+--------------+
+--| 11           | 1            |
+--| 12           | 1            |
+--| 13           | 5            |
+--| 14           | 6            |
+--| 15           | 7            |
+--+--------------+--------------+
+--Output:
+--+--------+----------------+
+--| bus_id | passengers_cnt |
+--+--------+----------------+
+--| 1      | 1              |
+--| 2      | 1              |
+--| 3      | 2              |
+--+--------+----------------+
+--Explanation:
+--- Passenger 11 arrives at time 1.
+--- Passenger 12 arrives at time 1.
+--- Bus 1 arrives at time 2 and collects passenger 11 as it has one empty seat.
+--
+--- Bus 2 arrives at time 4 and collects passenger 12 as it has ten empty seats.
+--
+--- Passenger 12 arrives at time 5.
+--- Passenger 13 arrives at time 6.
+--- Passenger 14 arrives at time 7.
+--- Bus 3 arrives at time 7 and collects passengers 12 and 13 as it has two empty seats.
+
+# Write your MySQL query statement below
+
+WITH RECURSIVE A AS(
+    SELECT bus_id,
+    LAG(arrival_time, 1, -1) OVER( ORDER BY arrival_time) AS last_arrival_time,
+    arrival_time,  capacity FROM Buses
+)
+# select * from A;
+,
+B AS(
+    SELECT A.bus_id, A.arrival_time,  A.capacity, COUNT(P.passenger_id) AS passager_count FROM A LEFT JOIN Passengers P
+    ON A.last_arrival_time < P.arrival_time AND P.arrival_time<= A.arrival_time GROUP BY 1
+)
+# select * from B;
+,
+C AS(
+    SELECT bus_id,
+    capacity,
+    passager_count AS total_passenger,
+    ROW_NUMBER() OVER(ORDER BY arrival_time) AS id
+    FROM B
+)
+# select * from C;
+,
+D AS(
+    SELECT bus_id,capacity , total_passenger,id,
+    IF(capacity>total_passenger, total_passenger, capacity) AS passager_taken,
+    IF(capacity<total_passenger, total_passenger - capacity, 0) AS passager_overleft
+    FROM C WHERE id = 1
+    UNION
+    SELECT C.bus_id,C.capacity , C.total_passenger, C.id,
+    IF(C.capacity>C.total_passenger+D.passager_overleft, C.total_passenger+D.passager_overleft, C.capacity) AS passager_taken,
+    IF(C.capacity<C.total_passenger+D.passager_overleft, C.total_passenger+D.passager_overleft - C.capacity, 0) AS passager_overleft
+    FROM C
+    INNER JOIN D ON D.id+1 = C.id
+)
+# select * from D;
+SELECT bus_id, passager_taken AS passengers_cnt FROM D ORDER BY 1
