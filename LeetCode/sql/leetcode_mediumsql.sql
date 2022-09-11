@@ -6171,3 +6171,210 @@ where
 
     rnk = 1;
 
+--1988. Find Cutoff Score for Each School
+--Medium
+--
+--52
+--
+--95
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Schools
+--
+--+-------------+------+
+--| Column Name | Type |
+--+-------------+------+
+--| school_id   | int  |
+--| capacity    | int  |
+--+-------------+------+
+--school_id is the primary key for this table.
+--This table contains information about the capacity of some schools. The capacity is the maximum number of students the school can accept.
+--
+--
+--Table: Exam
+--
+--+---------------+------+
+--| Column Name   | Type |
+--+---------------+------+
+--| score         | int  |
+--| student_count | int  |
+--+---------------+------+
+--score is the primary key for this table.
+--Each row in this table indicates that there are student_count students that got at least score points in the exam.
+--The data in this table will be logically correct, meaning a row recording a higher score will have the same or smaller student_count compared to a row recording a lower score. More formally, for every two rows i and j in the table, if scorei > scorej then student_counti <= student_countj.
+--
+--
+--Every year, each school announces a minimum score requirement that a student needs to apply to it. The school chooses the minimum score requirement based on the exam results of all the students:
+--
+--They want to ensure that even if every student meeting the requirement applies, the school can accept everyone.
+--They also want to maximize the possible number of students that can apply.
+--They must use a score that is in the Exam table.
+--Write an SQL query to report the minimum score requirement for each school. If there are multiple score values satisfying the above conditions, choose the smallest one. If the input data is not enough to determine the score, report -1.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Schools table:
+--+-----------+----------+
+--| school_id | capacity |
+--+-----------+----------+
+--| 11        | 151      |
+--| 5         | 48       |
+--| 9         | 9        |
+--| 10        | 99       |
+--+-----------+----------+
+--Exam table:
+--+-------+---------------+
+--| score | student_count |
+--+-------+---------------+
+--| 975   | 10            |
+--| 966   | 60            |
+--| 844   | 76            |
+--| 749   | 76            |
+--| 744   | 100           |
+--+-------+---------------+
+--Output:
+--+-----------+-------+
+--| school_id | score |
+--+-----------+-------+
+--| 5         | 975   |
+--| 9         | -1    |
+--| 10        | 749   |
+--| 11        | 744   |
+--+-----------+-------+
+--Explanation:
+--- School 5: The school's capacity is 48. Choosing 975 as the min score requirement, the school will get at most 10 applications, which is within capacity.
+--- School 10: The school's capacity is 99. Choosing 844 or 749 as the min score requirement, the school will get at most 76 applications, which is within capacity. We choose the smallest of them, which is 749.
+--- School 11: The school's capacity is 151. Choosing 744 as the min score requirement, the school will get at most 100 applications, which is within capacity.
+--- School 9: The data given is not enough to determine the min score requirement. Choosing 975 as the min score, the school may get 10 requests while its capacity is 9. We do not have information about higher scores, hence we report -1.
+
+# Write your MySQL query statement below
+
+select
+    s.school_id,
+    coalesce(min(e.score),-1) as score
+from
+    Schools s left join exam e
+on
+    e.student_count <= s.capacity
+group by
+    s.school_id
+order by
+    1;
+
+--1990. Count the Number of Experiments
+--Medium
+--
+--8
+--
+--123
+--
+--Add to List
+--
+--Share
+--SQL Schema
+--Table: Experiments
+--
+--+-----------------+------+
+--| Column Name     | Type |
+--+-----------------+------+
+--| experiment_id   | int  |
+--| platform        | enum |
+--| experiment_name | enum |
+--+-----------------+------+
+--experiment_id is the primary key for this table.
+--platform is an enum with one of the values ('Android', 'IOS', 'Web').
+--experiment_name is an enum with one of the values ('Reading', 'Sports', 'Programming').
+--This table contains information about the ID of an experiment done with a random person, the platform used to do the experiment, and the name of the experiment.
+--
+--
+--Write an SQL query to report the number of experiments done on each of the three platforms for each of the three given experiments. Notice that all the pairs of (platform, experiment) should be included in the output including the pairs with zero experiments.
+--
+--Return the result table in any order.
+--
+--The query result format is in the following example.
+--
+--
+--
+--Example 1:
+--
+--Input:
+--Experiments table:
+--+---------------+----------+-----------------+
+--| experiment_id | platform | experiment_name |
+--+---------------+----------+-----------------+
+--| 4             | IOS      | Programming     |
+--| 13            | IOS      | Sports          |
+--| 14            | Android  | Reading         |
+--| 8             | Web      | Reading         |
+--| 12            | Web      | Reading         |
+--| 18            | Web      | Programming     |
+--+---------------+----------+-----------------+
+--Output:
+--+----------+-----------------+-----------------+
+--| platform | experiment_name | num_experiments |
+--+----------+-----------------+-----------------+
+--| Android  | Reading         | 1               |
+--| Android  | Sports          | 0               |
+--| Android  | Programming     | 0               |
+--| IOS      | Reading         | 0               |
+--| IOS      | Sports          | 1               |
+--| IOS      | Programming     | 1               |
+--| Web      | Reading         | 2               |
+--| Web      | Sports          | 0               |
+--| Web      | Programming     | 1               |
+--+----------+-----------------+-----------------+
+--Explanation:
+--On the platform "Android", we had only one "Reading" experiment.
+--On the platform "IOS", we had one "Sports" experiment and one "Programming" experiment.
+--On the platform "Web", we had two "Reading" experiments and one "Programming" experiment.
+
+# Write your MySQL query statement below
+
+with experiment_cte (experiment) AS (
+
+    select "Programming" as "Programming" from Experiments
+    UNION
+    select "Sports" as "Sports" from Experiments
+    UNION
+    select "Reading" as "Reading" from Experiments
+
+),
+
+platform_cte (platform) AS (
+
+    select "IOS" as "IOS" from Experiments
+    UNION
+    select "Android" as "Android" from Experiments
+    UNION
+    select "Web" as "Web" from Experiments
+)
+
+Select
+    a.platform,a.experiment as experiment_name ,IFNULL(b.num_experiments,0) as num_experiments
+From (
+(select
+    platform,experiment
+from
+    experiment_cte cross join platform_cte) a
+
+left join
+
+(select
+    platform,experiment_name, count(*) as num_experiments
+from
+    Experiments
+group by platform,experiment_name) b
+on a.platform = b.platform
+and a.experiment = b.experiment_name)
+order by a.platform;
+
