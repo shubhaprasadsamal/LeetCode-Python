@@ -530,3 +530,108 @@ class Solution:
 
         return [1]+digits
 
+# 69. Sqrt(x)
+# Easy
+#
+# 4984
+#
+# 3601
+#
+# Add to List
+#
+# Share
+# Given a non-negative integer x, compute and return the square root of x.
+#
+# Since the return type is an integer, the decimal digits are truncated, and only the integer part of the result is returned.
+#
+# Note: You are not allowed to use any built-in exponent function or operator, such as pow(x, 0.5) or x ** 0.5.
+#
+#
+#
+# Example 1:
+#
+# Input: x = 4
+# Output: 2
+# Example 2:
+#
+# Input: x = 8
+# Output: 2
+# Explanation: The square root of 8 is 2.82842..., and since the decimal part is truncated, 2 is returned.
+
+class Solution:
+    def mySqrt(self, x: int) -> int:
+
+        if x ==0 or x == 1:
+            return x
+
+        left = 1
+        right = x
+
+        while left <= right:
+            mid = (left +right)//2
+            sqr = mid * mid
+
+            if sqr == x:
+                return mid
+            elif sqr < x:
+                left = mid + 1
+                ans = mid
+            else:
+                right = mid -1
+                # ans = mid
+
+        return ans
+
+# 70. Climbing Stairs
+# Easy
+#
+# 14826
+#
+# 440
+#
+# Add to List
+#
+# Share
+# You are climbing a staircase. It takes n steps to reach the top.
+#
+# Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+#
+#
+#
+# Example 1:
+#
+# Input: n = 2
+# Output: 2
+# Explanation: There are two ways to climb to the top.
+# 1. 1 step + 1 step
+# 2. 2 steps
+# Example 2:
+#
+# Input: n = 3
+# Output: 3
+# Explanation: There are three ways to climb to the top.
+# 1. 1 step + 1 step + 1 step
+# 2. 1 step + 2 steps
+# 3. 2 steps + 1 step
+
+class Solution:
+    def climbStairs(self, n: int) -> int:
+
+        # S
+        # This solution is like a fibonacci series i.e. for every nth staircase needs the sum of total ways in both n-1 and n-2 stares
+        mapper = {1:1,2:2}
+
+        if n == 1:
+            return 1
+        if n == 2:
+            return 2
+
+        a = 1
+        b = 2
+
+        for i in range(3,n+1):
+            c = a + b
+            a = b
+            b = c
+
+        return c
