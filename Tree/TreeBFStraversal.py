@@ -18,10 +18,12 @@ def breadthFirstSearch(root):
         return
     queue = []                                      # Define a queue and insert
     queue.append(root)
+    res = ""
 
     while (len(queue) > 0):
         node = queue.pop(0)                         # Take out the first node in the queue and check for the child element and then insert it into queue
-        print('Traverse Node: ',node.value)
+        res = res +  str(node.value) +" > "
+        print('Traverse Node: ',res)
         if node.left:
             queue.append(node.left)
         if node.right:

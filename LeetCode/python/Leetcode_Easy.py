@@ -402,7 +402,7 @@ class Solution:
 
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
-        left = 1
+        left = 1 # A second pointer indicating the place where next unique value is going to come and sit in the list
 
         for right in range(1,len(nums)):
 
@@ -575,10 +575,13 @@ class Solution:
                 return mid
             elif sqr < x:
                 left = mid + 1
-                ans = mid
+                ans = mid # why we storing the ans here because there are two scenario when we can find a square root,
+                # i.e. we can find the exact square root and another is we will not find the exact square root and
+                # hence we have to satisfy with the nearest one. In the second case we will always find a number
+                # whose square would be always smaller than the the number. we can't consider the number whose square
+                # is more than our number
             else:
                 right = mid -1
-                # ans = mid
 
         return ans
 
@@ -614,6 +617,9 @@ class Solution:
 # 2. 1 step + 2 steps
 # 3. 2 steps + 1 step
 
+# Space Optimisation technique!!!
+# TC:- O(N) with NO EXTRA SPACE!!!
+
 class Solution:
     def climbStairs(self, n: int) -> int:
 
@@ -635,3 +641,418 @@ class Solution:
             b = c
 
         return c
+
+# 83. Remove Duplicates from Sorted List
+# Easy
+#
+# 6029
+#
+# 212
+#
+# Add to List
+#
+# Share
+# Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: head = [1,1,2]
+# Output: [1,2]
+# Example 2:
+#
+#
+# Input: head = [1,1,2,3,3]
+# Output: [1,2,3]
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+
+        curr = head
+        while curr and curr.next:
+            if curr.val == curr.next.val:
+                curr.next = curr.next.next
+            else:
+                curr = curr.next
+
+        return head
+
+# 88. Merge Sorted Array
+# Easy
+#
+# 8097
+#
+# 716
+#
+# Add to List
+#
+# Share
+# You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.
+#
+# Merge nums1 and nums2 into a single array sorted in non-decreasing order.
+#
+# The final sorted array should not be returned by the function, but instead be stored inside the array nums1. To accommodate this, nums1 has a length of m + n, where the first m elements denote the elements that should be merged, and the last n elements are set to 0 and should be ignored. nums2 has a length of n.
+#
+#
+#
+# Example 1:
+#
+# Input: nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+# Output: [1,2,2,3,5,6]
+# Explanation: The arrays we are merging are [1,2,3] and [2,5,6].
+# The result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1.
+# Example 2:
+#
+# Input: nums1 = [1], m = 1, nums2 = [], n = 0
+# Output: [1]
+# Explanation: The arrays we are merging are [1] and [].
+# The result of the merge is [1].
+# Example 3:
+#
+# Input: nums1 = [0], m = 0, nums2 = [1], n = 1
+# Output: [1]
+# Explanation: The arrays we are merging are [] and [1].
+# The result of the merge is [1].
+# Note that because m = 0, there are no elements in nums1. The 0 is only there to ensure the merge result can fit in nums1.
+
+class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        """
+        Do not return anything, modify nums1 in-place instead.
+        """
+        l = m+n-1
+        l1 = m-1
+        l2 = n-1
+
+        while (l >= 0 and l1 >= 0 and l2 >= 0):
+            if nums1[l1] <= nums2[l2]:
+                # print("nums1[l1] & nums2[l2]: ",nums1[l1],nums2[l2])
+                nums1[l] = nums2[l2]
+                l2 -= 1
+                # print("l2: ",l2)
+                # print("nums1: ",nums1)
+            else:
+                # print("nums1[l1]: ",nums1[l1])
+                nums1[l] = nums1[l1]
+                l1 -= 1
+                # print("nums1: ",nums1)
+
+            l -= 1
+
+        while  l2 > l1:
+            nums1[l] = nums2[l2]
+            l2 -= 1
+            l -= 1
+
+        return nums1
+
+# 94. Binary Tree Inorder Traversal
+# Easy
+#
+# 10010
+#
+# 474
+#
+# Add to List
+#
+# Share
+# Given the root of a binary tree, return the inorder traversal of its nodes' values.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [1,null,2,3]
+# Output: [1,3,2]
+# Example 2:
+#
+# Input: root = []
+# Output: []
+# Example 3:
+#
+# Input: root = [1]
+# Output: [1]
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+
+        output = []
+        def inorder(root):
+            if not root:
+                return output
+
+            inorder(root.left)
+            output.append(root.val)
+            inorder(root.right)
+
+
+        inorder(root)
+        return output
+
+# 100. Same Tree
+# Easy
+#
+# 7439
+#
+# 157
+#
+# Add to List
+#
+# Share
+# Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+#
+# Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: p = [1,2,3], q = [1,2,3]
+# Output: true
+# Example 2:
+#
+#
+# Input: p = [1,2], q = [1,null,2]
+# Output: false
+# Example 3:
+#
+#
+# Input: p = [1,2,1], q = [1,1,2]
+# Output: false
+
+class Solution:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+
+        # p and q are both None
+        if not p and not q:
+            return True
+        # one of p and q is None
+        if not q or not p:
+            return False
+        if p.val != q.val:
+            return False
+        return self.isSameTree(p.right, q.right) and \
+               self.isSameTree(p.left, q.left)
+
+# 101. Symmetric Tree
+# Easy
+#
+# 11432
+#
+# 260
+#
+# Add to List
+#
+# Share
+# Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [1,2,2,3,4,4,3]
+# Output: true
+# Example 2:
+#
+#
+# Input: root = [1,2,2,null,3,null,3]
+# Output: false
+
+class Solution:
+    def isSymmetric(self, root: Optional[TreeNode]) -> bool:
+
+        def isMirror(rLeft,rRight):
+
+            if rLeft is None and rRight is None:
+                return True
+            elif rLeft is None or rRight is None:
+                return False
+            # elif rLeft and rRight:
+            #     if rLeft.val == rRight.val and isMirror(rLeft.left,rRight.right) and isMirror(rLeft.right,rRight.left):
+            elif rLeft.val == rRight.val and isMirror(rLeft.left,rRight.right) and isMirror(rLeft.right,rRight.left):
+                # print(isMirror(rLeft.left,rRight.right))
+                # print(isMirror(rLeft.right,rRight.left))
+                return True
+
+        return isMirror(root.left,root.right)
+
+# 104. Maximum Depth of Binary Tree
+# Easy
+#
+# 8827
+#
+# 143
+#
+# Add to List
+#
+# Share
+# Given the root of a binary tree, return its maximum depth.
+#
+# A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [3,9,20,null,null,15,7]
+# Output: 3
+# Example 2:
+#
+# Input: root = [1,null,2]
+# Output: 2
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+
+        height = 0
+        if not root:
+            return height
+        queue = []
+        queue.append(root)
+
+
+        while queue:
+            height += 1
+            temp = []
+            # node = queue.pop()
+            # print(node.val)
+            for node in queue:
+
+                if node.left:
+                    temp.append(node.left)
+                if node.right:
+                    temp.append(node.right)
+
+            queue = temp
+
+        return height
+
+# 108. Convert Sorted Array to Binary Search Tree
+# Easy
+#
+# 8463
+#
+# 426
+#
+# Add to List
+#
+# Share
+# Given an integer array nums where the elements are sorted in ascending order, convert it to a height-balanced binary search tree.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: nums = [-10,-3,0,5,9]
+# Output: [0,-3,9,-10,null,5]
+# Explanation: [0,-10,5,null,-3,null,9] is also accepted:
+#
+# Example 2:
+#
+#
+# Input: nums = [1,3]
+# Output: [3,1]
+# Explanation: [1,null,3] and [3,1] are both height-balanced BSTs.
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> Optional[TreeNode]:
+
+        def helper(l,r):
+            if l > r:
+                return None
+
+            mid = (l+r)//2
+
+            root = TreeNode(nums[mid])
+            root.left = helper(l,mid-1)
+            root.right = helper(mid+1,r)
+
+            return root
+        return helper(0,len(nums)-1)
+
+# 112. Path Sum
+# Easy
+#
+# 7356
+#
+# 888
+#
+# Add to List
+#
+# Share
+# Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+#
+# A leaf is a node with no children.
+#
+#
+#
+# Example 1:
+#
+#
+# Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+# Output: true
+# Explanation: The root-to-leaf path with the target sum is shown.
+# Example 2:
+#
+#
+# Input: root = [1,2,3], targetSum = 5
+# Output: false
+# Explanation: There two root-to-leaf paths in the tree:
+# (1 --> 2): The sum is 3.
+# (1 --> 3): The sum is 4.
+# There is no root-to-leaf path with sum = 5.
+# Example 3:
+#
+# Input: root = [], targetSum = 0
+# Output: false
+# Explanation: Since the tree is empty, there are no root-to-leaf paths.
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def hasPathSum(self, root: Optional[TreeNode], targetSum: int) -> bool:
+        if root is None:
+            return False
+        targetSum = targetSum-root.val
+
+        if root.left is None and root.right is None:
+            return targetSum == 0
+
+        return (self.hasPathSum(root.left,targetSum) or self.hasPathSum(root.right,targetSum))
+
+
+
