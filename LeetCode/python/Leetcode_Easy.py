@@ -1054,5 +1054,72 @@ class Solution:
 
         return (self.hasPathSum(root.left,targetSum) or self.hasPathSum(root.right,targetSum))
 
+# 118. Pascal's Triangle
+# Easy
+#
+# 8312
+#
+# 275
+#
+# Add to List
+#
+# Share
+# Given an integer numRows, return the first numRows of Pascal's triangle.
+#
+# In Pascal's triangle, each number is the sum of the two numbers directly above it as shown:
+#
+#
+#
+#
+# Example 1:
+#
+# Input: numRows = 5
+# Output: [[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]
+# Example 2:
+#
+# Input: numRows = 1
+# Output: [[1]]
+
+# [O(n^2)]
+class Solution(object):
+    def generate(self, numRows):
+        """
+        :type numRows: int
+        :rtype: List[List[int]]
+        """
+
+        output = [[1]] # Defining/hardcode first row of the Triangle/fist element
+
+        for i in range(numRows-1): # numRows-1 beacuse we have already hard coed the first element
+            # create an array by adding 0 before and after of the last value output array for addition in the next step
+            map1 = [0]+output[-1]+[0] #output[-1] is to pick up the last list from output
+            map2 = []
+
+            for j in range(len(map1)-1):
+                map2.append(map1[j]+map1[j+1]) # Get the element by adding the consecutive elemenets of the previous array
+
+            output.append(map2)
+
+        return output
+
+# Solution2 [Dynamic Programing] [O(n^2)]
+
+class Solution:
+    def generate(self, numRows: int) -> List[List[int]]:
+
+        if numRows   == 0: return []
+        elif numRows == 1: return [[1]]
+        Tri = [[1]]
+        for i in range(1,numRows):
+            row = [1]
+            for j in range(1,i):
+                row.append(Tri[i-1][j-1] + Tri[i-1][j])
+            row.append(1)
+            Tri.append(row)
+        return Tri
+
+
+
+
 
 
