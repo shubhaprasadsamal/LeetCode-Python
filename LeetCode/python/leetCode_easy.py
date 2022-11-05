@@ -1162,6 +1162,183 @@ class Solution:
             Tri.append(row)
         return Tri[rowIndex]
 
+# 121. Best Time to Buy and Sell Stock
+# Easy
+#
+# 21117
+#
+# 670
+#
+# Add to List
+#
+# Share
+# You are given an array prices where prices[i] is the price of a given stock on the ith day.
+#
+# You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+#
+# Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+#
+#
+#
+# Example 1:
+#
+# Input: prices = [7,1,5,3,6,4]
+# Output: 5
+# Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+# Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+# Example 2:
+#
+# Input: prices = [7,6,4,3,1]
+# Output: 0
+# Explanation: In this case, no transactions are done and the max profit = 0.
+
+# Time complexity: O(n)O(n). Only a single pass is needed.
+#
+# Space complexity: O(1)O(1). Only two variables are used.
+
+
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        buy = prices[0]
+        profit = 0
+        for i in range(1,len(prices)):
+            buy = min(buy,prices[i])
+
+            if profit < prices[i]-buy:
+                profit = prices[i]-buy
+
+        return profit
+
+# 136. Single Number
+# Easy
+
+# Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.
+#
+# You must implement a solution with a linear runtime complexity and use only constant extra space.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [2,2,1]
+# Output: 1
+# Example 2:
+#
+# Input: nums = [4,1,2,1,2]
+# Output: 4
+# Example 3:
+#
+# Input: nums = [1]
+# Output: 1
+
+# Approach 1: List operation
+
+# Algorithm
+
+# Iterate over all the elements in nums\text{nums}nums
+# If some number in nums\text{nums}nums is new to array, append it
+# If some number is already in the array, remove it
+
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        no_duplicate_list = []
+        for i in nums:
+            if i not in no_duplicate_list:
+                no_duplicate_list.append(i)
+            else:
+                no_duplicate_list.remove(i)
+        return no_duplicate_list.pop()
+
+# Complexity Analysis
+
+
+# Time complexity : O(n^2).
+# We iterate through nums, taking O(n) time.
+# We search the whole list to find whether there is duplicate number, taking O(n)O(n)O(n) time. Because search is in the for loop, so we have to multiply both time complexities which is O(n^2).
+
+# Space complexity : O(n).
+# We need a list of size n to contain elements in nums.
+
+# Approach 2: Hash Table
+# Algorithm
+
+# We use hash table to avoid the O(n) time required for searching the elements.
+# Iterate through all elements in nums and set up key/value pair.
+# Return the element which appeared only once.
+
+from collections import defaultdict
+class Solution:
+    def singleNumber(self, nums: List[int]) -> int:
+        hash_table = defaultdict(int)
+        for i in nums:
+            hash_table[i] += 1
+
+        for i in hash_table:
+            if hash_table[i] == 1:
+                return i
+
+# Complexity Analysis
+
+# Time complexity : O(n⋅1)=O(n).
+#     Time complexity of for loop is O(n).
+#     Time complexity of hash table(dictionary in python) operation pop is O(1).
+
+# Space complexity : O(n).
+#     The space required by hash_tablehash\_tablehash_table is equal to the number of elements in nums.
+
+
+# Approach 3: Math
+# Concept
+
+# 2∗(a+b+c)−(a+a+b+b+c)=c2 * (a + b + c) - (a + a + b + b + c) = c2∗(a+b+c)−(a+a+b+b+c)=c
+
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        return 2 * sum(set(nums)) - sum(nums)
+
+# Complexity Analysis
+
+# Time complexity : O(n+n)=O(n).
+#     sum will call next to iterate through nums. We can see it as sum(list(i, for i in nums)) which means the time complexity is O(n) because of the number of elements(n) in nums.
+
+# Space complexity : O(n+n)=O(n).
+#     set needs space for the elements in nums
+
+# Approach 4: Bit Manipulation
+# Concept
+
+# If we take XOR of zero and some bit, it will return that bit
+# a⊕0=a
+# If we take XOR of two same bits, it will return 0
+# a⊕a=0
+# a⊕b⊕a=(a⊕a)⊕b=0⊕b=b
+# So we can XOR all bits together to find the unique number.
+
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        a = 0
+        for i in nums:
+            a ^= i
+        return a
+
+# Complexity Analysis
+
+# Time complexity : O(n).
+#     We only iterate through nums, so the time complexity is the number of elements in nums.
+
+# Space complexity : O(1).
 
 
 
