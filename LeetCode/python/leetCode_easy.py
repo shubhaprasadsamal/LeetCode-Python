@@ -1377,6 +1377,9 @@ class Solution(object):
 # Output: []
 # Explanation: There are no missing ranges since there are no missing numbers.
 
+# Time Complexity : O(n)
+# Space Complexity: O(n)    # Validate with Someone
+
 class Solution:
     def findMissingRanges(self, nums: List[int], lower: int, upper: int) -> List[str]:
 
