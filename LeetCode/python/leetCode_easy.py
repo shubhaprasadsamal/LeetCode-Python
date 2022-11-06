@@ -1569,6 +1569,134 @@ class Solution:
             return True
 
 
+# 219. Contains Duplicate II
+# Easy
+# 4.1K
+# 2.4K
+# company
+# Amazon
+# company
+# Facebook
+# company
+# Google
+# Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [1,2,3,1], k = 3
+# Output: true
+# Example 2:
+#
+# Input: nums = [1,0,1,1], k = 1
+# Output: true
+# Example 3:
+#
+# Input: nums = [1,2,3,1,2,3], k = 2
+# Output: false
+
+class Solution:
+    def containsNearbyDuplicate(self, nums: List[int], k: int) -> bool:
+# Time complexity: O(n)
+# Space complexity: O(n)
+#
+# Idea that I took: if once True [abs(i - j) <= k] then return True else keep storing False and keep checking if any True comes up
+dict = {}
+res = False
+for i in range(len(nums)):
+    if nums[i] in dict.keys():
+        if abs(i - dict[nums[i]]) > k:
+            res = False
+        else:
+            return True
+    dict[nums[i]] = i
+return res
+
+# Solution: 2
+
+class Solution:
+    def containsNearbyDuplicate(self, nums: List[int], k: int) -> bool:
+        dic = {}
+        for i, v in enumerate(nums):
+            if v in dic and i - dic[v] <= k:
+                return True
+            dic[v] = i
+        return False
+
+# 268. Missing Number
+# Easy
+# 7.9K
+# 3K
+# company
+# Amazon
+# company
+# Microsoft
+# company
+# Google
+# Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [3,0,1]
+# Output: 2
+# Explanation: n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums.
+# Example 2:
+#
+# Input: nums = [0,1]
+# Output: 2
+# Explanation: n = 2 since there are 2 numbers, so all numbers are in the range [0,2]. 2 is the missing number in the range since it does not appear in nums.
+# Example 3:
+#
+# Input: nums = [9,6,4,2,3,5,7,0,1]
+# Output: 8
+# Explanation: n = 9 since there are 9 numbers, so all numbers are in the range [0,9]. 8 is the missing number in the range since it does not appear in nums.
+
+# Using same List
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+
+        # Time complexity: O(n^2)
+        # Space complexity: O(1)
+
+        for i in range(len(nums)+1):
+            if i not in nums:
+                return i
+
+# Using Hash Map
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+
+        # Time complexity: O(n)
+        # Space complexity: O(n)
+        dict = {}
+        for i in range(len(nums)):
+            dict[nums[i]] = True
+
+        for i in range(len(nums)+1):
+            if i not in dict:
+                return i
+
+# Using bit operator
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+
+        # Time complexity: O(n)
+        # Space complexity: O(1)
+
+        missing = len(nums)
+        for i in range(len(nums)):
+            missing = missing ^(i^nums[i])
+
+        return missing
+
+
+
+
+
+
 
 
 
