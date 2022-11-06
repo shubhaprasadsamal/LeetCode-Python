@@ -1514,6 +1514,60 @@ class Solution:
 
         return res
 
+# 217. Contains Duplicate
+# Easy
+# 7.2K
+# 1K
+# company
+# Amazon
+# company
+# Apple
+# company
+# Bloomberg
+# Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [1,2,3,1]
+# Output: true
+# Example 2:
+#
+# Input: nums = [1,2,3,4]
+# Output: false
+# Example 3:
+#
+# Input: nums = [1,1,1,3,3,4,3,2,4,2]
+# Output: true
+
+# Time complexity: O(n)
+# Space complexity: O(n)
+
+class Solution:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+
+        dict = {}
+
+        for i in nums:
+            if i in dict.keys():
+                dict[i] += 1
+            else:
+                dict[i] = 1
+
+            if dict[i] > 1:
+                return True
+
+# Solution: 2
+
+# Time complexity: O(1)
+# Space complexity: O(n)
+
+class Solution:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        if len(nums) != len(set(nums)):
+            return True
+
 
 
 
