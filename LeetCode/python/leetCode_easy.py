@@ -1417,6 +1417,104 @@ class Solution:
 
         return sol
 
+# 169. Majority Element
+# Easy
+# 12.6K
+# 406
+# company
+# Amazon
+# company
+# Google
+# company
+# Adobe
+# Given an array nums of size n, return the majority element.
+#
+# The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+#
+#
+#
+# Example 1:
+#
+# Input: nums = [3,2,3]
+# Output: 3
+# Example 2:
+#
+# Input: nums = [2,2,1,1,1,2,2]
+# Output: 2
+
+# Time Complexity : O(n)
+# Space Complexity: O(n)
+
+class Solution:
+    def majorityElement(self, nums: List[int]) -> int:
+
+        size = len(nums)/2
+        # print(size)
+        dict = {}
+        for i in nums:
+            if i not in dict.keys(): # We can also do : if i not in dict:
+                dict[i] = 1
+            else:
+                dict[i] += 1
+
+            if dict[i] > size:
+                return i
+
+# 171. Excel Sheet Column Number
+# Easy
+# 3.7K
+# 305
+# company
+# Facebook
+# company
+# Microsoft
+# company
+# Google
+# Given a string columnTitle that represents the column title as appears in an Excel sheet, return its corresponding column number.
+#
+# For example:
+#
+# A -> 1
+# B -> 2
+# C -> 3
+# ...
+# Z -> 26
+# AA -> 27
+# AB -> 28
+# ...
+#
+#
+# Example 1:
+#
+# Input: columnTitle = "A"
+# Output: 1
+# Example 2:
+#
+# Input: columnTitle = "AB"
+# Output: 28
+
+# Time complexity: O(n)
+# Space complexity: O(1)
+
+class Solution:
+    def titleToNumber(self, columnTitle: str) -> int:
+
+        # 'C' = 3 x 26**0 = 3 x 1 = 3
+        # 'AB'= 1(for A) x 26**1 + 2(for B) x 26**0 = 26 x 2 = 28
+        # Ordinate: this is will assign a number to a letter
+
+        size = len(columnTitle)
+        power = size
+        res = 0
+
+        for i in range(size):
+            value = ord(columnTitle[i]) - ord("A") +1 # find the number that has to be assigned to letter
+            power -= 1
+            res += value * 26 ** power
+
+        return res
+
+
 
 
 
