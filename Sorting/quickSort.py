@@ -8,24 +8,29 @@
 #       Both right and left elements will need to be processed by recursion to be sorted
 def partition(array, left, right):
 
+    # i will find smaller element from left to right
+    # j will find larger element from right to left
     i = left
     j = right-1
     pivot = array[right]
 
     # Until i & j Cross each other
     while i < j:
-        # Move i to the right; j to the left & check if element is already less than Pivot; Then move i
+        # Move i to the right; j to the left & check if element is already less than Pivot
+        # Then move.increment i towards right
         while i < right and array[i] < pivot:
             i += 1
-        # Similarly, we have to check for j too and decrement
+        # Similarly, we have to check for j too and decrement towards left
         while j > left and array[j] >= pivot:
             j -= 1
-        # if both above conditions are not met then array[i] > pivot and array[j] < pivot and i & j did not cross each other
+        # if both above whiles are not met then array[i] > pivot and array[j] < pivot
+        # if i & j did not cross each other
         # hence switch the element in the array
         if i < j :
             array[i],array[j] = array[j],array[i]
 
-    # When i & j crossed each other element at i index is higher than Pivot, then swap and find the partition position for Pivot
+    # When i & j crossed each other
+    # i index value is higher than pivot, then swap ith element and find the partition position for pivot
     if array[i] > pivot:
         array[i],array[right] = array[right],array[i]
 
