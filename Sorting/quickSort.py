@@ -1,4 +1,11 @@
 
+# Quick Sort:
+#       We have to pick a pivot value from an array.
+#       Any Element smaller than pivot should go to its left and large should go to right by swapping their positions.
+#       Pivot value itself might not be in its right position.
+#       We need to find the right position for pivot element by a partition function
+#       Once find, both left and right side of the pivot may not necessarily to be sorted.
+#       Both right and left elements will need to be processed by recursion to be sorted
 def partition(array, left, right):
 
     i = left
