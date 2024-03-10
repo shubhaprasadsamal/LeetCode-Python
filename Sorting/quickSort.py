@@ -1,5 +1,15 @@
 
 # Quick Sort:
+    # Real time Example
+    # There are 10 students in a class, Teacher wants all the student to stand in a sorted order. Two possible things can be done here.
+    # Teacher can look into each students height and instruct them to come either left or right to stand in a sorted order
+    # Students can sort themselves by standing in such a way that shorter hights should come left and higher heights should come to the right
+    # for each of the student (Quicker Way)
+
+    # So, when we think about Quick sort, first thing shoould come to our mind is PIVOT element
+
+
+
 #       We have to pick a pivot value from an array.
 #       Any Element smaller than pivot should go to its left and large should go to right by swapping their positions.
 #       Pivot value itself might not be in its right position.
